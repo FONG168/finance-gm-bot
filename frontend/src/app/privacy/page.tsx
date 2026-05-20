@@ -1,15 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowLeft, Shield, User, Download, Trash2,
-  AlertTriangle, X, Smartphone, Copy, Check,
-} from 'lucide-react';
+import { ArrowLeft, User, Smartphone, Copy, Check, Lock, Shield } from 'lucide-react';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
-import { apiService } from '@/services/api';
 
 function SectionHeader({ icon: Icon, title, color }: { icon: React.ElementType; title: string; color: string }) {
   return (
@@ -47,109 +42,11 @@ function InfoRow({ label, value, copyable }: { label: string; value: string; cop
   );
 }
 
-function DeleteModal({ onConfirm, onClose, loading }: {
-  onConfirm: () => void;
-  onClose: () => void;
-  loading: boolean;
-}) {
-  const [typed, setTyped] = useState('');
-  const canDelete = typed === 'DELETE';
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-end justify-center p-4 pb-8"
-        style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
-        onClick={onClose}
-      >
-        <motion.div
-          initial={{ y: 60, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 60, opacity: 0 }}
-          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="w-full max-w-sm rounded-3xl bg-card border border-rose-500/30 p-6"
-          style={{ boxShadow: '0 0 0 1px rgba(239,68,68,0.15), 0 24px 48px rgba(0,0,0,0.5)' }}
-          onClick={e => e.stopPropagation()}
-        >
-          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-            <X className="w-4 h-4 text-muted-foreground" />
-          </button>
-
-          <div className="flex justify-center mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(239,68,68,0.15)' }}>
-              <AlertTriangle className="w-7 h-7 text-rose-400" />
-            </div>
-          </div>
-
-          <h2 className="text-lg font-bold text-center mb-1">Delete Account</h2>
-          <p className="text-sm text-muted-foreground text-center mb-4">
-            This permanently deletes all your data — transactions, accounts, and reports. This cannot be undone.
-          </p>
-
-          <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-3 mb-4">
-            <p className="text-xs text-rose-400 font-medium mb-2">Type <span className="font-bold">DELETE</span> to confirm</p>
-            <input
-              type="text"
-              value={typed}
-              onChange={e => setTyped(e.target.value.toUpperCase())}
-              placeholder="DELETE"
-              className="w-full bg-transparent text-sm font-mono outline-none text-foreground placeholder-muted-foreground/50"
-            />
-          </div>
-
-          <button
-            onClick={onConfirm}
-            disabled={!canDelete || loading}
-            className="w-full py-3 rounded-2xl text-sm font-bold transition-all"
-            style={{
-              background: canDelete ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'rgba(239,68,68,0.2)',
-              color: canDelete ? 'white' : 'rgba(239,68,68,0.5)',
-              cursor: canDelete ? 'pointer' : 'not-allowed',
-            }}
-          >
-            {loading ? 'Deleting...' : 'Permanently Delete Account'}
-          </button>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
-
 export default function PrivacyPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [exporting, setExporting] = useState(false);
 
-  const handleExport = async () => {
-    setExporting(true);
-    try {
-      await apiService.user.exportData();
-    } catch (err) {
-      alert('Export failed. Please try again.');
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    setDeleting(true);
-    try {
-      await apiService.user.deleteAccount();
-      localStorage.clear();
-      router.replace('/');
-    } catch {
-      alert('Failed to delete account. Please try again.');
-      setDeleting(false);
-      setShowDeleteModal(false);
-    }
-  };
-
-  const loginTime = user?.createdAt
+  const memberSince = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : '—';
 
@@ -180,9 +77,9 @@ export default function PrivacyPage() {
         <div>
           <SectionHeader icon={Smartphone} title="Session" color="#6366f1" />
           <div className="rounded-2xl bg-card border border-border divide-y divide-border/50">
-            <InfoRow label="Current Session" value="Active" />
+            <InfoRow label="Status" value="Active" />
             <InfoRow label="Platform" value="Telegram Mini App" />
-            <InfoRow label="Member Since" value={loginTime} />
+            <InfoRow label="Member Since" value={memberSince} />
             <button
               onClick={() => {
                 localStorage.removeItem('auth_token');
@@ -196,81 +93,34 @@ export default function PrivacyPage() {
           </div>
         </div>
 
-        {/* Export Data */}
+        {/* Security Info */}
         <div>
-          <SectionHeader icon={Download} title="Your Data" color="#10b981" />
-          <div className="rounded-2xl bg-card border border-border">
-            <div className="px-4 py-4">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.25)' }}>
-                  <Download className="w-4 h-4 text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Export My Data</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Download all your transactions, accounts, and reports as a JSON file.
-                  </p>
-                </div>
-              </div>
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                onClick={handleExport}
-                disabled={exporting}
-                className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
-                style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#10b981' }}
-              >
-                <Download className="w-4 h-4" />
-                {exporting ? 'Preparing Export...' : 'Download JSON Export'}
-              </motion.button>
-            </div>
+          <SectionHeader icon={Lock} title="Security" color="#10b981" />
+          <div className="rounded-2xl bg-card border border-border divide-y divide-border/50">
+            <InfoRow label="Authentication" value="Telegram Auth" />
+            <InfoRow label="Data Encryption" value="End-to-End" />
+            <InfoRow label="Storage" value="Secure Cloud (Supabase)" />
           </div>
         </div>
 
-        {/* Danger Zone */}
-        <div>
-          <SectionHeader icon={AlertTriangle} title="Danger Zone" color="#ef4444" />
-          <div className="rounded-2xl border border-rose-500/25 overflow-hidden"
-            style={{ background: 'rgba(239,68,68,0.05)' }}>
-            <div className="px-4 py-4">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(239,68,68,0.15)' }}>
-                  <Trash2 className="w-4 h-4 text-rose-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-rose-400">Delete My Account</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Permanently removes all your data. This action cannot be reversed.
-                  </p>
-                </div>
-              </div>
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setShowDeleteModal(true)}
-                className="w-full py-3 rounded-xl text-sm font-semibold text-rose-400 transition-colors"
-                style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}
-              >
-                Delete My Account
-              </motion.button>
-            </div>
+        {/* Privacy note */}
+        <div className="rounded-2xl border border-border bg-card p-4 flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: 'rgba(99,102,241,0.15)' }}>
+            <Shield className="w-4 h-4 text-indigo-400" />
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-0.5">Your Privacy Matters</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Your financial data is stored securely and never shared with third parties. Only you can access your transactions and accounts.
+            </p>
           </div>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground pb-2">
-          Your data is stored securely and never shared with third parties.
-        </p>
+        <div className="h-2" />
       </div>
 
       <BottomNav />
-
-      {showDeleteModal && (
-        <DeleteModal
-          onConfirm={handleDelete}
-          onClose={() => setShowDeleteModal(false)}
-          loading={deleting}
-        />
-      )}
     </div>
   );
 }
