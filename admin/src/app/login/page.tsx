@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { BarChart3, Lock, Mail } from 'lucide-react';
+import { BarChart3, Lock, User } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, admin, isLoading } = useAuth();
@@ -57,18 +57,18 @@ export default function LoginPage() {
         <div className="rounded-xl border border-border bg-card p-8 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground" htmlFor="email">Email</label>
+              <label className="text-sm font-medium text-foreground" htmlFor="email">Username</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="admin@example.com"
+                  type="text"
+                  placeholder="Enter your username"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="pl-9"
                   required
-                  autoComplete="email"
+                  autoComplete="username"
                 />
               </div>
             </div>
