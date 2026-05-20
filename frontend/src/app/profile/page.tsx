@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Settings, Shield, ChevronRight, LogOut, X, Send } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
 import { useTelegram } from '@/hooks/useTelegram';
@@ -124,8 +125,8 @@ function SupportModal({ onClose }: { onClose: () => void }) {
 }
 
 const MENU_ITEMS = [
-  { icon: Settings, label: 'Settings', description: 'App preferences', action: null },
-  { icon: Shield, label: 'Privacy & Security', description: 'Data & permissions', action: null },
+  { icon: Settings, label: 'Settings', description: 'App preferences', action: 'settings' },
+  { icon: Shield, label: 'Privacy & Security', description: 'Data & permissions', action: 'privacy' },
   {
     icon: TelegramIcon,
     label: 'Telegram Support',
@@ -138,6 +139,7 @@ const MENU_ITEMS = [
 export default function ProfilePage() {
   const { user } = useAuth();
   const { close } = useTelegram();
+  const router = useRouter();
   const [showSupport, setShowSupport] = useState(false);
 
   const initials = user
@@ -146,6 +148,8 @@ export default function ProfilePage() {
 
   const handleMenuItem = (action: string | null) => {
     if (action === 'support') setShowSupport(true);
+    if (action === 'settings') router.push('/settings');
+    if (action === 'privacy') router.push('/privacy');
   };
 
   return (

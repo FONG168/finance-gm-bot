@@ -84,5 +84,17 @@ export function useAuth() {
     authenticate();
   }, [isReady, authenticate]);
 
-  return { ...state, authenticate };
+  const refreshUser = useCallback(async () => {
+    try {
+      const user = await apiService.auth.me();
+      setState(s => ({ ...s, user }));
+    } catch {}
+  }, []);
+
+  const updatePreferences = useCallback(async (prefs: { currency?: string; timezone?: string }) => {
+    await apiService.user.updatePreferences(prefs);
+    await refreshUser();
+  }, [refreshUser]);
+
+  return { ...state, authenticate, refreshUser, updatePreferences };
 }

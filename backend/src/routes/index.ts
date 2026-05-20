@@ -166,6 +166,60 @@ router.get('/subscription', authenticate, async (req, res) => {
   }
 });
 
+// Update user preferences (currency, timezone)
+router.patch('/auth/me', authenticate, async (req, res) => {
+  try {
+    const { userId } = (req as any).user;
+    const { currency, timezone } = req.body;
+    const allowed_currencies = ['USD', 'KHR', 'THB'];
+    const allowed_timezones = ['UTC', 'Asia/Phnom_Penh', 'Asia/Bangkok', 'Asia/Singapore', 'Asia/Tokyo', 'America/New_York', 'Europe/London'];
+    const data: any = {};
+    if (currency && allowed_currencies.includes(currency)) data.currency = currency;
+    if (timezone && allowed_timezones.includes(timezone)) data.timezone = timezone;
+    if (!Object.keys(data).length) { res.status(400).json({ success: false, error: 'No valid fields to update' }); return; }
+    const user = await prisma.user.update({ where: { id: userId }, data });
+    res.json({ success: true, data: { currency: user.currency, timezone: user.timezone } });
+  } catch (err) {
+    console.error('Update preferences error:', err);
+    res.status(500).json({ success: false, error: 'Failed to update preferences' });
+  }
+});
+
+// Export user data as JSON
+router.get('/user/export', authenticate, async (req, res) => {
+  try {
+    const { userId } = (req as any).user;
+    const [user, transactions, accounts] = await Promise.all([
+      prisma.user.findUnique({ where: { id: userId } }),
+      prisma.transaction.findMany({ where: { userId }, orderBy: { date: 'desc' } }),
+      prisma.account.findMany({ where: { userId } }),
+    ]);
+    const exportData = {
+      exportedAt: new Date().toISOString(),
+      user: { firstName: user?.firstName, lastName: user?.lastName, currency: user?.currency, timezone: user?.timezone, createdAt: user?.createdAt },
+      accounts: accounts.map(a => ({ name: a.name, type: a.type, balance: Number(a.balance), currency: a.currency, createdAt: a.createdAt })),
+      transactions: transactions.map(t => ({ date: t.date, type: t.type, amount: Number(t.amount), categoryId: t.categoryId, note: t.note, createdAt: t.createdAt })),
+    };
+    res.setHeader('Content-Disposition', 'attachment; filename="finance-gm-export.json"');
+    res.json(exportData);
+  } catch (err) {
+    console.error('Export error:', err);
+    res.status(500).json({ success: false, error: 'Export failed' });
+  }
+});
+
+// Delete user account (cascade deletes all data)
+router.delete('/user/account', authenticate, async (req, res) => {
+  try {
+    const { userId } = (req as any).user;
+    await prisma.user.delete({ where: { id: userId } });
+    res.json({ success: true, message: 'Account permanently deleted' });
+  } catch (err) {
+    console.error('Delete account error:', err);
+    res.status(500).json({ success: false, error: 'Failed to delete account' });
+  }
+});
+
 // Categories (public)
 router.get('/categories', async (_req, res) => {
   try {

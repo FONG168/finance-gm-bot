@@ -28,7 +28,12 @@
       "Bash(git --version)",
       "Bash(gh --version)",
       "Bash(gh auth *)",
-      "Bash(git init *)"
+      "Bash(git init *)",
+      "Bash(git config *)",
+      "Bash(gh repo *)",
+      "PowerShell(Start-Process \"http://localhost:3002\")",
+      "Bash(vercel whoami *)",
+      "Bash(vercel --prod)"
     ],
     "additionalDirectories": [
       "C:\\Users\\MSi\\.railway"

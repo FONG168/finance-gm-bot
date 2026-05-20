@@ -139,6 +139,28 @@ class ApiService {
   categories = {
     list: (): Promise<Category[]> => this.fetch('/categories'),
   };
+
+  user = {
+    updatePreferences: (data: { currency?: string; timezone?: string }): Promise<{ currency: string; timezone: string }> =>
+      this.fetch('/auth/me', { method: 'PATCH', body: JSON.stringify(data) }),
+
+    exportData: async (): Promise<void> => {
+      const res = await fetch(`${API_BASE}/user/export`, {
+        headers: { Authorization: `Bearer ${this.token}` },
+      });
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'finance-gm-export.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+
+    deleteAccount: (): Promise<{ message: string }> =>
+      this.fetch('/user/account', { method: 'DELETE' }),
+  };
 }
 
 export const apiService = new ApiService();
