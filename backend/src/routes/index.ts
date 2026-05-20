@@ -171,7 +171,7 @@ router.patch('/auth/me', authenticate, async (req, res) => {
   try {
     const { userId } = (req as any).user;
     const { currency, timezone } = req.body;
-    const allowed_currencies = ['USD', 'KHR', 'THB'];
+    const allowed_currencies = ['USD', 'KHR'];
     const allowed_timezones = ['UTC', 'Asia/Phnom_Penh', 'Asia/Bangkok', 'Asia/Singapore', 'Asia/Tokyo', 'America/New_York', 'Europe/London'];
     const data: any = {};
     if (currency && allowed_currencies.includes(currency)) data.currency = currency;

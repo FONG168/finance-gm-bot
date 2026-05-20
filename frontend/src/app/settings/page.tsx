@@ -135,9 +135,8 @@ function OptionSheet({ title, options, value, onSelect, onClose }: {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 const CURRENCIES = [
-  { value: 'USD', label: 'US Dollar', sub: '$1,200.00' },
-  { value: 'KHR', label: 'Cambodian Riel', sub: '៛4,800,000' },
-  { value: 'THB', label: 'Thai Baht', sub: '฿4,500.00' },
+  { value: 'USD', label: 'US Dollar', sub: '$1,250.00', flag: '🇺🇸' },
+  { value: 'KHR', label: 'Cambodian Riel', sub: '៛5,000,000', flag: '🇰🇭' },
 ];
 
 const TIMEZONES = [
@@ -247,7 +246,8 @@ export default function SettingsPage() {
                 label="Default Currency"
                 sublabel={saving === 'currency' ? 'Saving...' : currentCurrency.sub}
                 right={
-                  <div className="flex items-center gap-1 text-muted-foreground">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <span className="text-base">{(currentCurrency as any).flag}</span>
                     <span className="text-xs font-semibold">{currentCurrency.value}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </div>
@@ -342,7 +342,7 @@ export default function SettingsPage() {
       {sheet === 'currency' && (
         <OptionSheet
           title="Choose Currency"
-          options={CURRENCIES}
+          options={CURRENCIES.map(c => ({ value: c.value, label: `${c.flag}  ${c.value} — ${c.label}`, sub: c.sub }))}
           value={user?.currency || 'USD'}
           onSelect={handleCurrency}
           onClose={() => setSheet(null)}
