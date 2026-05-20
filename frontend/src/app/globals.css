@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 235 45% 6%;
+    --foreground: 0 0% 96%;
+    --card: 235 38% 11%;
+    --card-foreground: 0 0% 96%;
+    --popover: 235 38% 11%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 263 70% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 235 33% 17%;
+    --secondary-foreground: 0 0% 75%;
+    --muted: 235 33% 17%;
+    --muted-foreground: 235 18% 52%;
+    --accent: 235 33% 17%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 235 28% 22%;
+    --input: 235 33% 17%;
+    --ring: 263 70% 58%;
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 235 45% 6%;
+    --foreground: 0 0% 96%;
+    --card: 235 38% 11%;
+    --card-foreground: 0 0% 96%;
+    --popover: 235 38% 11%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 263 70% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 235 33% 17%;
+    --secondary-foreground: 0 0% 75%;
+    --muted: 235 33% 17%;
+    --muted-foreground: 235 18% 52%;
+    --accent: 235 33% 17%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 235 28% 22%;
+    --input: 235 33% 17%;
+    --ring: 263 70% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-text-size-adjust: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar,
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar,
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent;
+  }
+
+  .amount-income {
+    @apply text-emerald-400;
+  }
+
+  .amount-expense {
+    @apply text-rose-400;
+  }
+
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+  }
+  .mb-safe {
+    margin-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+  }
+  .pb-nav {
+    padding-bottom: calc(4rem + max(env(safe-area-inset-bottom, 0px), 16px) + 1rem);
+  }
+}

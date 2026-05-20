@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(RAILWAY_API_TOKEN=8534ff71-2487-44ab-8a72-4dd80a744148 railway up --detach --service finance-backend)",
+      "PowerShell($env:RAILWAY_API_TOKEN=\"8534ff71-2487-44ab-8a72-4dd80a744148\"; railway --version 2>&1; railway projects 2>&1)",
+      "PowerShell($env:RAILWAY_API_TOKEN=\"8534ff71-2487-44ab-8a72-4dd80a744148\"; railway project list 2>&1)",
+      "PowerShell($env:RAILWAY_API_TOKEN=\"8534ff71-2487-44ab-8a72-4dd80a744148\"; railway service --help 2>&1)",
+      "PowerShell(cd \"C:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\backend\"; $env:RAILWAY_API_TOKEN=\"8534ff71-2487-44ab-8a72-4dd80a744148\"; railway service list --json 2>&1)",
+      "PowerShell(cd \"C:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\bot\"; $env:RAILWAY_API_TOKEN=\"8534ff71-2487-44ab-8a72-4dd80a744148\"; railway up --detach --service finance-bot 2>&1)",
+      "PowerShell(cd \"C:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\bot\"; $env:RAILWAY_API_TOKEN=\"8534ff71-2487-44ab-8a72-4dd80a744148\"; railway service logs --service finance-bot 2>&1 | Select-Object -Last 20)",
+      "PowerShell(cd \"C:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\backend\"; $env:RAILWAY_API_TOKEN=\"8534ff71-2487-44ab-8a72-4dd80a744148\"; railway up --detach --service finance-backend 2>&1)",
+      "PowerShell(Invoke-RestMethod -Uri \"https://finance-backend-production-9841.up.railway.app/api/health\" -Method GET 2>&1)",
+      "Bash(railway up *)",
+      "Bash(railway login *)",
+      "Bash(npx railway *)",
+      "PowerShell($env:RAILWAY_TOKEN = \"8534ff71-2487-44ab-8a72-4dd80a744148\"; Set-Location \"C:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\backend\"; railway up --service finance-backend 2>&1)",
+      "PowerShell(railway --version 2>&1)",
+      "PowerShell(railway whoami 2>&1)",
+      "Bash(node \"C:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\check-backend.js\")",
+      "Bash(node -e ' *)",
+      "Bash(findstr env *)",
+      "Bash(tasklist)",
+      "PowerShell(taskkill /F /IM node.exe 2>$null)",
+      "PowerShell(Start-Process cmd -ArgumentList '/k', \"cd /d `\"c:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\admin`\" && npm run dev\" -WindowStyle Normal)",
+      "PowerShell(Start-Process cmd -ArgumentList '/k', 'cd /d \"C:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\frontend\" && npm run dev')",
+      "Bash(railway status *)",
+      "Bash(railway whoami *)",
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "Bash(git init *)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\MSi\\.railway"
+    ]
+  }
+}
