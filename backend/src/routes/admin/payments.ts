@@ -128,7 +128,6 @@ router.post('/:id/approve', requirePermission('manage_payments'), async (req: Re
     });
 
     // Notify user via Telegram bot
-    const appUrl = process.env.FRONTEND_URL || 'https://t.me/kh_mart_finance_bot';
     const nextBillingDate = isLifetime ? 'Never — Lifetime access!' : formatDate(expiry);
     const planLabel = isLifetime ? 'Lifetime' : `${payment.durationDays}-day Premium`;
     const DIV = '━━━━━━━━━━━━━━━━━━';
@@ -159,10 +158,7 @@ router.post('/:id/approve', requirePermission('manage_payments'), async (req: Re
         `⚠️ We'll remind you <b>3 days before</b> your subscription expires.\n\n` +
         `You can now record transactions freely!`;
 
-    await sendTelegramMessage(payment.user.telegramId, message, {
-      parseMode: 'HTML',
-      inlineKeyboard: [[{ text: '💰 Open Finance GM', url: appUrl }]],
-    });
+    await sendTelegramMessage(payment.user.telegramId, message, { parseMode: 'HTML' });
 
     res.json({ success: true, message: 'Payment approved, premium activated' });
   } catch (err) {
@@ -197,7 +193,6 @@ router.post('/:id/reject', requirePermission('manage_payments'), async (req: Req
     });
 
     // Notify user
-    const appUrl = process.env.FRONTEND_URL || 'https://t.me/kh_mart_finance_bot';
     const DIV = '━━━━━━━━━━━━━━━━━━';
     const rejectMessage =
       `❌ <b>Payment Not Confirmed</b>\n${DIV}\n\n` +
@@ -208,10 +203,7 @@ router.post('/:id/reject', requirePermission('manage_payments'), async (req: Req
       (reason ? `📝 <b>Reason:</b> ${reason}\n\n` : '') +
       `Please resubmit your payment or contact support.`;
 
-    await sendTelegramMessage(payment.user.telegramId, rejectMessage, {
-      parseMode: 'HTML',
-      inlineKeyboard: [[{ text: '💰 Open Finance GM', url: appUrl }]],
-    });
+    await sendTelegramMessage(payment.user.telegramId, rejectMessage, { parseMode: 'HTML' });
 
     res.json({ success: true, message: 'Payment rejected' });
   } catch (err) {
