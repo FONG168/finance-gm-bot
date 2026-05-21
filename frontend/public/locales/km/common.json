@@ -92,7 +92,17 @@
     "premiumIncludes": "Premium រួមមាន", "unlimitedTransactions": "ការកត់ប្រតិបត្តិការគ្មានដែនកំណត់",
     "advancedAnalytics": "ការវិភាគ & របាយការណ៍កម្រិតខ្ពស់", "multipleAccounts": "គណនីច្រើន & ការផ្ទេរ",
     "smartAlerts": "ការជូនដំណឹងការចំណាយ", "upgradePremium": "សូម តំឡើងទៅកម្រឹត Premium",
-    "scanQR": "ស្កែន QR ដើម្បីបង់ · ធ្វើឱ្យសកម្មក្នុង 24 ម៉ោង"
+    "scanQR": "ស្កែន QR ដើម្បីបង់ · ធ្វើឱ្យសកម្មក្នុង 24 ម៉ោង",
+    "renewToKeep": "បន្តដើម្បីរក្សាការចូលប្រើពេញលេញ",
+    "trialEndsToday": "ការសាកល្បងផុតថ្ងៃនេះ",
+    "daysLeftTrial": "នៅសល់ {{count}} ថ្ងៃក្នុងការសាកល្បង",
+    "daysLeftTrial_plural": "នៅសល់ {{count}} ថ្ងៃក្នុងការសាកល្បង",
+    "upgradeAnytime": "ដំឡើងគ្រប់ពេលដើម្បីរក្សាមុខងារទាំងអស់",
+    "premiumExpiresIn": "Premium ផុតក្នុង {{count}} ថ្ងៃ",
+    "premiumExpiresIn_plural": "Premium ផុតក្នុង {{count}} ថ្ងៃ",
+    "renewToAvoid": "បន្តឥឡូវដើម្បីជៀសវាងការរំខាន",
+    "renew": "បន្ត",
+    "upgrade": "ដំឡើង"
   },
   "common": {
     "loading": "កំពុងផ្ទុក...", "error": "កំហុស", "retry": "ព្យាយាមម្ដងទៀត",

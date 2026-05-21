@@ -85,7 +85,17 @@
     "premiumIncludes": "Premium 包含", "unlimitedTransactions": "无限制交易记录",
     "advancedAnalytics": "高级分析与报告", "multipleAccounts": "多账户与转账",
     "smartAlerts": "智能消费提醒", "upgradePremium": "升级到 Premium",
-    "scanQR": "扫码支付 · 24小时内激活"
+    "scanQR": "扫码支付 · 24小时内激活",
+    "renewToKeep": "续费以保持完整访问权限",
+    "trialEndsToday": "试用期今天结束",
+    "daysLeftTrial": "试用期剩余 {{count}} 天",
+    "daysLeftTrial_plural": "试用期剩余 {{count}} 天",
+    "upgradeAnytime": "随时升级以保留所有功能",
+    "premiumExpiresIn": "Premium 将在 {{count}} 天后到期",
+    "premiumExpiresIn_plural": "Premium 将在 {{count}} 天后到期",
+    "renewToAvoid": "立即续费以避免中断",
+    "renew": "续费",
+    "upgrade": "升级"
   },
   "common": {
     "loading": "加载中...", "error": "错误", "retry": "重试", "close": "关闭",

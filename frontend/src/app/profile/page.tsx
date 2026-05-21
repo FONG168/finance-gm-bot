@@ -283,24 +283,26 @@ export default function ProfilePage() {
                 <div className="flex-1 min-w-0">
                   {isExpired && (
                     <>
-                      <p className="text-sm font-bold text-white">Subscription Expired</p>
-                      <p className="text-xs text-red-300">Renew to keep full access</p>
+                      <p className="text-sm font-bold text-white">{t('subscription.expired')}</p>
+                      <p className="text-xs text-red-300">{t('subscription.renewToKeep')}</p>
                     </>
                   )}
                   {isTrial && trialDaysLeft !== null && (
                     <>
                       <p className="text-sm font-bold text-white">
-                        {trialDaysLeft === 0 ? 'Trial ends today' : `${trialDaysLeft} day${trialDaysLeft !== 1 ? 's' : ''} left in trial`}
+                        {trialDaysLeft === 0
+                          ? t('subscription.trialEndsToday')
+                          : t('subscription.daysLeftTrial', { count: trialDaysLeft })}
                       </p>
-                      <p className="text-xs text-indigo-300">Upgrade anytime to keep all features</p>
+                      <p className="text-xs text-indigo-300">{t('subscription.upgradeAnytime')}</p>
                     </>
                   )}
                   {isPremiumExpiringSoon && premiumDaysLeft !== null && (
                     <>
                       <p className="text-sm font-bold text-white">
-                        Premium expires in {premiumDaysLeft} day{premiumDaysLeft !== 1 ? 's' : ''}
+                        {t('subscription.premiumExpiresIn', { count: premiumDaysLeft })}
                       </p>
-                      <p className="text-xs text-indigo-300">Renew now to avoid interruption</p>
+                      <p className="text-xs text-indigo-300">{t('subscription.renewToAvoid')}</p>
                     </>
                   )}
                 </div>
@@ -311,7 +313,7 @@ export default function ProfilePage() {
                   className="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold text-white"
                   style={{ background: isExpired ? '#ef4444' : 'rgba(124,58,237,0.9)', border: `1px solid ${isExpired ? '#f87171' : '#a78bfa'}40` }}
                 >
-                  {isExpired ? 'Renew' : 'Upgrade'}
+                  {isExpired ? t('subscription.renew') : t('subscription.upgrade')}
                 </motion.button>
               </div>
             </motion.div>

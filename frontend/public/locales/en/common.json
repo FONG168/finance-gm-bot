@@ -86,7 +86,17 @@
     "premiumIncludes": "Premium includes", "unlimitedTransactions": "Unlimited transaction recording",
     "advancedAnalytics": "Advanced analytics & reports", "multipleAccounts": "Multiple accounts & transfers",
     "smartAlerts": "Smart spending alerts", "upgradePremium": "Upgrade to Premium",
-    "scanQR": "Scan QR to pay · Activated within 24h"
+    "scanQR": "Scan QR to pay · Activated within 24h",
+    "renewToKeep": "Renew to keep full access",
+    "trialEndsToday": "Trial ends today",
+    "daysLeftTrial": "{{count}} day left in trial",
+    "daysLeftTrial_plural": "{{count}} days left in trial",
+    "upgradeAnytime": "Upgrade anytime to keep all features",
+    "premiumExpiresIn": "Premium expires in {{count}} day",
+    "premiumExpiresIn_plural": "Premium expires in {{count}} days",
+    "renewToAvoid": "Renew now to avoid interruption",
+    "renew": "Renew",
+    "upgrade": "Upgrade"
   },
   "common": {
     "loading": "Loading...", "error": "Error", "retry": "Retry", "close": "Close",
