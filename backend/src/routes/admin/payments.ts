@@ -131,22 +131,38 @@ router.post('/:id/approve', requirePermission('manage_payments'), async (req: Re
     const appUrl = process.env.FRONTEND_URL || 'https://t.me/kh_mart_finance_bot';
     const nextBillingDate = isLifetime ? 'Never — Lifetime access!' : formatDate(expiry);
     const planLabel = isLifetime ? 'Lifetime' : `${payment.durationDays}-day Premium`;
-    const message = isLifetime
-      ? `✅ *Payment Approved!*\n\n` +
-        `Your payment of *$${payment.amount}* has been confirmed.\n\n` +
-        `🏆 *Plan:* ${planLabel}\n` +
-        `♾️ *Access:* Lifetime — never expires\n\n` +
-        `You can now record unlimited transactions. Enjoy!\n\n` +
-        `[Open Finance GM](${appUrl})`
-      : `✅ *Payment Approved!*\n\n` +
-        `Your payment of *$${payment.amount}* has been confirmed.\n\n` +
-        `⭐ *Plan:* ${planLabel}\n` +
-        `📅 *Active until:* ${nextBillingDate}\n` +
-        `🔄 *Next payment due:* ${nextBillingDate}\n\n` +
-        `You can now record transactions freely. We'll remind you before your next billing date.\n\n` +
-        `[Open Finance GM](${appUrl})`;
+    const DIV = '━━━━━━━━━━━━━━━━━━';
 
-    await sendTelegramMessage(payment.user.telegramId, message);
+    const message = isLifetime
+      ? `✅ <b>Payment Confirmed</b>\n${DIV}\n\n` +
+        `🧾 <b>RECEIPT</b>\n\n` +
+        `  Amount       <code>$${payment.amount}</code>\n` +
+        `  Plan         <code>${planLabel}</code>\n` +
+        `  Status       <code>Approved ✅</code>\n\n` +
+        `${DIV}\n\n` +
+        `🏆 <b>Subscription</b>\n\n` +
+        `  Access       <code>Lifetime ♾️</code>\n` +
+        `  Expires      <code>Never</code>\n\n` +
+        `${DIV}\n\n` +
+        `You now have <b>unlimited</b> access. Enjoy Finance GM!`
+      : `✅ <b>Payment Confirmed</b>\n${DIV}\n\n` +
+        `🧾 <b>RECEIPT</b>\n\n` +
+        `  Amount       <code>$${payment.amount}</code>\n` +
+        `  Plan         <code>${planLabel}</code>\n` +
+        `  Status       <code>Approved ✅</code>\n\n` +
+        `${DIV}\n\n` +
+        `📅 <b>Subscription</b>\n\n` +
+        `  Active from  <code>${formatDate(start)}</code>\n` +
+        `  Active until <code>${nextBillingDate}</code>\n` +
+        `  Next renewal <code>${nextBillingDate}</code>\n\n` +
+        `${DIV}\n\n` +
+        `⚠️ We'll remind you <b>3 days before</b> your subscription expires.\n\n` +
+        `You can now record transactions freely!`;
+
+    await sendTelegramMessage(payment.user.telegramId, message, {
+      parseMode: 'HTML',
+      inlineKeyboard: [[{ text: '💰 Open Finance GM', url: appUrl }]],
+    });
 
     res.json({ success: true, message: 'Payment approved, premium activated' });
   } catch (err) {
@@ -182,14 +198,20 @@ router.post('/:id/reject', requirePermission('manage_payments'), async (req: Req
 
     // Notify user
     const appUrl = process.env.FRONTEND_URL || 'https://t.me/kh_mart_finance_bot';
-    const message =
-      `❌ *Payment Not Confirmed*\n\n` +
-      `Your payment of *$${payment.amount}* could not be verified.\n\n` +
-      (reason ? `📝 *Reason:* ${reason}\n\n` : '') +
-      `Please try again or contact support.\n\n` +
-      `[Open Finance GM](${appUrl})`;
+    const DIV = '━━━━━━━━━━━━━━━━━━';
+    const rejectMessage =
+      `❌ <b>Payment Not Confirmed</b>\n${DIV}\n\n` +
+      `🧾 <b>RECEIPT</b>\n\n` +
+      `  Amount       <code>$${payment.amount}</code>\n` +
+      `  Status       <code>Rejected ❌</code>\n\n` +
+      `${DIV}\n\n` +
+      (reason ? `📝 <b>Reason:</b> ${reason}\n\n` : '') +
+      `Please resubmit your payment or contact support.`;
 
-    await sendTelegramMessage(payment.user.telegramId, message);
+    await sendTelegramMessage(payment.user.telegramId, rejectMessage, {
+      parseMode: 'HTML',
+      inlineKeyboard: [[{ text: '💰 Open Finance GM', url: appUrl }]],
+    });
 
     res.json({ success: true, message: 'Payment rejected' });
   } catch (err) {

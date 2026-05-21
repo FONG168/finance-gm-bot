@@ -6,6 +6,7 @@ import { reportCommand } from './commands/report.command';
 import { languageCommand, handleLangCallback } from './commands/language.command';
 import { handleTextMessage } from './handlers/message.handler';
 import { startWeeklyReportScheduler } from './scheduler/weekly-report';
+import { startSubscriptionReminderScheduler } from './scheduler/subscription-reminder';
 import { prisma } from './lib/prisma';
 import { t, resolveLang } from './i18n';
 
@@ -115,6 +116,7 @@ async function start() {
     }
 
     startWeeklyReportScheduler(bot);
+    startSubscriptionReminderScheduler(bot);
 
     const publicDomain = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.PUBLIC_URL;
     if (process.env.NODE_ENV === 'production' && publicDomain) {
