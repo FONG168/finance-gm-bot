@@ -94,11 +94,22 @@ const T = {
     summaryFailed: '❌ មិនអាចបង្កើតរបាយការណ៍! សូមព្យាយាមម្ដងទៀត។',
     openDashboard: '💰 Open Dashboard',
     openAccounts: '🏦 Open Accounts',
+    renewButton: '💳 បន្តការជាវ',
     paymentApproved: (plan: string, until: string) =>
       `✅ *ការទូទាត់ត្រូវបានអនុម័ត!*\n\n` +
       `$${plan} ⭐ Plan: *${plan}*\n` +
       `📅 អស់រហូតដល់: *${until}*\n\n` +
       `អ្នកអាចកត់ត្រាប្រតិបត្តិការបានដោយសេរី។ យើងនឹងជូនដំណឹងមុនដល់ការបញ្ចប់!`,
+    subscriptionExpiring: (daysLeft: number, expiryDate: string) => {
+      const urgency = daysLeft === 1 ? '🚨' : '⚠️';
+      const dayLabel = daysLeft === 1 ? 'ថ្ងៃស្អែក' : 'ក្នុង 3 ថ្ងៃ';
+      const DIV = '━━━━━━━━━━━━━━━━━━';
+      return `${urgency} <b>ការជាវអស់ ${daysLeft === 1 ? 'ថ្ងៃស្អែក' : 'ក្នុង 3 ថ្ងៃ'}</b>\n${DIV}\n\n` +
+        `ការជាវ Finance GM Premium របស់អ្នកនឹងអស់ <b>${dayLabel}</b>។\n\n` +
+        `  អស់នៅថ្ងៃ   <code>${expiryDate}</code>\n\n` +
+        `${DIV}\n\n` +
+        `បន្តការជាវឥឡូវ ដើម្បីកុំឱ្យខកខានការតាមដានហិរញ្ញវត្ថុ។`;
+    },
   },
 
   zh: {
@@ -186,11 +197,22 @@ const T = {
     summaryFailed: '❌ 生成摘要失败，请重试。',
     openDashboard: '💰 Open Dashboard',
     openAccounts: '🏦 Open Accounts',
+    renewButton: '💳 续费订阅',
     paymentApproved: (plan: string, until: string) =>
       `✅ *付款已批准！*\n\n` +
       `⭐ 套餐: *${plan}*\n` +
       `📅 有效期至: *${until}*\n\n` +
       `您现在可以自由记录交易。到期前我们会提醒您续费！`,
+    subscriptionExpiring: (daysLeft: number, expiryDate: string) => {
+      const urgency = daysLeft === 1 ? '🚨' : '⚠️';
+      const dayLabel = daysLeft === 1 ? '明天' : '3天后';
+      const DIV = '━━━━━━━━━━━━━━━━━━';
+      return `${urgency} <b>订阅将于${daysLeft === 1 ? '明天' : '3天后'}到期</b>\n${DIV}\n\n` +
+        `您的 Finance GM Premium 订阅将<b>${dayLabel}</b>到期。\n\n` +
+        `  到期日期   <code>${expiryDate}</code>\n\n` +
+        `${DIV}\n\n` +
+        `请立即续费，以免中断财务记录。`;
+    },
   },
 
   en: {
@@ -278,11 +300,22 @@ const T = {
     summaryFailed: '❌ Failed to generate summary. Please try again.',
     openDashboard: '💰 Open Dashboard',
     openAccounts: '🏦 Open Accounts',
+    renewButton: '💳 Renew Subscription',
     paymentApproved: (plan: string, until: string) =>
       `✅ *Payment Approved!*\n\n` +
       `⭐ Plan: *${plan}*\n` +
       `📅 Active until: *${until}*\n\n` +
       `You can now record transactions freely. We'll remind you before your next billing date.`,
+    subscriptionExpiring: (daysLeft: number, expiryDate: string) => {
+      const urgency = daysLeft === 1 ? '🚨' : '⚠️';
+      const dayLabel = daysLeft === 1 ? 'tomorrow' : 'in 3 days';
+      const DIV = '━━━━━━━━━━━━━━━━━━';
+      return `${urgency} <b>Subscription Expiring ${daysLeft === 1 ? 'Tomorrow' : 'in 3 Days'}</b>\n${DIV}\n\n` +
+        `Your Finance GM Premium subscription expires <b>${dayLabel}</b>.\n\n` +
+        `  Expires on   <code>${expiryDate}</code>\n\n` +
+        `${DIV}\n\n` +
+        `Renew now to keep tracking your finances without interruption.`;
+    },
   },
 };
 
