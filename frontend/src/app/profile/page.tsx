@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import '@/lib/i18n';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, Shield, ChevronRight, LogOut, X, Send } from 'lucide-react';
+import { Settings, Shield, ChevronRight, X, Send, Crown, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTelegram } from '@/hooks/useTelegram';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
-import { useTelegram } from '@/hooks/useTelegram';
+import { useTranslation } from 'react-i18next';
+import { PaymentQRSheet } from '@/components/subscription/PaymentQRSheet';
 
 const SUPPORT_USERNAME = 'smart_money_management_admin';
 const SUPPORT_URL = `https://t.me/${SUPPORT_USERNAME}`;
@@ -21,6 +24,7 @@ function TelegramIcon({ className, style }: { className?: string; style?: React.
 
 function SupportModal({ onClose }: { onClose: () => void }) {
   const { webApp } = useTelegram();
+  const { t } = useTranslation('common');
 
   const openChat = () => {
     if (webApp?.openLink) {
@@ -85,10 +89,10 @@ function SupportModal({ onClose }: { onClose: () => void }) {
 
               {/* Title & description */}
               <h2 className="text-xl font-bold text-white text-center mb-2">
-                Telegram Support
+                {t('support.title')}
               </h2>
               <p className="text-sm text-center mb-5" style={{ color: 'rgba(255,255,255,0.55)', lineHeight: '1.6' }}>
-                Need help or have questions? Chat directly with our support admin on Telegram.
+                {t('support.desc')}
               </p>
 
               {/* Username badge */}
@@ -110,11 +114,11 @@ function SupportModal({ onClose }: { onClose: () => void }) {
                 <div className="absolute inset-0 opacity-0 hover:opacity-20 transition-opacity"
                   style={{ background: 'white' }} />
                 <Send className="w-4 h-4" />
-                Open Telegram Chat
+                {t('support.openChat')}
               </motion.button>
 
               <p className="text-center text-xs mt-3" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                Opens in Telegram
+                {t('support.opensIn')}
               </p>
             </div>
           </div>
@@ -124,27 +128,34 @@ function SupportModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-const MENU_ITEMS = [
-  { icon: Settings, label: 'Settings', description: 'App preferences', action: 'settings' },
-  { icon: Shield, label: 'Privacy & Security', description: 'Data & permissions', action: 'privacy' },
-  {
-    icon: TelegramIcon,
-    label: 'Telegram Support',
-    description: 'Chat directly with support admin',
-    action: 'support',
-    accent: true,
-  },
-];
-
 export default function ProfilePage() {
   const { user } = useAuth();
-  const { close } = useTelegram();
   const router = useRouter();
+  const { t } = useTranslation('common');
   const [showSupport, setShowSupport] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const initials = user
     ? `${user.firstName[0]}${user.lastName?.[0] || ''}`.toUpperCase()
     : 'FG';
+
+  const MENU_ITEMS = [
+    { icon: Settings, label: t('profile.settings'), description: t('profile.settingsDesc'), action: 'settings' },
+    { icon: Shield, label: t('profile.privacy'), description: t('profile.privacyDesc'), action: 'privacy' },
+    {
+      icon: TelegramIcon,
+      label: t('profile.support'),
+      description: t('profile.supportDesc'),
+      action: 'support',
+      accent: true,
+    },
+  ];
 
   const handleMenuItem = (action: string | null) => {
     if (action === 'support') setShowSupport(true);
@@ -155,7 +166,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-background pb-nav">
       <div className="px-4 pt-5 pb-3 max-w-2xl mx-auto">
-        <h1 className="text-xl font-bold">Profile</h1>
+        <h1 className="text-xl font-bold">{t('profile.title')}</h1>
       </div>
 
       <div className="px-4 max-w-2xl mx-auto space-y-4">
@@ -183,7 +194,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-white/60">@{user.username}</p>
               )}
               <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white/80 tracking-wide mt-1 inline-block">
-                PRO MEMBER
+                {t('profile.proMember')}
               </span>
             </div>
           </div>
@@ -191,17 +202,121 @@ export default function ProfilePage() {
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          {[
-            { label: 'Currency', value: user?.currency || 'USD' },
-            { label: 'Timezone', value: (user?.timezone || 'UTC').replace('_', ' ') },
-            { label: 'Since', value: user?.createdAt ? new Date(user.createdAt).getFullYear().toString() : '—' },
-          ].map((s) => (
-            <div key={s.label} className="rounded-2xl bg-card border border-border p-3 text-center">
-              <p className="font-bold text-sm">{s.value}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{s.label}</p>
-            </div>
-          ))}
+          {/* Currency */}
+          <div className="rounded-2xl bg-card border border-border p-3 text-center">
+            <p className="font-bold text-sm">{user?.currency || 'USD'}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{t('profile.currency')}</p>
+          </div>
+
+          {/* Live clock */}
+          {(() => {
+            // Use stored timezone if explicitly set; otherwise auto-detect from browser
+            const stored = user?.timezone || 'UTC';
+            const tz = stored === 'UTC' ? (Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC') : stored;
+            const city = tz.replace(/_/g, ' ').split('/').pop() ?? tz;
+            // Compute GMT offset by comparing UTC vs target timezone time strings
+            const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC', hour12: false, hour: '2-digit', minute: '2-digit' });
+            const tzStr  = now.toLocaleString('en-US', { timeZone: tz,    hour12: false, hour: '2-digit', minute: '2-digit' });
+            const [uh, um] = utcStr.split(':').map(Number);
+            const [th, tm] = tzStr.split(':').map(Number);
+            const diffMin = (th * 60 + tm) - (uh * 60 + um);
+            const sign = diffMin >= 0 ? '+' : '-';
+            const abs = Math.abs(diffMin);
+            const offsetLabel = `GMT${diffMin === 0 ? '+0' : `${sign}${Math.floor(abs / 60)}${abs % 60 ? ':' + String(abs % 60).padStart(2, '0') : ''}`}`;
+            return (
+              <div className="rounded-2xl bg-card border border-border p-3 text-center">
+                <p className="font-bold text-sm tabular-nums">
+                  {now.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{offsetLabel}</p>
+                {city && <p className="text-[9px] text-muted-foreground/50 truncate leading-tight">{city}</p>}
+              </div>
+            );
+          })()}
+
+          {/* Member since */}
+          <div className="rounded-2xl bg-card border border-border p-3 text-center">
+            <p className="font-bold text-sm">{user?.createdAt ? new Date(user.createdAt).getFullYear().toString() : '—'}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{t('profile.since')}</p>
+          </div>
         </div>
+
+        {/* Upgrade / Renewal card */}
+        {(() => {
+          const status = user?.subscriptionStatus;
+          const plan = user?.plan;
+          const trialEnd = user?.trialEndsAt ? new Date(user.trialEndsAt) : null;
+          const premiumEnd = user?.premiumExpiresAt ? new Date(user.premiumExpiresAt) : null;
+          const now2 = new Date();
+
+          const isTrial = status === 'TRIAL';
+          const isExpired = status === 'EXPIRED';
+          const isPremiumExpiringSoon = plan === 'PREMIUM' && status === 'ACTIVE' && premiumEnd && (premiumEnd.getTime() - now2.getTime()) < 14 * 86_400_000;
+          const isLifetime = plan === 'LIFETIME';
+
+          if (isLifetime || (!isTrial && !isExpired && !isPremiumExpiringSoon)) return null;
+
+          const trialDaysLeft = trialEnd ? Math.max(0, Math.floor((trialEnd.getTime() - now2.getTime()) / 86_400_000)) : null;
+          const premiumDaysLeft = premiumEnd ? Math.max(0, Math.floor((premiumEnd.getTime() - now2.getTime()) / 86_400_000)) : null;
+
+          const accentColor = isExpired ? '#ef4444' : '#7c3aed';
+          const bgGrad = isExpired
+            ? 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%)'
+            : 'linear-gradient(135deg, #1e1b4b 0%, #3b1278 60%, #4c1d95 100%)';
+
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-2xl p-4"
+              style={{ background: bgGrad }}
+            >
+              {/* Decorative circle */}
+              <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full opacity-10 bg-white" />
+
+              <div className="relative z-10 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: `${accentColor}30`, border: `1px solid ${accentColor}50` }}>
+                  {isExpired ? <Zap className="w-5 h-5" style={{ color: accentColor }} /> : <Crown className="w-5 h-5 text-yellow-300" />}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  {isExpired && (
+                    <>
+                      <p className="text-sm font-bold text-white">Subscription Expired</p>
+                      <p className="text-xs text-red-300">Renew to keep full access</p>
+                    </>
+                  )}
+                  {isTrial && trialDaysLeft !== null && (
+                    <>
+                      <p className="text-sm font-bold text-white">
+                        {trialDaysLeft === 0 ? 'Trial ends today' : `${trialDaysLeft} day${trialDaysLeft !== 1 ? 's' : ''} left in trial`}
+                      </p>
+                      <p className="text-xs text-indigo-300">Upgrade anytime to keep all features</p>
+                    </>
+                  )}
+                  {isPremiumExpiringSoon && premiumDaysLeft !== null && (
+                    <>
+                      <p className="text-sm font-bold text-white">
+                        Premium expires in {premiumDaysLeft} day{premiumDaysLeft !== 1 ? 's' : ''}
+                      </p>
+                      <p className="text-xs text-indigo-300">Renew now to avoid interruption</p>
+                    </>
+                  )}
+                </div>
+
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowPayment(true)}
+                  className="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold text-white"
+                  style={{ background: isExpired ? '#ef4444' : 'rgba(124,58,237,0.9)', border: `1px solid ${isExpired ? '#f87171' : '#a78bfa'}40` }}
+                >
+                  {isExpired ? 'Renew' : 'Upgrade'}
+                </motion.button>
+              </div>
+            </motion.div>
+          );
+        })()}
 
         {/* Menu items */}
         <div className="rounded-2xl bg-card border border-border overflow-hidden divide-y divide-border/50">
@@ -238,31 +353,21 @@ export default function ProfilePage() {
           })}
         </div>
 
-        {/* AI features teaser */}
-        <div className="rounded-2xl border-2 border-dashed border-violet-500/30 p-4 text-center">
-          <p className="text-2xl mb-1">🤖</p>
-          <p className="font-semibold text-sm">AI Insights Coming Soon</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Smart expense categorization, budget recommendations, and spending insights.
+        <div className="text-center pb-2 space-y-0.5">
+          <p className="text-xs text-muted-foreground">{t('profile.version')}</p>
+          <p className="text-[11px] text-muted-foreground/60">
+            Built &amp; owned by <span className="text-muted-foreground font-semibold">Bun Kompheak</span>
           </p>
         </div>
-
-        {/* Close app */}
-        <button
-          onClick={close}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm font-semibold"
-        >
-          <LogOut className="w-4 h-4" />
-          Close App
-        </button>
-
-        <p className="text-center text-xs text-muted-foreground pb-2">Finance GM v1.0.0</p>
       </div>
 
       <BottomNav />
 
       {/* Support modal */}
       {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
+
+      {/* Payment / upgrade sheet */}
+      <PaymentQRSheet isOpen={showPayment} onClose={() => setShowPayment(false)} />
     </div>
   );
 }

@@ -1,32 +1,19 @@
 'use client';
 
+import '@/lib/i18n';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import {
-  ArrowLeft, Sun, Moon, Monitor, DollarSign, Clock,
-  Bell, Globe, ChevronRight, Check,
+  ArrowLeft, Sun, Moon, Monitor, DollarSign,
+  Globe, ChevronRight, Check,
 } from 'lucide-react';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme, ThemeMode } from '@/hooks/useTheme';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface NotifSettings {
-  weeklySummary: boolean;
-  trialExpiration: boolean;
-  premiumReminder: boolean;
-  budgetAlerts: boolean;
-}
-
-const NOTIF_KEY = 'finance_gm_notifications';
-const LANG_KEY = 'finance_gm_language';
-
-function loadNotif(): NotifSettings {
-  if (typeof window === 'undefined') return { weeklySummary: true, trialExpiration: true, premiumReminder: true, budgetAlerts: false };
-  try { return JSON.parse(localStorage.getItem(NOTIF_KEY) || '{}'); } catch { return {} as NotifSettings; }
-}
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/providers/I18nProvider';
+import { SUPPORTED_LANGUAGES } from '@/lib/i18n';
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -139,50 +126,26 @@ const CURRENCIES = [
   { value: 'KHR', label: 'Cambodian Riel', sub: '៛5,000,000', flag: '🇰🇭' },
 ];
 
-const TIMEZONES = [
-  { value: 'Asia/Phnom_Penh', label: 'Phnom Penh', sub: 'UTC+7' },
-  { value: 'Asia/Bangkok', label: 'Bangkok', sub: 'UTC+7' },
-  { value: 'Asia/Singapore', label: 'Singapore', sub: 'UTC+8' },
-  { value: 'Asia/Tokyo', label: 'Tokyo', sub: 'UTC+9' },
-  { value: 'Europe/London', label: 'London', sub: 'UTC+0' },
-  { value: 'America/New_York', label: 'New York', sub: 'UTC-5' },
-  { value: 'UTC', label: 'UTC', sub: 'UTC+0' },
-];
-
-const THEME_OPTIONS = [
-  { value: 'dark' as ThemeMode, label: 'Dark', sub: 'Always dark', icon: Moon },
-  { value: 'light' as ThemeMode, label: 'Light', sub: 'Always light', icon: Sun },
-  { value: 'system' as ThemeMode, label: 'System', sub: 'Follow device', icon: Monitor },
-];
-
-const LANGUAGES = [
-  { value: 'en', label: 'English', flag: '🇬🇧', available: true },
-  { value: 'km', label: 'ខ្មែរ (Khmer)', flag: '🇰🇭', available: false },
-  { value: 'th', label: 'ภาษาไทย (Thai)', flag: '🇹🇭', available: false },
-  { value: 'zh', label: '中文 (Chinese)', flag: '🇨🇳', available: false },
-];
 
 export default function SettingsPage() {
   const router = useRouter();
   const { user, updatePreferences } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation('common');
+  const { language, changeLanguage } = useLanguage();
 
-  const [sheet, setSheet] = useState<'currency' | 'timezone' | 'theme' | null>(null);
+  const THEME_OPTIONS = [
+    { value: 'dark' as ThemeMode, label: t('theme.dark'), sub: t('theme.darkDesc'), icon: Moon },
+    { value: 'light' as ThemeMode, label: t('theme.light'), sub: t('theme.lightDesc'), icon: Sun },
+    { value: 'system' as ThemeMode, label: t('theme.system'), sub: t('theme.systemDesc'), icon: Monitor },
+  ];
+
+  const [sheet, setSheet] = useState<'currency' | 'theme' | 'language' | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
 
-  const [notif, setNotifState] = useState<NotifSettings>(() => {
-    const saved = loadNotif();
-    return {
-      weeklySummary: saved.weeklySummary ?? true,
-      trialExpiration: saved.trialExpiration ?? true,
-      premiumReminder: saved.premiumReminder ?? true,
-      budgetAlerts: saved.budgetAlerts ?? false,
-    };
-  });
-
   const currentCurrency = CURRENCIES.find(c => c.value === user?.currency) || CURRENCIES[0];
-  const currentTimezone = TIMEZONES.find(t => t.value === user?.timezone) || TIMEZONES[0];
   const currentTheme = THEME_OPTIONS.find(t => t.value === theme) || THEME_OPTIONS[0];
+  const currentLanguage = SUPPORTED_LANGUAGES.find(l => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   const handleCurrency = async (value: string) => {
     setSaving('currency');
@@ -190,16 +153,10 @@ export default function SettingsPage() {
     setSaving(null);
   };
 
-  const handleTimezone = async (value: string) => {
-    setSaving('timezone');
-    try { await updatePreferences({ timezone: value }); } catch {}
+  const handleLanguage = async (value: string) => {
+    setSaving('language');
+    try { await changeLanguage(value); } catch {}
     setSaving(null);
-  };
-
-  const handleNotif = (key: keyof NotifSettings, value: boolean) => {
-    const next = { ...notif, [key]: value };
-    setNotifState(next);
-    localStorage.setItem(NOTIF_KEY, JSON.stringify(next));
   };
 
   return (
@@ -209,20 +166,20 @@ export default function SettingsPage() {
         <button onClick={() => router.back()} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
           <ArrowLeft className="w-4 h-4" />
         </button>
-        <h1 className="text-xl font-bold">Settings</h1>
+        <h1 className="text-xl font-bold">{t('settings.title')}</h1>
       </div>
 
       <div className="px-4 max-w-2xl mx-auto space-y-5">
 
         {/* Appearance */}
         <div>
-          <SectionHeader icon={Sun} title="Appearance" color="#f59e0b" />
+          <SectionHeader icon={Sun} title={t('settings.appearance')} color="#f59e0b" />
           <SettingsCard>
             <button className="w-full" onClick={() => setSheet('theme')}>
               <SettingsRow
                 icon={currentTheme.icon}
                 iconColor="#f59e0b"
-                label="Theme"
+                label={t('settings.theme')}
                 sublabel={currentTheme.sub}
                 right={
                   <div className="flex items-center gap-1 text-muted-foreground">
@@ -237,14 +194,14 @@ export default function SettingsPage() {
 
         {/* Currency */}
         <div>
-          <SectionHeader icon={DollarSign} title="Currency" color="#10b981" />
+          <SectionHeader icon={DollarSign} title={t('settings.currency')} color="#10b981" />
           <SettingsCard>
             <button className="w-full" onClick={() => setSheet('currency')}>
               <SettingsRow
                 icon={DollarSign}
                 iconColor="#10b981"
-                label="Default Currency"
-                sublabel={saving === 'currency' ? 'Saving...' : currentCurrency.sub}
+                label={t('settings.defaultCurrency')}
+                sublabel={saving === 'currency' ? t('settings.saving') : currentCurrency.sub}
                 right={
                   <div className="flex items-center gap-1.5 text-muted-foreground">
                     <span className="text-base">{(currentCurrency as any).flag}</span>
@@ -257,70 +214,26 @@ export default function SettingsPage() {
           </SettingsCard>
         </div>
 
-        {/* Timezone */}
+
+        {/* Language */}
         <div>
-          <SectionHeader icon={Clock} title="Timezone" color="#6366f1" />
+          <SectionHeader icon={Globe} title={t('settings.language')} color="#ec4899" />
           <SettingsCard>
-            <button className="w-full" onClick={() => setSheet('timezone')}>
+            <button className="w-full" onClick={() => setSheet('language')}>
               <SettingsRow
-                icon={Clock}
-                iconColor="#6366f1"
-                label="Timezone"
-                sublabel={saving === 'timezone' ? 'Saving...' : currentTimezone.sub}
+                icon={Globe}
+                iconColor="#ec4899"
+                label={t('settings.language')}
+                sublabel={saving === 'language' ? t('settings.saving') : currentLanguage.nativeLabel}
                 right={
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <span className="text-xs">{currentTimezone.label}</span>
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <span className="text-base">{currentLanguage.flag}</span>
+                    <span className="text-xs font-semibold">{currentLanguage.code.toUpperCase()}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </div>
                 }
               />
             </button>
-          </SettingsCard>
-        </div>
-
-        {/* Notifications */}
-        <div>
-          <SectionHeader icon={Bell} title="Notifications" color="#229ED9" />
-          <SettingsCard>
-            {([
-              { key: 'weeklySummary', label: 'Weekly Summary', sub: 'Get your weekly finance report' },
-              { key: 'trialExpiration', label: 'Trial Expiration', sub: 'Reminder before trial ends' },
-              { key: 'premiumReminder', label: 'Premium Reminders', sub: 'Subscription renewal alerts' },
-              { key: 'budgetAlerts', label: 'Budget Alerts', sub: 'Notify when nearing budget limit' },
-            ] as { key: keyof NotifSettings; label: string; sub: string }[]).map(item => (
-              <SettingsRow
-                key={item.key}
-                icon={Bell}
-                iconColor="#229ED9"
-                label={item.label}
-                sublabel={item.sub}
-                right={<Toggle checked={notif[item.key]} onChange={v => handleNotif(item.key, v)} />}
-              />
-            ))}
-          </SettingsCard>
-        </div>
-
-        {/* Language */}
-        <div>
-          <SectionHeader icon={Globe} title="Language" color="#ec4899" />
-          <SettingsCard>
-            {LANGUAGES.map(lang => (
-              <div key={lang.value} className="flex items-center gap-3 px-4 py-3.5 opacity-100">
-                <div className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center text-lg flex-shrink-0">
-                  {lang.flag}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{lang.label}</p>
-                  {!lang.available && (
-                    <p className="text-xs text-muted-foreground">Coming soon</p>
-                  )}
-                </div>
-                {lang.available
-                  ? <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                  : <span className="text-[10px] px-2 py-0.5 rounded-full border border-border text-muted-foreground">Soon</span>
-                }
-              </div>
-            ))}
           </SettingsCard>
         </div>
 
@@ -332,7 +245,7 @@ export default function SettingsPage() {
       {/* Option Sheets */}
       {sheet === 'theme' && (
         <OptionSheet
-          title="Choose Theme"
+          title={t('settings.chooseTheme')}
           options={THEME_OPTIONS.map(t => ({ value: t.value, label: t.label, sub: t.sub }))}
           value={theme}
           onSelect={v => setTheme(v as ThemeMode)}
@@ -341,19 +254,19 @@ export default function SettingsPage() {
       )}
       {sheet === 'currency' && (
         <OptionSheet
-          title="Choose Currency"
+          title={t('settings.chooseCurrency')}
           options={CURRENCIES.map(c => ({ value: c.value, label: `${c.flag}  ${c.value} — ${c.label}`, sub: c.sub }))}
           value={user?.currency || 'USD'}
           onSelect={handleCurrency}
           onClose={() => setSheet(null)}
         />
       )}
-      {sheet === 'timezone' && (
+      {sheet === 'language' && (
         <OptionSheet
-          title="Choose Timezone"
-          options={TIMEZONES}
-          value={user?.timezone || 'UTC'}
-          onSelect={handleTimezone}
+          title={t('settings.chooseLanguage')}
+          options={SUPPORTED_LANGUAGES.map(l => ({ value: l.code, label: `${l.flag}  ${l.nativeLabel}`, sub: l.label }))}
+          value={language}
+          onSelect={handleLanguage}
           onClose={() => setSheet(null)}
         />
       )}

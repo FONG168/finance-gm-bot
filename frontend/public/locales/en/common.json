@@ -1,0 +1,141 @@
+{
+  "nav": { "home": "Home", "accounts": "Accounts", "add": "Add", "reports": "Reports", "profile": "Profile" },
+  "greeting": { "morning": "Good morning", "afternoon": "Good afternoon", "evening": "Good evening" },
+  "home": {
+    "totalNetWorth": "Total Net Worth", "income": "Income", "spent": "Spent", "saved": "Saved",
+    "accounts": "Accounts", "manage": "Manage →", "thisWeek": "This Week", "savingsRate": "Savings Rate",
+    "transactions": "transactions", "spendingByCategory": "Spending by Category",
+    "recentTransactions": "Recent Transactions", "seeAll": "See all →",
+    "noTransactions": "No transactions yet", "noTransactionsHint": "Add your first expense or income!",
+    "monthlyTrend": "Monthly Trend", "excellent": "Excellent!", "keepGoing": "Keep going!", "overspending": "Overspending"
+  },
+  "accounts": {
+    "title": "Accounts", "subtitle": "Manage your money accounts", "totalAssets": "Total Assets",
+    "transfer": "Transfer", "noAccounts": "No accounts yet", "addFirst": "+ Add your first account",
+    "newAccount": "New Account", "editAccount": "Edit Account", "transferMoney": "Transfer Money",
+    "createAccount": "Create Account", "saveChanges": "Save Changes", "type": "Type",
+    "accountName": "Account Name", "accountNameHint": "e.g. ABA, Wing, Savings…",
+    "openingBalance": "Opening Balance", "icon": "Icon", "color": "Color", "from": "From", "to": "To",
+    "amount": "Amount", "noteOptional": "Note (optional)", "noteHint": "Add a note…",
+    "deleteConfirm": "Delete this account? Transactions will be unlinked.", "default": "DEFAULT",
+    "selectDifferent": "Select different accounts"
+  },
+  "accountType": { "cash": "Cash", "bank": "Bank", "ewallet": "E-Wallet", "savings": "Savings", "credit": "Credit" },
+  "add": {
+    "title": "Add Transaction", "expense": "Expense", "income": "Income", "amount": "Amount",
+    "category": "Category", "account": "Account", "noteOptional": "Note (optional)",
+    "noteHint": "What was this for?", "saveExpense": "Save Expense", "saveIncome": "Save Income",
+    "confirmTransaction": "Confirm Transaction", "balanceAfter": "Balance after", "note": "Note",
+    "cancel": "Cancel", "confirm": "Confirm", "blocked": "Transaction Blocked", "gotIt": "Got it",
+    "invalidAmount": "Please enter a valid amount greater than $0.",
+    "selectCategory": "Please select a category before saving."
+  },
+  "transactions": {
+    "title": "Transactions", "subtitle": "Your transaction history", "search": "Search transactions...",
+    "all": "All", "expenses": "Expenses", "income": "Income", "notFound": "No transactions found",
+    "loadMore": "Load more", "deleteTransaction": "Delete Transaction?",
+    "deleteWarning": "This action cannot be undone. The account balance will be reversed.",
+    "editTransaction": "Edit Transaction", "saveChanges": "Save Changes", "saveChangesQ": "Save Changes?",
+    "delete": "Delete", "cancel": "Cancel", "confirm": "Confirm", "category": "Category", "balanceAfter": "Balance after"
+  },
+  "reports": {
+    "title": "Reports", "subtitle": "Your spending analysis", "income": "Income", "expenses": "Expenses",
+    "saved": "Saved", "savingsRate": "Savings Rate",
+    "excellentSavings": "Excellent! You saved well this month.",
+    "brokeEven": "You broke even. Try to save more next month.",
+    "overspent": "You spent more than you earned this month.",
+    "weeklyTrends": "Weekly Trends", "spendingByCategory": "Spending by Category",
+    "noReports": "No reports yet", "noReportsHint": "Start adding transactions to see monthly reports."
+  },
+  "profile": {
+    "title": "Profile", "settings": "Settings", "settingsDesc": "App preferences",
+    "privacy": "Privacy & Security", "privacyDesc": "Data & permissions",
+    "support": "Telegram Support", "supportDesc": "Chat directly with support admin",
+    "closeApp": "Close App", "aiComing": "AI Insights Coming Soon",
+    "aiDesc": "Smart expense categorization, budget recommendations, and spending insights.",
+    "currency": "Currency", "timezone": "Timezone", "since": "Since", "proMember": "PRO MEMBER",
+    "version": "Finance GM v1.0.0"
+  },
+  "settings": {
+    "title": "Settings", "appearance": "Appearance", "theme": "Theme", "currency": "Currency",
+    "defaultCurrency": "Default Currency", "timezone": "Timezone", "notifications": "Notifications",
+    "weeklySummary": "Weekly Summary", "weeklySummaryDesc": "Get your weekly finance report",
+    "trialExpiration": "Trial Expiration", "trialExpirationDesc": "Reminder before trial ends",
+    "premiumReminder": "Premium Reminders", "premiumReminderDesc": "Subscription renewal alerts",
+    "budgetAlerts": "Budget Alerts", "budgetAlertsDesc": "Notify when nearing budget limit",
+    "language": "Language", "saving": "Saving...", "chooseTheme": "Choose Theme",
+    "chooseCurrency": "Choose Currency", "chooseTimezone": "Choose Timezone", "chooseLanguage": "Choose Language"
+  },
+  "theme": {
+    "dark": "Dark", "darkDesc": "Always dark", "light": "Light", "lightDesc": "Always light",
+    "system": "System", "systemDesc": "Follow device"
+  },
+  "privacy": {
+    "title": "Privacy & Security", "telegramAccount": "Telegram Account", "session": "Session",
+    "security": "Security", "name": "Name", "username": "Username", "telegramId": "Telegram ID",
+    "accountLinked": "Account Linked", "status": "Status", "platform": "Platform",
+    "memberSince": "Member Since", "logout": "Logout", "authentication": "Authentication",
+    "dataEncryption": "Data Encryption", "yourPrivacy": "Your Privacy Matters",
+    "privacyText": "Your financial data is stored securely and never shared with third parties. Only you can access your transactions and accounts.",
+    "active": "Active", "telegramAuth": "Telegram Auth", "endToEnd": "End-to-End"
+  },
+  "subscription": {
+    "expired": "Subscription Expired", "trialEnded": "Free Trial Ended",
+    "expiredDesc": "Your premium subscription has expired. Renew now to keep recording transactions.",
+    "trialDesc": "Your free trial has ended. Go Premium to keep tracking your finances.",
+    "premiumIncludes": "Premium includes", "unlimitedTransactions": "Unlimited transaction recording",
+    "advancedAnalytics": "Advanced analytics & reports", "multipleAccounts": "Multiple accounts & transfers",
+    "smartAlerts": "Smart spending alerts", "upgradePremium": "Upgrade to Premium",
+    "scanQR": "Scan QR to pay · Activated within 24h"
+  },
+  "common": {
+    "loading": "Loading...", "error": "Error", "retry": "Retry", "close": "Close",
+    "cancel": "Cancel", "save": "Save", "done": "Done", "comingSoon": "Coming soon",
+    "loadMore": "Load more", "transfer": "Transfer", "noData": "No data yet",
+    "today": "Today", "yesterday": "Yesterday", "daysAgo": "{{n}} days ago"
+  },
+  "notifications": {
+    "title": "Notifications", "empty": "No notifications", "emptyDesc": "You're all caught up!",
+    "planExpired": "Plan Expired", "planExpiredDesc": "Your subscription has expired. Upgrade now to continue.",
+    "premiumExpired": "Premium Expired", "premiumExpiredDesc": "Your Premium plan has expired. Renew to keep access.",
+    "premiumExpiringSoon": "Expiring Soon", "premiumExpiringSoonDesc": "Your Premium plan expires in {{days}} days.",
+    "paymentPending": "Payment Under Review", "paymentPendingDesc": "Your payment is being reviewed. We'll activate your plan within 24h.",
+    "paymentApproved": "Payment Approved!", "paymentApprovedDesc": "Your Premium plan is now active. Enjoy full access!",
+    "tapToUpgrade": "Tap to upgrade →"
+  },
+  "support": {
+    "title": "Telegram Support",
+    "desc": "Need help or have questions? Chat directly with our support admin on Telegram.",
+    "openChat": "Open Telegram Chat", "opensIn": "Opens in Telegram"
+  },
+  "categories": {
+    "food": "Food",
+    "transport": "Transport",
+    "entertainment": "Entertainment",
+    "shopping": "Shopping",
+    "bills": "Bills",
+    "health": "Health",
+    "salary": "Salary",
+    "freelance": "Freelance",
+    "investment": "Investment",
+    "other": "Other"
+  },
+  "payment": {
+    "upgradeTitle": "Upgrade to Premium",
+    "selectPlan": "Select Plan",
+    "plan1month": "1 Month", "plan3months": "3 Months", "plan6months": "6 Months", "planLifetime": "Lifetime",
+    "popular": "Popular", "bestValue": "Best Value", "days": "days",
+    "payVia": "Pay via",
+    "accountName": "Account Name", "accountNo": "Account No.", "amountToPay": "Amount to Pay",
+    "receipt": "Payment Receipt", "removeReceipt": "Remove",
+    "uploadReceipt": "Tap to upload payment screenshot", "uploadRequired": "Required before submitting",
+    "receiptUploaded": "✓ Receipt uploaded — tap to change",
+    "txRef": "Transaction Ref / Note (optional)", "txRefHint": "e.g. last 4 digits of transaction",
+    "submit": "Submit Payment Request", "uploadFirst": "Upload Receipt First",
+    "activateHint": "Your plan will be activated within 24 hours after admin review",
+    "submitted": "Payment Submitted!",
+    "submittedDesc": "Your payment request has been sent to the admin for review. We'll activate your plan within 24 hours.",
+    "done": "Done",
+    "noMethods": "No payment methods available yet.", "contactSupport": "Please contact support to upgrade."
+  }
+}

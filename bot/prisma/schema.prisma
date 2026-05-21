@@ -19,9 +19,11 @@ model User {
   username     String?
   photoUrl     String?  @map("photo_url")
   languageCode String?  @map("language_code")
-  currency     String   @default("USD")
-  timezone     String   @default("UTC")
-  isActive     Boolean  @default(true) @map("is_active")
+  currency          String   @default("USD")
+  timezone          String   @default("UTC")
+  preferredLanguage String    @default("km") @map("preferred_language")
+  trialEndsAt       DateTime? @map("trial_ends_at")
+  isActive          Boolean   @default(true) @map("is_active")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 

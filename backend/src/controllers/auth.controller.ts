@@ -53,6 +53,7 @@ export async function telegramAuth(req: Request, res: Response): Promise<void> {
         username: telegramUser.username || null,
         photoUrl: telegramUser.photo_url || null,
         languageCode: telegramUser.language_code || null,
+        trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       },
     });
 
@@ -79,6 +80,7 @@ export async function telegramAuth(req: Request, res: Response): Promise<void> {
           photoUrl: user.photoUrl,
           currency: user.currency,
           timezone: user.timezone,
+          preferredLanguage: user.preferredLanguage,
           plan: user.plan,
           subscriptionStatus: user.subscriptionStatus,
           trialEndsAt: user.trialEndsAt,

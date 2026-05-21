@@ -1,0 +1,139 @@
+{
+  "nav": { "home": "首页", "accounts": "账户", "add": "添加", "reports": "报告", "profile": "我的" },
+  "greeting": { "morning": "早上好", "afternoon": "下午好", "evening": "晚上好" },
+  "home": {
+    "totalNetWorth": "总净资产", "income": "收入", "spent": "支出", "saved": "储蓄",
+    "accounts": "账户", "manage": "管理 →", "thisWeek": "本周", "savingsRate": "储蓄率",
+    "transactions": "笔交易", "spendingByCategory": "分类支出",
+    "recentTransactions": "最近交易", "seeAll": "查看全部 →",
+    "noTransactions": "暂无交易记录", "noTransactionsHint": "添加您的第一笔支出或收入！",
+    "monthlyTrend": "月度趋势", "excellent": "非常好！", "keepGoing": "继续加油！", "overspending": "超支"
+  },
+  "accounts": {
+    "title": "账户", "subtitle": "管理您的资金账户", "totalAssets": "总资产",
+    "transfer": "转账", "noAccounts": "暂无账户", "addFirst": "+ 添加您的第一个账户",
+    "newAccount": "新建账户", "editAccount": "编辑账户", "transferMoney": "转账",
+    "createAccount": "创建账户", "saveChanges": "保存更改", "type": "类型",
+    "accountName": "账户名称", "accountNameHint": "例如：招行、支付宝、储蓄…",
+    "openingBalance": "初始余额", "icon": "图标", "color": "颜色", "from": "转出", "to": "转入",
+    "amount": "金额", "noteOptional": "备注（可选）", "noteHint": "添加备注…",
+    "deleteConfirm": "删除此账户？关联的交易将被解除。", "default": "默认",
+    "selectDifferent": "请选择不同的账户"
+  },
+  "accountType": { "cash": "现金", "bank": "银行", "ewallet": "电子钱包", "savings": "储蓄", "credit": "信用卡" },
+  "add": {
+    "title": "添加交易", "expense": "支出", "income": "收入", "amount": "金额",
+    "category": "类别", "account": "账户", "noteOptional": "备注（可选）",
+    "noteHint": "这笔钱用于什么？", "saveExpense": "保存支出", "saveIncome": "保存收入",
+    "confirmTransaction": "确认交易", "balanceAfter": "交易后余额", "note": "备注",
+    "cancel": "取消", "confirm": "确认", "blocked": "交易被拦截", "gotIt": "知道了",
+    "invalidAmount": "请输入大于 0 的有效金额。", "selectCategory": "请先选择类别再保存。"
+  },
+  "transactions": {
+    "title": "交易记录", "subtitle": "您的交易历史", "search": "搜索交易...",
+    "all": "全部", "expenses": "支出", "income": "收入", "notFound": "未找到交易记录",
+    "loadMore": "加载更多", "deleteTransaction": "删除交易？",
+    "deleteWarning": "此操作无法撤销。账户余额将被恢复。",
+    "editTransaction": "编辑交易", "saveChanges": "保存更改", "saveChangesQ": "保存更改？",
+    "delete": "删除", "cancel": "取消", "confirm": "确认", "category": "类别", "balanceAfter": "交易后余额"
+  },
+  "reports": {
+    "title": "报告", "subtitle": "您的支出分析", "income": "收入", "expenses": "支出",
+    "saved": "储蓄", "savingsRate": "储蓄率",
+    "excellentSavings": "非常好！您本月储蓄出色。",
+    "brokeEven": "您收支平衡。下个月尝试多存一些。",
+    "overspent": "您本月的支出超过了收入。",
+    "weeklyTrends": "周趋势", "spendingByCategory": "分类支出",
+    "noReports": "暂无报告", "noReportsHint": "开始添加交易记录以查看月度报告。"
+  },
+  "profile": {
+    "title": "我的", "settings": "设置", "settingsDesc": "应用偏好",
+    "privacy": "隐私与安全", "privacyDesc": "数据与权限",
+    "support": "Telegram 客服", "supportDesc": "直接与客服管理员聊天",
+    "closeApp": "关闭应用", "aiComing": "AI 洞察即将推出",
+    "aiDesc": "智能支出分类、预算建议和消费洞察。",
+    "currency": "货币", "timezone": "时区", "since": "加入时间", "proMember": "PRO 会员",
+    "version": "Finance GM v1.0.0"
+  },
+  "settings": {
+    "title": "设置", "appearance": "外观", "theme": "主题", "currency": "货币",
+    "defaultCurrency": "默认货币", "timezone": "时区", "notifications": "通知",
+    "weeklySummary": "每周总结", "weeklySummaryDesc": "获取每周财务报告",
+    "trialExpiration": "试用到期", "trialExpirationDesc": "试用结束前提醒",
+    "premiumReminder": "高级订阅提醒", "premiumReminderDesc": "订阅续期提醒",
+    "budgetAlerts": "预算提醒", "budgetAlertsDesc": "接近预算上限时通知",
+    "language": "语言", "saving": "保存中...", "chooseTheme": "选择主题",
+    "chooseCurrency": "选择货币", "chooseTimezone": "选择时区", "chooseLanguage": "选择语言"
+  },
+  "theme": {
+    "dark": "深色", "darkDesc": "始终深色", "light": "浅色", "lightDesc": "始终浅色",
+    "system": "跟随系统", "systemDesc": "跟随设备"
+  },
+  "privacy": {
+    "title": "隐私与安全", "telegramAccount": "Telegram 账号", "session": "会话",
+    "security": "安全", "name": "姓名", "username": "用户名", "telegramId": "Telegram ID",
+    "accountLinked": "已关联账号", "status": "状态", "platform": "平台",
+    "memberSince": "注册时间", "logout": "退出登录", "authentication": "身份验证",
+    "dataEncryption": "数据加密", "yourPrivacy": "您的隐私至关重要",
+    "privacyText": "您的财务数据经过安全存储，绝不与第三方共享。只有您才能访问自己的交易记录和账户。",
+    "active": "活跃", "telegramAuth": "Telegram 验证", "endToEnd": "端对端"
+  },
+  "subscription": {
+    "expired": "订阅已到期", "trialEnded": "免费试用已结束",
+    "expiredDesc": "您的高级订阅已到期。立即续费以继续记录交易。",
+    "trialDesc": "您的免费试用已结束。升级 Premium 以继续追踪财务。",
+    "premiumIncludes": "Premium 包含", "unlimitedTransactions": "无限制交易记录",
+    "advancedAnalytics": "高级分析与报告", "multipleAccounts": "多账户与转账",
+    "smartAlerts": "智能消费提醒", "upgradePremium": "升级到 Premium",
+    "scanQR": "扫码支付 · 24小时内激活"
+  },
+  "common": {
+    "loading": "加载中...", "error": "错误", "retry": "重试", "close": "关闭",
+    "cancel": "取消", "save": "保存", "done": "完成", "comingSoon": "即将推出",
+    "loadMore": "加载更多", "transfer": "转账", "noData": "暂无数据",
+    "today": "今天", "yesterday": "昨天", "daysAgo": "{{n}} 天前"
+  },
+  "notifications": {
+    "title": "通知", "empty": "暂无通知", "emptyDesc": "您已全部查看！",
+    "planExpired": "套餐已到期", "planExpiredDesc": "您的订阅已到期。立即升级以继续使用。",
+    "premiumExpired": "Premium 已到期", "premiumExpiredDesc": "您的 Premium 套餐已到期。续费以保持访问权限。",
+    "premiumExpiringSoon": "即将到期", "premiumExpiringSoonDesc": "您的 Premium 套餐将在 {{days}} 天后到期。",
+    "paymentPending": "付款审核中", "paymentPendingDesc": "您的付款正在审核中。我们将在24小时内激活您的套餐。",
+    "paymentApproved": "付款已批准！", "paymentApprovedDesc": "您的 Premium 套餐现已激活。尽情享用！",
+    "tapToUpgrade": "点击升级 →"
+  },
+  "support": {
+    "title": "Telegram 客服", "desc": "需要帮助？直接在 Telegram 上与我们的客服管理员聊天。",
+    "openChat": "打开 Telegram 聊天", "opensIn": "在 Telegram 中打开"
+  },
+  "categories": {
+    "food": "餐饮",
+    "transport": "交通",
+    "entertainment": "娱乐",
+    "shopping": "购物",
+    "bills": "账单",
+    "health": "健康",
+    "salary": "工资",
+    "freelance": "自由职业",
+    "investment": "投资",
+    "other": "其他"
+  },
+  "payment": {
+    "upgradeTitle": "升级到 Premium",
+    "selectPlan": "选择套餐",
+    "plan1month": "1个月", "plan3months": "3个月", "plan6months": "6个月", "planLifetime": "终身",
+    "popular": "热门", "bestValue": "最超值", "days": "天",
+    "payVia": "付款方式",
+    "accountName": "账户名称", "accountNo": "账户号码", "amountToPay": "应付金额",
+    "receipt": "付款收据", "removeReceipt": "删除",
+    "uploadReceipt": "点击上传付款截图", "uploadRequired": "提交前必须上传",
+    "receiptUploaded": "✓ 收据已上传 — 点击更换",
+    "txRef": "交易参考号 / 备注（选填）", "txRefHint": "例如：交易末4位数字",
+    "submit": "提交付款请求", "uploadFirst": "请先上传收据",
+    "activateHint": "管理员审核后，您的套餐将在24小时内激活",
+    "submitted": "付款已提交！",
+    "submittedDesc": "您的付款请求已发送给管理员审核，我们将在24小时内激活您的套餐。",
+    "done": "完成",
+    "noMethods": "暂无可用的付款方式。", "contactSupport": "请联系支持以升级。"
+  }
+}

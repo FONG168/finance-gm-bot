@@ -50,7 +50,7 @@ router.post('/auth/bot-token', async (req, res) => {
     const user = await prisma.user.findUnique({ where: { telegramId: BigInt(uid) } });
     if (!user) { res.status(404).json({ success: false, error: 'User not found — send /start to the bot first' }); return; }
     const token = generateJWT({ userId: user.id, telegramId: Number(user.telegramId), firstName: user.firstName });
-    res.json({ success: true, data: { token, user: { id: user.id, telegramId: Number(user.telegramId), firstName: user.firstName, lastName: user.lastName, username: user.username, photoUrl: user.photoUrl, currency: user.currency, timezone: user.timezone, plan: user.plan, subscriptionStatus: user.subscriptionStatus, trialEndsAt: user.trialEndsAt, premiumStartedAt: user.premiumStartedAt, premiumExpiresAt: user.premiumExpiresAt } } });
+    res.json({ success: true, data: { token, user: { id: user.id, telegramId: Number(user.telegramId), firstName: user.firstName, lastName: user.lastName, username: user.username, photoUrl: user.photoUrl, currency: user.currency, timezone: user.timezone, preferredLanguage: user.preferredLanguage, plan: user.plan, subscriptionStatus: user.subscriptionStatus, trialEndsAt: user.trialEndsAt, premiumStartedAt: user.premiumStartedAt, premiumExpiresAt: user.premiumExpiresAt } } });
   } catch (err) {
     console.error('Bot-token auth error:', err);
     res.status(500).json({ success: false, error: 'Auth failed' });
@@ -60,8 +60,17 @@ router.post('/auth/bot-token', async (req, res) => {
 router.get('/auth/me', authenticate, async (req, res) => {
   try {
     const payload = (req as any).user;
-    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    let user = await prisma.user.findUnique({ where: { id: payload.userId } });
     if (!user) { res.status(404).json({ success: false, error: 'User not found' }); return; }
+    // Lazy-set trialEndsAt for existing users who signed up before the 14-day logic
+    if (user.plan === 'FREE' && user.subscriptionStatus === 'TRIAL' && !user.trialEndsAt) {
+      const trialEnd = new Date(user.createdAt.getTime() + 14 * 24 * 60 * 60 * 1000);
+      user = await prisma.user.update({ where: { id: user.id }, data: { trialEndsAt: trialEnd } });
+    }
+    // Auto-expire trial if time has passed so frontend always sees correct status
+    if (user.plan === 'FREE' && user.subscriptionStatus === 'TRIAL' && user.trialEndsAt && user.trialEndsAt < new Date()) {
+      user = await prisma.user.update({ where: { id: user.id }, data: { subscriptionStatus: 'EXPIRED' } });
+    }
     res.json({
       success: true,
       data: {
@@ -73,6 +82,7 @@ router.get('/auth/me', authenticate, async (req, res) => {
         photoUrl: user.photoUrl,
         currency: user.currency,
         timezone: user.timezone,
+        preferredLanguage: user.preferredLanguage,
         plan: user.plan,
         subscriptionStatus: user.subscriptionStatus,
         trialEndsAt: user.trialEndsAt,
@@ -166,19 +176,21 @@ router.get('/subscription', authenticate, async (req, res) => {
   }
 });
 
-// Update user preferences (currency, timezone)
+// Update user preferences (currency, timezone, preferredLanguage)
 router.patch('/auth/me', authenticate, async (req, res) => {
   try {
     const { userId } = (req as any).user;
-    const { currency, timezone } = req.body;
+    const { currency, timezone, preferredLanguage } = req.body;
     const allowed_currencies = ['USD', 'KHR'];
     const allowed_timezones = ['UTC', 'Asia/Phnom_Penh', 'Asia/Bangkok', 'Asia/Singapore', 'Asia/Tokyo', 'America/New_York', 'Europe/London'];
+    const allowed_languages = ['en', 'km', 'zh'];
     const data: any = {};
     if (currency && allowed_currencies.includes(currency)) data.currency = currency;
     if (timezone && allowed_timezones.includes(timezone)) data.timezone = timezone;
+    if (preferredLanguage && allowed_languages.includes(preferredLanguage)) data.preferredLanguage = preferredLanguage;
     if (!Object.keys(data).length) { res.status(400).json({ success: false, error: 'No valid fields to update' }); return; }
     const user = await prisma.user.update({ where: { id: userId }, data });
-    res.json({ success: true, data: { currency: user.currency, timezone: user.timezone } });
+    res.json({ success: true, data: { currency: user.currency, timezone: user.timezone, preferredLanguage: user.preferredLanguage } });
   } catch (err) {
     console.error('Update preferences error:', err);
     res.status(500).json({ success: false, error: 'Failed to update preferences' });

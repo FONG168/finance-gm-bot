@@ -5,18 +5,20 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/index.js"
   },
   "dependencies": {
     "@prisma/client": "^5.7.0",
     "dotenv": "^16.3.1",
     "node-cron": "^3.0.3",
+    "pdfkit": "^0.18.0",
     "telegraf": "^4.15.6"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@types/node-cron": "^3.0.11",
+    "@types/pdfkit": "^0.17.6",
     "prisma": "^5.7.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"

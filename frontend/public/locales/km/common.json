@@ -1,0 +1,147 @@
+{
+  "nav": { "home": "ទំព័រដើម", "accounts": "គណនី", "add": "បន្ថែម", "reports": "របាយការណ៍", "profile": "ប្រវត្តិរូប" },
+  "greeting": { "morning": "អរុណសួស្ដី", "afternoon": "ទិវាសួស្ដី", "evening": "សាយណ្ហសួស្ដី" },
+  "home": {
+    "totalNetWorth": "ទ្រព្យសម្បត្តិសុទ្ធ", "income": "ចំណូល", "spent": "ចំណាយ", "saved": "សន្សំ",
+    "accounts": "គណនី", "manage": "គ្រប់គ្រង →", "thisWeek": "សប្ដាហ៍នេះ", "savingsRate": "អត្រាសន្សំ",
+    "transactions": "ប្រតិបត្តិការ", "spendingByCategory": "ការចំណាយតាមប្រភេទ",
+    "recentTransactions": "ប្រតិបត្តិការថ្មីៗ", "seeAll": "មើលទាំងអស់ →",
+    "noTransactions": "មិនទាន់មានប្រតិបត្តិការ", "noTransactionsHint": "បន្ថែមការចំណាយ ឬចំណូលដំបូងរបស់អ្នក!",
+    "monthlyTrend": "និន្នាការប្រចាំខែ", "excellent": "ល្អឥតខ្ចោះ!", "keepGoing": "បន្តទៀត!", "overspending": "ចំណាយលើស"
+  },
+  "accounts": {
+    "title": "គណនី", "subtitle": "គ្រប់គ្រងគណនីរបស់អ្នក", "totalAssets": "ទ្រព្យសម្បត្តិសរុប",
+    "transfer": "ផ្ទេរ", "noAccounts": "មិនទាន់មានគណនី", "addFirst": "+ បន្ថែមគណនីដំបូង",
+    "newAccount": "គណនីថ្មី", "editAccount": "កែប្រែគណនី", "transferMoney": "ផ្ទេរប្រាក់",
+    "createAccount": "បង្កើតគណនី", "saveChanges": "រក្សាទុកការផ្លាស់ប្ដូរ", "type": "ប្រភេទ",
+    "accountName": "ឈ្មោះគណនី", "accountNameHint": "ឧ. ABA, Wing, សន្សំ…",
+    "openingBalance": "សមតុល្យចាប់ផ្ដើម", "icon": "រូបតំណាង", "color": "ពណ៌",
+    "from": "ពី", "to": "ទៅ", "amount": "ចំនួន", "noteOptional": "កំណត់ចំណាំ (ស្រេចចិត្ត)",
+    "noteHint": "បន្ថែមកំណត់ចំណាំ…", "deleteConfirm": "លុបគណនីនេះ? ប្រតិបត្តិការនឹងត្រូវដកចេញ។",
+    "default": "លំនាំដើម", "selectDifferent": "ជ្រើសរើសគណនីខុសគ្នា"
+  },
+  "accountType": { "cash": "សាច់ប្រាក់", "bank": "ធនាគារ", "ewallet": "កាបូបអេឡិចត្រូនិក", "savings": "សន្សំ", "credit": "ឥណទាន" },
+  "add": {
+    "title": "បន្ថែមប្រតិបត្តិការ", "expense": "ការចំណាយ", "income": "ចំណូល",
+    "amount": "ចំនួនទឹកប្រាក់", "category": "ប្រភេទ", "account": "គណនី",
+    "noteOptional": "កំណត់ចំណាំ (ស្រេចចិត្ត)", "noteHint": "នេះជាការចំណាយអ្វី?",
+    "saveExpense": "រក្សាទុកការចំណាយ", "saveIncome": "រក្សាទុកចំណូល",
+    "confirmTransaction": "បញ្ជាក់ប្រតិបត្តិការ", "balanceAfter": "សមតុល្យក្រោយ",
+    "note": "កំណត់ចំណាំ", "cancel": "បោះបង់", "confirm": "បញ្ជាក់",
+    "blocked": "ប្រតិបត្តិការត្រូវបានទប់ស្កាត់", "gotIt": "យល់ហើយ",
+    "invalidAmount": "សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ។",
+    "selectCategory": "សូមជ្រើសរើសប្រភេទមុននឹងរក្សាទុក។"
+  },
+  "transactions": {
+    "title": "ប្រតិបត្តិការ", "subtitle": "ប្រវត្តិប្រតិបត្តិការរបស់អ្នក", "search": "ស្វែងរកប្រតិបត្តិការ...",
+    "all": "ទាំងអស់", "expenses": "ការចំណាយ", "income": "ចំណូល", "notFound": "រកមិនឃើញប្រតិបត្តិការ",
+    "loadMore": "ផ្ទុកបន្ថែម", "deleteTransaction": "លុបប្រតិបត្តិការ?",
+    "deleteWarning": "សកម្មភាពនេះមិនអាចដកវិញបានទេ។ សមតុល្យគណនីនឹងត្រឡប់មកវិញ។",
+    "editTransaction": "កែប្រែប្រតិបត្តិការ", "saveChanges": "រក្សាទុកការផ្លាស់ប្ដូរ",
+    "saveChangesQ": "រក្សាទុកការផ្លាស់ប្ដូរ?", "delete": "លុប", "cancel": "បោះបង់", "confirm": "បញ្ជាក់",
+    "category": "ប្រភេទ", "balanceAfter": "សមតុល្យក្រោយ"
+  },
+  "reports": {
+    "title": "របាយការណ៍", "subtitle": "ការវិភាគការចំណាយរបស់អ្នក", "income": "ចំណូល",
+    "expenses": "ការចំណាយ", "saved": "សន្សំ", "savingsRate": "អត្រាសន្សំ",
+    "excellentSavings": "ល្អឥតខ្ចោះ! អ្នកបានសន្សំបានល្អខែនេះ។",
+    "brokeEven": "អ្នករកចំណូលស្មើនឹងការចំណាយ។ ព្យាយាមសន្សំបន្ថែមខែក្រោយ។",
+    "overspent": "អ្នកចំណាយលើសចំណូលខែនេះ។",
+    "weeklyTrends": "និន្នាការប្រចាំសប្ដាហ៍", "spendingByCategory": "ការចំណាយតាមប្រភេទ",
+    "noReports": "មិនទាន់មានរបាយការណ៍", "noReportsHint": "ចាប់ផ្ដើមបន្ថែមប្រតិបត្តិការដើម្បីមើលរបាយការណ៍ប្រចាំខែ។"
+  },
+  "profile": {
+    "title": "ប្រវត្តិរូប", "settings": "ការកំណត់", "settingsDesc": "ចំណូលចិត្តកម្មវិធី",
+    "privacy": "ឯកជនភាព & សន្តិសុខ", "privacyDesc": "ទិន្នន័យ & សិទ្ធ",
+    "support": "ជំនួយ Telegram", "supportDesc": "ជជែកផ្ទាល់ជាមួយអ្នកគ្រប់គ្រង",
+    "closeApp": "បិទកម្មវិធី", "aiComing": "AI Insights នឹងមកដល់ក្នុងពេលឆាប់ៗ",
+    "aiDesc": "ការចាត់ថ្នាក់ការចំណាយ ការណែនាំថវិកា និងការវិភាគការចំណាយ។",
+    "currency": "រូបិយប័ណ្ណ", "timezone": "តំបន់ពេលវេលា", "since": "តាំងពី",
+    "proMember": "សមាជិក PRO", "version": "Finance GM v1.0.0"
+  },
+  "settings": {
+    "title": "ការកំណត់", "appearance": "រូបរាង", "theme": "រូបរាង", "currency": "រូបិយប័ណ្ណ",
+    "defaultCurrency": "រូបិយប័ណ្ណលំនាំដើម", "timezone": "តំបន់ពេលវេលា",
+    "notifications": "ការជូនដំណឹង", "weeklySummary": "សង្ខេបប្រចាំសប្ដាហ៍",
+    "weeklySummaryDesc": "ទទួលរបាយការណ៍ហិរញ្ញវត្ថុប្រចាំសប្ដាហ៍",
+    "trialExpiration": "ការផុតកំណត់ការសាកល្បង",
+    "trialExpirationDesc": "ការរំលឹកមុនការផុតការសាកល្បង",
+    "premiumReminder": "ការរំលឹក Premium", "premiumReminderDesc": "ការជូនដំណឹងការបន្ត",
+    "budgetAlerts": "ការជូនដំណឹងថវិកា", "budgetAlertsDesc": "ជូនដំណឹងនៅពេលជិតដល់ដែនកំណត់ថវិកា",
+    "language": "ភាសា", "saving": "កំពុងរក្សាទុក...", "chooseTheme": "ជ្រើសរើសរូបរាង",
+    "chooseCurrency": "ជ្រើសរើសរូបិយប័ណ្ណ", "chooseTimezone": "ជ្រើសរើសតំបន់ពេលវេលា",
+    "chooseLanguage": "ជ្រើសរើសភាសា"
+  },
+  "theme": {
+    "dark": "ងងឹត", "darkDesc": "ងងឹតជាអចិន្ត្រៃយ៍", "light": "ភ្លឺ", "lightDesc": "ភ្លឺជាអចិន្ត្រៃយ៍",
+    "system": "ប្រព័ន្ធ", "systemDesc": "តាមឧបករណ៍"
+  },
+  "privacy": {
+    "title": "ឯកជនភាព & សន្តិសុខ", "telegramAccount": "គណនី Telegram", "session": "វគ្គ",
+    "security": "សន្តិសុខ", "name": "ឈ្មោះ", "username": "ឈ្មោះអ្នកប្រើ", "telegramId": "Telegram ID",
+    "accountLinked": "គណនីភ្ជាប់", "status": "ស្ថានភាព", "platform": "វេទិកា",
+    "memberSince": "សមាជិកតាំងពី", "logout": "ចាកចេញ", "authentication": "ការផ្ទៀងផ្ទាត់",
+    "dataEncryption": "ការអ៊ិនគ្រីបទិន្នន័យ", "yourPrivacy": "ឯកជនភាពរបស់អ្នកសំខាន់",
+    "privacyText": "ទិន្នន័យហិរញ្ញវត្ថុរបស់អ្នកត្រូវបានរក្សាទុកដោយសុវត្ថិភាព និងមិនត្រូវបានចែករំលែកជាមួយភាគីទីបី។",
+    "active": "សកម្ម", "telegramAuth": "ការផ្ទៀងផ្ទាត់ Telegram", "endToEnd": "ពីចុងដល់ចុង"
+  },
+  "subscription": {
+    "expired": "ការជាវផុតកំណត់", "trialEnded": "ការសាកល្បងឥតគិតថ្លៃបានបញ្ចប់",
+    "expiredDesc": "ការជាវ premium របស់អ្នកផុតកំណត់ហើយ។ បន្តឥឡូវនេះ។",
+    "trialDesc": "ការសាកល្បងឥតគិតថ្លៃរបស់អ្នកបានបញ្ចប់ហើយ។ សូម តំឡើងទៅកម្រឹត Premium ដើម្បីបន្ត។",
+    "premiumIncludes": "Premium រួមមាន", "unlimitedTransactions": "ការកត់ប្រតិបត្តិការគ្មានដែនកំណត់",
+    "advancedAnalytics": "ការវិភាគ & របាយការណ៍កម្រិតខ្ពស់", "multipleAccounts": "គណនីច្រើន & ការផ្ទេរ",
+    "smartAlerts": "ការជូនដំណឹងការចំណាយ", "upgradePremium": "សូម តំឡើងទៅកម្រឹត Premium",
+    "scanQR": "ស្កែន QR ដើម្បីបង់ · ធ្វើឱ្យសកម្មក្នុង 24 ម៉ោង"
+  },
+  "common": {
+    "loading": "កំពុងផ្ទុក...", "error": "កំហុស", "retry": "ព្យាយាមម្ដងទៀត",
+    "close": "បិទ", "cancel": "បោះបង់", "save": "រក្សាទុក", "done": "រួចរាល់", "comingSoon": "ឆាប់ៗ",
+    "loadMore": "មើលបន្ថែម", "transfer": "ផ្ទេរ", "noData": "មិនទាន់មានទិន្នន័យ",
+    "today": "ថ្ងៃនេះ", "yesterday": "ម្សិលមិញ", "daysAgo": "{{n}} ថ្ងៃមុន"
+  },
+  "notifications": {
+    "title": "ការជូនដំណឹង", "empty": "គ្មានការជូនដំណឹង", "emptyDesc": "អ្នកទាំងអស់គ្នាបានឃើញ!",
+    "planExpired": "ការជាវផុតកំណត់", "planExpiredDesc": "ការជាវរបស់អ្នកផុតកំណត់ហើយ។ ដំឡើងឥឡូវដើម្បីបន្ត។",
+    "premiumExpired": "Premium ផុតកំណត់", "premiumExpiredDesc": "ការជាវ Premium ផុតកំណត់ហើយ។ បន្តដើម្បីរក្សាការចូលប្រើ។",
+    "premiumExpiringSoon": "ជិតផុតកំណត់", "premiumExpiringSoonDesc": "ការជាវ Premium នឹងផុតក្នុង {{days}} ថ្ងៃ។",
+    "paymentPending": "ការទូទាត់កំពុងត្រូវបានពិនិត្យ", "paymentPendingDesc": "ការទូទាត់របស់អ្នកកំពុងត្រូវបានពិនិត្យ។ យើងនឹងដំណើរការក្នុង 24 ម៉ោង។",
+    "paymentApproved": "ការទូទាត់ត្រូវបានអនុម័ត!", "paymentApprovedDesc": "ការជាវ Premium របស់អ្នកឥឡូវដំណើរការ។ រីករាយនឹងការចូលប្រើពេញលេញ!",
+    "tapToUpgrade": "ចុចដើម្បីដំឡើង →"
+  },
+  "support": {
+    "title": "ជំនួយ Telegram",
+    "desc": "ត្រូវការជំនួយ? ជជែកផ្ទាល់ជាមួយអ្នកគ្រប់គ្រងតាម Telegram។",
+    "openChat": "បើក Telegram Chat", "opensIn": "បើកក្នុង Telegram"
+  },
+  "categories": {
+    "food": "អាហារ",
+    "transport": "ដឹកជញ្ជូន",
+    "entertainment": "កម្សាន្ត",
+    "shopping": "ទិញដូរ",
+    "bills": "វិក្កយបត្រ",
+    "health": "សុខភាព",
+    "salary": "ប្រាក់ខែ",
+    "freelance": "ឯករាជ្យ",
+    "investment": "វិនិយោគ",
+    "other": "ផ្សេងៗ"
+  },
+  "payment": {
+    "upgradeTitle": "តំឡើងទៅ Premium",
+    "selectPlan": "ជ្រើសរើសគម្រោង",
+    "plan1month": "១ ខែ", "plan3months": "៣ ខែ", "plan6months": "៦ ខែ", "planLifetime": "អស់មួយជីវិត",
+    "popular": "ពេញនិយម", "bestValue": "តម្លៃល្អបំផុត", "days": "ថ្ងៃ",
+    "payVia": "បង់ប្រាក់តាម",
+    "accountName": "ឈ្មោះគណនី", "accountNo": "លេខគណនី", "amountToPay": "ចំនួនទឹកប្រាក់ត្រូវបង់",
+    "receipt": "វិក្កយបត្រការទូទាត់", "removeReceipt": "លុប",
+    "uploadReceipt": "ចុចដើម្បីបញ្ចូលរូបថតការទូទាត់", "uploadRequired": "ត្រូវការមុនការដាក់ស្នើ",
+    "receiptUploaded": "✓ វិក្កយបត្របានបញ្ចូល — ចុចដើម្បីប្តូរ",
+    "txRef": "លេខយោងប្រតិបត្តិការ / កំណត់ចំណាំ (ស្រេចចិត្ត)", "txRefHint": "ឧ. លេខ 4 ខ្ទង់ចុងក្រោយ",
+    "submit": "ដាក់ស្នើសំណើការទូទាត់", "uploadFirst": "សូមបញ្ចូលវិក្កយបត្រជាមុន",
+    "activateHint": "គម្រោងរបស់អ្នកនឹងត្រូវបានដំណើរការក្នុង 24 ម៉ោង បន្ទាប់ពីការពិនិត្យ",
+    "submitted": "ការទូទាត់បានដាក់ស្នើ!",
+    "submittedDesc": "សំណើការទូទាត់របស់អ្នកត្រូវបានផ្ញើទៅអ្នកគ្រប់គ្រងដើម្បីពិនិត្យ។ យើងនឹងដំណើរការគម្រោងរបស់អ្នកក្នុង 24 ម៉ោង។",
+    "done": "រួចរាល់",
+    "noMethods": "មិនទាន់មានវិធីបង់ប្រាក់ទេ។", "contactSupport": "សូមទាក់ទងផ្នែកជំនួយដើម្បីតំឡើង។"
+  }
+}

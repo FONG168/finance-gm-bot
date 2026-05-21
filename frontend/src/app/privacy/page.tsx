@@ -1,10 +1,12 @@
 'use client';
 
+import '@/lib/i18n';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, User, Smartphone, Copy, Check, Lock, Shield } from 'lucide-react';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 function SectionHeader({ icon: Icon, title, color }: { icon: React.ElementType; title: string; color: string }) {
   return (
@@ -45,6 +47,7 @@ function InfoRow({ label, value, copyable }: { label: string; value: string; cop
 export default function PrivacyPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useTranslation('common');
 
   const memberSince = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -57,49 +60,38 @@ export default function PrivacyPage() {
         <button onClick={() => router.back()} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center">
           <ArrowLeft className="w-4 h-4" />
         </button>
-        <h1 className="text-xl font-bold">Privacy & Security</h1>
+        <h1 className="text-xl font-bold">{t('privacy.title')}</h1>
       </div>
 
       <div className="px-4 max-w-2xl mx-auto space-y-5">
 
         {/* Account Info */}
         <div>
-          <SectionHeader icon={User} title="Telegram Account" color="#229ED9" />
+          <SectionHeader icon={User} title={t('privacy.telegramAccount')} color="#229ED9" />
           <div className="rounded-2xl bg-card border border-border divide-y divide-border/50">
-            <InfoRow label="Name" value={`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || '—'} />
-            {user?.username && <InfoRow label="Username" value={`@${user.username}`} copyable />}
-            <InfoRow label="Telegram ID" value={user?.telegramId ? String(user.telegramId) : '—'} copyable />
-            <InfoRow label="Account Linked" value="✓ Telegram" />
+            <InfoRow label={t('privacy.name')} value={`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || '—'} />
+            {user?.username && <InfoRow label={t('privacy.username')} value={`@${user.username}`} copyable />}
+            <InfoRow label={t('privacy.telegramId')} value={user?.telegramId ? String(user.telegramId) : '—'} copyable />
+            <InfoRow label={t('privacy.accountLinked')} value="✓ Telegram" />
           </div>
         </div>
 
         {/* Session */}
         <div>
-          <SectionHeader icon={Smartphone} title="Session" color="#6366f1" />
+          <SectionHeader icon={Smartphone} title={t('privacy.session')} color="#6366f1" />
           <div className="rounded-2xl bg-card border border-border divide-y divide-border/50">
-            <InfoRow label="Status" value="Active" />
-            <InfoRow label="Platform" value="Telegram Mini App" />
-            <InfoRow label="Member Since" value={memberSince} />
-            <button
-              onClick={() => {
-                localStorage.removeItem('auth_token');
-                router.replace('/');
-              }}
-              className="w-full flex items-center justify-between px-4 py-3.5 text-rose-400 hover:bg-rose-500/5 transition-colors"
-            >
-              <span className="text-sm font-medium">Logout</span>
-              <ArrowLeft className="w-4 h-4 rotate-180" />
-            </button>
+            <InfoRow label={t('privacy.status')} value={t('privacy.active')} />
+            <InfoRow label={t('privacy.platform')} value="Telegram Mini App" />
+            <InfoRow label={t('privacy.memberSince')} value={memberSince} />
           </div>
         </div>
 
         {/* Security Info */}
         <div>
-          <SectionHeader icon={Lock} title="Security" color="#10b981" />
+          <SectionHeader icon={Lock} title={t('privacy.security')} color="#10b981" />
           <div className="rounded-2xl bg-card border border-border divide-y divide-border/50">
-            <InfoRow label="Authentication" value="Telegram Auth" />
-            <InfoRow label="Data Encryption" value="End-to-End" />
-            <InfoRow label="Storage" value="Secure Cloud (Supabase)" />
+            <InfoRow label={t('privacy.authentication')} value={t('privacy.telegramAuth')} />
+            <InfoRow label={t('privacy.dataEncryption')} value={t('privacy.endToEnd')} />
           </div>
         </div>
 
@@ -110,9 +102,9 @@ export default function PrivacyPage() {
             <Shield className="w-4 h-4 text-indigo-400" />
           </div>
           <div>
-            <p className="text-sm font-medium mb-0.5">Your Privacy Matters</p>
+            <p className="text-sm font-medium mb-0.5">{t('privacy.yourPrivacy')}</p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Your financial data is stored securely and never shared with third parties. Only you can access your transactions and accounts.
+              {t('privacy.privacyText')}
             </p>
           </div>
         </div>

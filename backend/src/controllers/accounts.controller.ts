@@ -155,7 +155,7 @@ export async function getAccountTransactions(req: Request, res: Response): Promi
       return;
     }
 
-    const [transactions, total] = await Promise.all([
+    const [transactions, total, incomeAgg, expenseAgg, transferInAgg] = await Promise.all([
       prisma.transaction.findMany({
         where: { accountId: id, userId },
         include: { category: true, account: true },
@@ -164,17 +164,68 @@ export async function getAccountTransactions(req: Request, res: Response): Promi
         take: limitNum,
       }),
       prisma.transaction.count({ where: { accountId: id, userId } }),
+      prisma.transaction.aggregate({ where: { accountId: id, userId, type: 'income' }, _sum: { amount: true } }),
+      prisma.transaction.aggregate({ where: { accountId: id, userId, type: 'expense' }, _sum: { amount: true } }),
+      // Incoming transfers: note starts with "Transfer from" (credit leg)
+      prisma.transaction.aggregate({
+        where: { accountId: id, userId, type: 'transfer', note: { startsWith: 'Transfer from' } },
+        _sum: { amount: true },
+      }),
     ]);
+
+    // Determine transfer direction for each transfer transaction.
+    // Batch-fetch partner legs (same transferId, different accountId) to avoid N+1.
+    const transferIds = transactions
+      .filter((t) => t.type === 'transfer' && t.transferId)
+      .map((t) => t.transferId!);
+
+    const incomingTransferIds = new Set<string>();
+    if (transferIds.length > 0) {
+      const partners = await prisma.transaction.findMany({
+        where: { transferId: { in: transferIds }, accountId: { not: id } },
+        select: { transferId: true, accountId: true },
+      });
+      // The partner is the OTHER leg. If the partner's accountId is the source
+      // (i.e., the partner has note "Transfer to …"), then our leg is the credit (incoming).
+      // Simpler: query which transferIds had their partner as the FROM side by checking
+      // the partner note. But safest is: the transaction on THIS account whose note starts
+      // with "Transfer from" is the credit (incoming) leg.
+      for (const tx of transactions) {
+        if (tx.type === 'transfer' && tx.transferId && tx.note?.startsWith('Transfer from')) {
+          incomingTransferIds.add(tx.transferId);
+        }
+      }
+      // Fallback for custom notes: if neither leg has "Transfer from", check if this
+      // account's leg was NOT found in partners (i.e., this account IS the destination).
+      // The destination was balance-incremented. We can't know from the record alone,
+      // so leave unresolved transfers as 'out' (neutral fallback).
+    }
+
+    const serialized = transactions.map((t) => {
+      const base = serializeTransaction(t);
+      if (t.type === 'transfer' && t.transferId) {
+        return {
+          ...base,
+          transferDirection: incomingTransferIds.has(t.transferId) ? 'in' : 'out',
+        };
+      }
+      return base;
+    });
+
+    const totalIncome = Number(incomeAgg._sum.amount || 0) + Number(transferInAgg._sum.amount || 0);
+    const totalExpense = Number(expenseAgg._sum.amount || 0);
 
     res.json({
       success: true,
       data: {
         account: serializeAccount(account),
-        data: transactions.map(serializeTransaction),
+        data: serialized,
         total,
         page: pageNum,
         limit: limitNum,
         hasMore: skip + limitNum < total,
+        totalIncome,
+        totalExpense,
       },
     });
   } catch (err) {

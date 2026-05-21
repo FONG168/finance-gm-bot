@@ -27,3 +27,28 @@ export interface WeeklySummary {
   transactionCount: number;
   categoryBreakdown: CategoryBreakdown[];
 }
+
+export interface TransactionRecord {
+  id: string;
+  date: string;
+  type: string;
+  amount: number;
+  note: string;
+  categoryLabel: string;
+  categoryName: string;
+  categoryIcon: string;
+  accountName: string;
+  accountIcon: string;
+}
+
+export interface MonthlySummary {
+  month: number;
+  year: number;
+  totalIncome: number;
+  totalExpenses: number;
+  netBalance: number;
+  savingsRate: number;
+  categoryBreakdown: CategoryBreakdown[];
+  weeklyTrends: WeeklyTrend[];
+  transactions: TransactionRecord[];
+}

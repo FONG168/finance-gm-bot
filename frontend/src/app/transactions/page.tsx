@@ -1,16 +1,18 @@
 'use client';
 
+import '@/lib/i18n';
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Check, Trash2 } from 'lucide-react';
+import { Search, X, Check, Trash2, Pencil } from 'lucide-react';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { TransactionItem } from '@/components/transactions/TransactionItem';
 import { useAuth } from '@/hooks/useAuth';
 import { useTelegram } from '@/hooks/useTelegram';
 import { apiService } from '@/services/api';
 import { Transaction, CATEGORIES, TransactionType } from '@shared/types';
-import { formatDate, formatCurrency } from '@/lib/utils';
+import { formatDate, formatCurrency, formatTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 type FilterType = 'all' | 'income' | 'expense';
 
@@ -33,6 +35,7 @@ function DeleteConfirmModal({
 }: {
   transaction: Transaction; onConfirm: () => void; onCancel: () => void; isLoading: boolean;
 }) {
+  const { t } = useTranslation('common');
   const cat = CATEGORIES.find((c) => c.id === transaction.categoryId);
   return (
     <motion.div
@@ -53,9 +56,9 @@ function DeleteConfirmModal({
           <div className="w-14 h-14 rounded-full bg-rose-500/20 flex items-center justify-center">
             <Trash2 className="w-6 h-6 text-rose-400" />
           </div>
-          <h3 className="text-base font-bold">Delete Transaction?</h3>
+          <h3 className="text-base font-bold">{t('transactions.deleteTransaction')}</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            This action cannot be undone. The account balance will be reversed.
+            {t('transactions.deleteWarning')}
           </p>
         </div>
 
@@ -63,8 +66,8 @@ function DeleteConfirmModal({
         <div className="rounded-2xl bg-secondary p-3 mb-5 flex items-center gap-3">
           <span className="text-2xl flex-shrink-0">{cat?.icon || '📦'}</span>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold truncate">{transaction.note || cat?.label || 'Transaction'}</p>
-            <p className="text-xs text-muted-foreground">{cat?.label}</p>
+            <p className="text-sm font-semibold truncate">{transaction.note || (cat ? t(`categories.${cat.name}`) : t('categories.other'))}</p>
+            <p className="text-xs text-muted-foreground">{cat ? t(`categories.${cat.name}`) : ''}</p>
           </div>
           <p className={cn('text-sm font-bold tabular-nums flex-shrink-0', transaction.type === 'income' ? 'text-emerald-400' : 'text-rose-400')}>
             {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
@@ -76,7 +79,7 @@ function DeleteConfirmModal({
             onClick={onCancel}
             className="flex-1 py-3 rounded-2xl bg-secondary text-sm font-semibold text-muted-foreground"
           >
-            Cancel
+            {t('transactions.cancel')}
           </button>
           <button
             onClick={onConfirm}
@@ -90,7 +93,7 @@ function DeleteConfirmModal({
                 className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
               />
             ) : (
-              <><Trash2 className="w-4 h-4" />Delete</>
+              <><Trash2 className="w-4 h-4" />{t('transactions.delete')}</>
             )}
           </button>
         </div>
@@ -106,6 +109,7 @@ function EditTransactionModal({
   transaction: Transaction; onSaved: () => void; onCancel: () => void;
 }) {
   const { haptic } = useTelegram();
+  const { t } = useTranslation('common');
   const [type, setType] = useState<TransactionType>(transaction.type as TransactionType);
   const [amount, setAmount] = useState(String(transaction.amount));
   const [categoryId, setCategoryId] = useState(transaction.categoryId);
@@ -151,7 +155,7 @@ function EditTransactionModal({
       >
         {/* Header */}
         <div className="flex items-center justify-between p-5 pb-3 flex-shrink-0">
-          <h2 className="text-base font-bold">Edit Transaction</h2>
+          <h2 className="text-base font-bold">{t('transactions.editTransaction')}</h2>
           <button onClick={onCancel} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
             <X className="w-4 h-4" />
           </button>
@@ -161,25 +165,25 @@ function EditTransactionModal({
         <div className="overflow-y-auto flex-1 px-5 pb-safe space-y-4">
           {/* Type toggle */}
           <div className="flex rounded-2xl bg-secondary p-1 gap-1">
-            {(['expense', 'income'] as TransactionType[]).map((t) => (
+            {(['expense', 'income'] as TransactionType[]).map((tp) => (
               <button
-                key={t}
-                onClick={() => { setType(t); setCategoryId(''); haptic.selection(); }}
+                key={tp}
+                onClick={() => { setType(tp); setCategoryId(''); haptic.selection(); }}
                 className={cn(
                   'flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all',
-                  type === t
-                    ? t === 'expense' ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'
+                  type === tp
+                    ? tp === 'expense' ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'
                     : 'text-muted-foreground',
                 )}
               >
-                {t === 'expense' ? '💸 Expense' : '💰 Income'}
+                {tp === 'expense' ? `💸 ${t('add.expense')}` : `💰 ${t('add.income')}`}
               </button>
             ))}
           </div>
 
           {/* Amount */}
           <div className="text-center py-3">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Amount</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('add.amount')}</p>
             <div className="flex items-center justify-center gap-1">
               <span className="text-4xl font-bold flex-shrink-0" style={{ color: amountColor }}>$</span>
               <input
@@ -198,7 +202,7 @@ function EditTransactionModal({
 
           {/* Category grid */}
           <div>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Category</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('transactions.category')}</p>
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
               {categories.map((c) => (
                 <button
@@ -211,7 +215,7 @@ function EditTransactionModal({
                 >
                   <span className="text-xl">{c.icon}</span>
                   <span className={cn('text-[9px] font-medium text-center leading-tight', categoryId === c.id ? 'text-violet-400' : 'text-muted-foreground')}>
-                    {c.label.split(' ')[0]}
+                    {t(`categories.${c.name}`)}
                   </span>
                 </button>
               ))}
@@ -220,12 +224,12 @@ function EditTransactionModal({
 
           {/* Note */}
           <div className="bg-secondary rounded-2xl p-4">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block mb-2">Note (optional)</label>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block mb-2">{t('add.noteOptional')}</label>
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="What was this for?"
+              placeholder={t('add.noteHint')}
               className="w-full bg-transparent outline-none text-sm placeholder:text-muted-foreground/40"
               maxLength={100}
             />
@@ -239,7 +243,7 @@ function EditTransactionModal({
             style={{ background: 'linear-gradient(135deg,#7c3aed,#4f46e5)' }}
           >
             <Check className="w-4 h-4" />
-            Save Changes
+            {t('transactions.saveChanges')}
           </button>
         </div>
       </motion.div>
@@ -263,13 +267,13 @@ function EditTransactionModal({
             >
               <div className="flex flex-col items-center text-center gap-2 mb-5">
                 <span className="text-3xl">{cat?.icon || '📦'}</span>
-                <h3 className="text-base font-bold">Save Changes?</h3>
+                <h3 className="text-base font-bold">{t('transactions.saveChangesQ')}</h3>
                 <p className="text-xs text-muted-foreground">
                   Update this transaction to{' '}
                   <span style={{ color: type === 'expense' ? '#ef4444' : '#22c55e' }} className="font-bold">
                     {type === 'expense' ? '-' : '+'}{formatCurrency(parseFloat(amount) || 0)}
                   </span>
-                  {' '}· {cat?.label || 'Unknown'}
+                  {' '}· {cat ? t(`categories.${cat.name}`) : t('categories.other')}
                 </p>
               </div>
               <div className="flex gap-3">
@@ -277,7 +281,7 @@ function EditTransactionModal({
                   onClick={() => setShowConfirm(false)}
                   className="flex-1 py-3 rounded-2xl bg-secondary text-sm font-semibold text-muted-foreground"
                 >
-                  Cancel
+                  {t('transactions.cancel')}
                 </button>
                 <button
                   onClick={handleSave}
@@ -292,7 +296,7 @@ function EditTransactionModal({
                       className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                     />
                   ) : (
-                    <><Check className="w-4 h-4" />Confirm</>
+                    <><Check className="w-4 h-4" />{t('transactions.confirm')}</>
                   )}
                 </button>
               </div>
@@ -308,6 +312,7 @@ function EditTransactionModal({
 export default function TransactionsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { haptic } = useTelegram();
+  const { t } = useTranslation('common');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>('all');
@@ -317,6 +322,7 @@ export default function TransactionsPage() {
 
   const [pendingDelete, setPendingDelete] = useState<Transaction | null>(null);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const load = useCallback(
@@ -371,11 +377,11 @@ export default function TransactionsPage() {
     load(true);
   };
 
-  const filtered = transactions.filter((t) => {
+  const filtered = transactions.filter((tr) => {
     if (!search) return true;
     return (
-      t.note?.toLowerCase().includes(search.toLowerCase()) ||
-      t.category?.label.toLowerCase().includes(search.toLowerCase())
+      tr.note?.toLowerCase().includes(search.toLowerCase()) ||
+      tr.category?.label.toLowerCase().includes(search.toLowerCase())
     );
   });
 
@@ -386,8 +392,8 @@ export default function TransactionsPage() {
       {/* Header */}
       <div className="px-4 pt-5 pb-3 max-w-2xl mx-auto space-y-3">
         <div>
-          <h1 className="text-xl font-bold">Transactions</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Your transaction history</p>
+          <h1 className="text-xl font-bold">{t('transactions.title')}</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">{t('transactions.subtitle')}</p>
         </div>
 
         {/* Search */}
@@ -396,7 +402,7 @@ export default function TransactionsPage() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search transactions..."
+            placeholder={t('transactions.search')}
             className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-secondary text-sm outline-none placeholder:text-muted-foreground/50"
           />
         </div>
@@ -412,7 +418,7 @@ export default function TransactionsPage() {
                 filter === f ? 'bg-violet-600 text-white' : 'bg-secondary text-muted-foreground',
               )}
             >
-              {f === 'all' ? 'All' : f === 'expense' ? '💸 Expenses' : '💰 Income'}
+              {f === 'all' ? t('transactions.all') : f === 'expense' ? `💸 ${t('transactions.expenses')}` : `💰 ${t('transactions.income')}`}
             </button>
           ))}
         </div>
@@ -430,7 +436,7 @@ export default function TransactionsPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-4xl mb-3">🔍</p>
-            <p className="text-muted-foreground text-sm">No transactions found</p>
+            <p className="text-muted-foreground text-sm">{t('transactions.notFound')}</p>
           </div>
         ) : (
           <>
@@ -440,10 +446,11 @@ export default function TransactionsPage() {
                   {date}
                 </p>
                 <div className="rounded-2xl bg-card border border-border divide-y divide-border/50 overflow-hidden">
-                  {txns.map((t, i) => (
-                    <div key={t.id} className="px-3">
+                  {txns.map((tr, i) => (
+                    <div key={tr.id} className="px-3">
                       <TransactionItem
-                        transaction={t}
+                        transaction={tr}
+                        onClick={(tx) => { haptic.selection(); setViewingTransaction(tx); }}
                         onEdit={(tx) => { haptic.selection(); setEditingTransaction(tx); }}
                         onDelete={(id) => { haptic.selection(); setPendingDelete(transactions.find((tx) => tx.id === id) || null); }}
                         index={i}
@@ -459,7 +466,7 @@ export default function TransactionsPage() {
                 onClick={() => load(false)}
                 className="w-full py-3 text-sm text-violet-400 font-semibold"
               >
-                Load more
+                {t('transactions.loadMore')}
               </button>
             )}
           </>
@@ -490,6 +497,116 @@ export default function TransactionsPage() {
           />
         )}
       </AnimatePresence>
+
+      {/* Transaction detail sheet */}
+      <AnimatePresence>
+        {viewingTransaction && (
+          <TransactionDetailSheet
+            transaction={viewingTransaction}
+            onClose={() => setViewingTransaction(null)}
+            onEdit={(tx) => { setViewingTransaction(null); setEditingTransaction(tx); }}
+            onDelete={(tx) => { setViewingTransaction(null); setPendingDelete(tx); }}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Transaction Detail Sheet ──────────────────────────────────────────────────
+function TransactionDetailSheet({
+  transaction, onClose, onEdit, onDelete,
+}: {
+  transaction: Transaction;
+  onClose: () => void;
+  onEdit: (t: Transaction) => void;
+  onDelete: (t: Transaction) => void;
+}) {
+  const { t } = useTranslation('common');
+  const cat = CATEGORIES.find((c) => c.id === transaction.categoryId) || transaction.category;
+  const isIncome =
+    transaction.type === 'income' ||
+    (transaction.type === 'transfer' && (transaction.note?.startsWith('Transfer from') ?? false));
+  const catLabel = cat ? t(`categories.${cat.name}`, { defaultValue: cat.label }) : '';
+  const typeLabel = transaction.type === 'transfer'
+    ? t('common.transfer', { defaultValue: 'Transfer' })
+    : isIncome
+    ? t('transactions.income', { defaultValue: 'Income' })
+    : t('transactions.expenses', { defaultValue: 'Expense' });
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[70] bg-black/60 flex items-end sm:items-center sm:justify-center sm:px-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+        className="w-full max-w-lg mx-auto bg-card rounded-t-3xl sm:rounded-3xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Colored top banner */}
+        <div
+          className="px-6 pt-8 pb-6 flex flex-col items-center text-center"
+          style={{ backgroundColor: `${cat?.color}18` }}
+        >
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-3"
+            style={{ backgroundColor: `${cat?.color}30` }}
+          >
+            {cat?.icon || '📦'}
+          </div>
+          <p className={`text-3xl font-bold tabular-nums mb-1 ${isIncome ? 'text-emerald-400' : 'text-rose-400'}`}>
+            {isIncome ? '+' : '-'}{formatCurrency(transaction.amount)}
+          </p>
+          <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ backgroundColor: `${cat?.color}25`, color: cat?.color }}>
+            {typeLabel}
+          </span>
+        </div>
+
+        {/* Details list */}
+        <div className="px-6 py-4 space-y-3">
+          <DetailRow label={t('add.category', { defaultValue: 'Category' })} value={`${cat?.icon || ''} ${catLabel}`} />
+          <DetailRow label={t('add.date', { defaultValue: 'Date' })} value={formatDate(transaction.date, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} />
+          <DetailRow label={t('add.time', { defaultValue: 'Time' })} value={formatTime(transaction.date)} />
+          {transaction.note && <DetailRow label={t('add.note', { defaultValue: 'Note' })} value={transaction.note} />}
+          {transaction.account && <DetailRow label={t('accounts.title', { defaultValue: 'Account' })} value={`${transaction.account.icon} ${transaction.account.name}`} />}
+        </div>
+
+        {/* Action buttons */}
+        <div className="px-6 pb-safe flex gap-3" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}>
+          <button
+            onClick={() => onEdit(transaction)}
+            className="flex-1 py-3 rounded-2xl bg-secondary flex items-center justify-center gap-2 text-sm font-semibold"
+          >
+            <Pencil className="w-4 h-4" />
+            {t('transactions.edit', { defaultValue: 'Edit' })}
+          </button>
+          <button
+            onClick={() => onDelete(transaction)}
+            className="flex-1 py-3 rounded-2xl bg-rose-500/10 flex items-center justify-center gap-2 text-sm font-semibold text-rose-400"
+          >
+            <Trash2 className="w-4 h-4" />
+            {t('transactions.delete', { defaultValue: 'Delete' })}
+          </button>
+          <button
+            onClick={onClose}
+            className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-sm font-semibold text-right max-w-[60%]">{value}</span>
     </div>
   );
 }

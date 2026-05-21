@@ -1,6 +1,7 @@
 import { Context } from 'telegraf';
 import { parseTransaction } from '../services/nlp.service';
 import { prisma } from '../lib/prisma';
+import { t, resolveLang } from '../i18n';
 
 const db = prisma as any;
 
@@ -20,7 +21,9 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
       return;
     }
 
-    // ── 1. Require at least one account ──────────────────────────────────────
+    const lang = resolveLang(user.preferredLanguage);
+    const tr = t(lang);
+
     const accounts: any[] = await db.account.findMany({
       where: { userId: user.id, isArchived: false },
       orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }],
@@ -29,46 +32,37 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
     if (accounts.length === 0) {
       const webAppUrl = process.env.FRONTEND_URL!;
       const isProd = webAppUrl?.startsWith('https://');
-      await ctx.reply(
-        '🏦 *No account found!*\n\n' +
-        'You need to create a cash account before recording transactions.\n\n' +
-        '👉 Open the dashboard, go to *Accounts* tab, and tap ➕ to create your first account ' +
-        '(e.g. "Cash on Hand").\n\n' +
-        'Once your account is set up, come back and record your transaction normally.',
-        {
-          parse_mode: 'Markdown',
-          reply_markup: isProd
-            ? ({
-                keyboard: [[{ text: '🏦 Open Accounts', web_app: { url: `${webAppUrl}/accounts` } }]],
-                resize_keyboard: true,
-                one_time_keyboard: true,
-              } as any)
-            : undefined,
-        },
-      );
+      await ctx.reply(tr.noAccount, {
+        parse_mode: 'Markdown',
+        reply_markup: isProd
+          ? ({
+              keyboard: [[{ text: tr.openAccounts, web_app: { url: `${webAppUrl}/accounts` } }]],
+              resize_keyboard: true,
+              one_time_keyboard: true,
+            } as any)
+          : undefined,
+      });
       return;
     }
 
-    // Use default account, fallback to first
     const account = accounts.find((a: any) => a.isDefault) ?? accounts[0];
 
-    // ── 2. Insufficient funds check for expenses ──────────────────────────────
     if (parsed.type === 'expense') {
       const balance = Number(account.balance);
       if (balance < parsed.amount) {
         await ctx.reply(
-          `❌ *Insufficient funds!*\n\n` +
-          `💳 *${account.name}* balance: *$${balance.toFixed(2)}*\n` +
-          `💸 Transaction amount: *$${parsed.amount.toFixed(2)}*\n\n` +
-          `You need *$${(parsed.amount - balance).toFixed(2)}* more to complete this transaction.\n\n` +
-          `_Add income first or reduce the amount._`,
+          tr.insufficientFunds(
+            account.name,
+            balance.toFixed(2),
+            parsed.amount.toFixed(2),
+            (parsed.amount - balance).toFixed(2),
+          ),
           { parse_mode: 'Markdown' },
         );
         return;
       }
     }
 
-    // ── 3. Create transaction + update account balance atomically ─────────────
     const category = await prisma.category.findUnique({ where: { name: parsed.category } });
     const categoryId = category?.id || 'other';
 
@@ -85,36 +79,30 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
         },
       }),
       parsed.type === 'income'
-        ? db.account.update({
-            where: { id: account.id },
-            data: { balance: { increment: parsed.amount } },
-          })
-        : db.account.update({
-            where: { id: account.id },
-            data: { balance: { decrement: parsed.amount } },
-          }),
+        ? db.account.update({ where: { id: account.id }, data: { balance: { increment: parsed.amount } } })
+        : db.account.update({ where: { id: account.id }, data: { balance: { decrement: parsed.amount } } }),
     ]);
 
-    // Fetch updated balance to show in reply
     const updated = await db.account.findUnique({ where: { id: account.id } });
     const newBalance = Number(updated.balance);
-
     const isIncome = parsed.type === 'income';
     const sign = isIncome ? '+' : '-';
-    const emoji = isIncome ? '💰' : '💸';
 
-    const reply =
-      `${emoji} *Transaction Logged!*\n\n` +
-      `*Amount:* ${sign}$${parsed.amount.toFixed(2)}\n` +
-      `*Category:* ${category?.icon || '📦'} ${category?.label || 'Other'}\n` +
-      `*Note:* ${parsed.note}\n` +
-      `*Account:* ${account.icon} ${account.name}\n` +
-      `*New Balance:* $${newBalance.toFixed(2)}\n\n` +
-      `_Use /summary to see your weekly report._`;
-
-    await ctx.reply(reply, { parse_mode: 'Markdown' });
+    await ctx.reply(
+      tr.txLogged(
+        sign,
+        parsed.amount.toFixed(2),
+        category?.icon || '📦',
+        category?.label || 'Other',
+        parsed.note,
+        account.icon,
+        account.name,
+        newBalance.toFixed(2),
+      ),
+      { parse_mode: 'Markdown' },
+    );
   } catch (error) {
     console.error('Message handler error:', error);
-    await ctx.reply('❌ Failed to log transaction. Please try again.');
+    await ctx.reply(t(resolveLang(undefined)).txFailed);
   }
 }

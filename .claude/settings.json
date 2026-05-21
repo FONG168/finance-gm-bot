@@ -33,7 +33,18 @@
       "Bash(gh repo *)",
       "PowerShell(Start-Process \"http://localhost:3002\")",
       "Bash(vercel whoami *)",
-      "Bash(vercel --prod)"
+      "Bash(vercel --prod)",
+      "Bash(npm install *)",
+      "Bash(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\frontend\\\\public\\\\locales\\\\en\")",
+      "Bash(Out-Null)",
+      "Bash(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\frontend\\\\public\\\\locales\\\\km\")",
+      "Bash(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\frontend\\\\public\\\\locales\\\\zh\")",
+      "Bash(New-Item -ItemType Directory -Force \"c:\\\\Users\\\\MSi\\\\Desktop\\\\Finance GM Bot\\\\frontend\\\\src\\\\providers\")",
+      "Bash(railway logs *)",
+      "Bash(Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue)",
+      "Bash(Write-Host \"Cleared\")",
+      "Bash(railway redeploy *)",
+      "Bash(railway list *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\MSi\\.railway"

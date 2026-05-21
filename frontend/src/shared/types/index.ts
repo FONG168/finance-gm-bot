@@ -37,6 +37,7 @@ export interface User {
   languageCode?: string;
   currency: string;
   timezone: string;
+  preferredLanguage: string;
   plan: SubscriptionPlan;
   subscriptionStatus: SubscriptionStatus;
   trialEndsAt?: string | null;

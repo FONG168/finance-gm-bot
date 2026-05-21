@@ -71,8 +71,9 @@ model User {
   username     String?
   photoUrl     String?  @map("photo_url")
   languageCode String?  @map("language_code")
-  currency     String   @default("USD")
-  timezone     String   @default("UTC")
+  currency          String   @default("USD")
+  timezone          String   @default("UTC")
+  preferredLanguage String   @default("en") @map("preferred_language")
   isActive     Boolean  @default(true) @map("is_active")
   isBanned     Boolean  @default(false) @map("is_banned")
   isSuspended  Boolean  @default(false) @map("is_suspended")

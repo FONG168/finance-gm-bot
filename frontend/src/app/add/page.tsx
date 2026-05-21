@@ -1,5 +1,6 @@
 'use client';
 
+import '@/lib/i18n';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomNav } from '@/components/layout/BottomNav';
@@ -7,11 +8,13 @@ import { AddTransactionForm } from '@/components/transactions/AddTransactionForm
 import { useTelegram } from '@/hooks/useTelegram';
 import { useAuth } from '@/hooks/useAuth';
 import { Lock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function AddTransactionPage() {
   const router = useRouter();
   const { showBackButton, hideBackButton } = useTelegram();
   const { user } = useAuth();
+  const { t } = useTranslation('common');
 
   const isExpired =
     user?.subscriptionStatus === 'EXPIRED' ||
@@ -25,8 +28,7 @@ export default function AddTransactionPage() {
   return (
     <div className="min-h-screen bg-background pb-nav">
       <div className="px-4 pt-5 pb-2 max-w-2xl mx-auto">
-        <h1 className="text-xl font-bold">Add Transaction</h1>
-        <p className="text-xs text-muted-foreground mt-0.5">Record your expense or income</p>
+        <h1 className="text-xl font-bold">{t('add.title')}</h1>
       </div>
 
       {isExpired && (
@@ -40,9 +42,9 @@ export default function AddTransactionPage() {
             </div>
             <div>
               <p className="font-semibold text-violet-300 text-xs">
-                {user?.plan === 'PREMIUM' ? 'Subscription expired' : 'Free trial ended'}
+                {user?.plan === 'PREMIUM' ? t('subscription.expired') : t('subscription.trialEnded')}
               </p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Tap Save to see upgrade options</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{t('add.blocked')}</p>
             </div>
           </div>
         </div>

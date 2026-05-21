@@ -86,6 +86,21 @@
   }
 }
 
+/* Khmer font support */
+:lang(km),
+[data-lang="km"] {
+  font-family: 'Noto Sans Khmer', sans-serif;
+  line-height: 1.8;
+  letter-spacing: 0;
+}
+
+/* Chinese font support */
+:lang(zh),
+[data-lang="zh"] {
+  font-family: 'Noto Sans SC', sans-serif;
+  line-height: 1.6;
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar,
   .scrollbar-none::-webkit-scrollbar {
@@ -118,4 +133,18 @@
   .pb-nav {
     padding-bottom: calc(4rem + max(env(safe-area-inset-bottom, 0px), 16px) + 1rem);
   }
+}
+
+/* Khmer font — Kantumruy Pro */
+[data-lang="km"],
+[data-lang="km"] * {
+  font-family: 'Kantumruy Pro', sans-serif;
+  line-height: 1.9;
+}
+
+/* Chinese font — Noto Sans SC */
+[data-lang="zh"],
+[data-lang="zh"] * {
+  font-family: 'Noto Sans SC', sans-serif;
+  line-height: 1.6;
 }

@@ -1,34 +1,21 @@
 'use client';
 
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import '@/lib/i18n';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { CategoryBreakdown } from '@shared/types';
 import { formatCurrency } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface CategoryPieChartProps {
   data: CategoryBreakdown[];
 }
 
-const CustomTooltip = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
-    const d = payload[0].payload;
-    return (
-      <div className="bg-card border border-border rounded-xl p-3 shadow-lg text-sm">
-        <p className="font-semibold">{d.icon} {d.label}</p>
-        <p className="text-muted-foreground">{formatCurrency(d.amount)}</p>
-        <p className="text-muted-foreground">{d.percentage}%</p>
-      </div>
-    );
-  }
-  return null;
-};
-
 const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
-  if (percent < 0.05) return null; // Hide labels for tiny slices
+  if (percent < 0.05) return null;
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
   return (
     <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight={600}>
       {`${(percent * 100).toFixed(0)}%`}
@@ -37,10 +24,31 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: an
 };
 
 export function CategoryPieChart({ data }: CategoryPieChartProps) {
+  const { t } = useTranslation('common');
+
+  const translatedData = data.map((item) => ({
+    ...item,
+    translatedLabel: t(`categories.${item.categoryName}`, { defaultValue: item.label }),
+  }));
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const d = payload[0].payload;
+      return (
+        <div className="bg-card border border-border rounded-xl p-3 shadow-lg text-sm">
+          <p className="font-semibold">{d.icon} {d.translatedLabel}</p>
+          <p className="text-muted-foreground">{formatCurrency(d.amount)}</p>
+          <p className="text-muted-foreground">{d.percentage}%</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (!data.length) {
     return (
       <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
-        No expense data yet
+        {t('common.noData', { defaultValue: 'No expense data yet' })}
       </div>
     );
   }
@@ -50,7 +58,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
       <ResponsiveContainer width="100%" height={220}>
         <PieChart>
           <Pie
-            data={data}
+            data={translatedData}
             cx="50%"
             cy="50%"
             innerRadius={55}
@@ -60,7 +68,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
             labelLine={false}
             label={CustomLabel}
           >
-            {data.map((entry, index) => (
+            {translatedData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
@@ -70,11 +78,11 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
 
       {/* Category legend */}
       <div className="space-y-2">
-        {data.slice(0, 5).map((cat) => (
+        {translatedData.slice(0, 5).map((cat) => (
           <div key={cat.categoryId} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color }} />
-              <span className="text-sm text-muted-foreground">{cat.icon} {cat.label}</span>
+              <span className="text-sm text-muted-foreground">{cat.icon} {cat.translatedLabel}</span>
             </div>
             <div className="text-right">
               <span className="text-sm font-semibold">{formatCurrency(cat.amount)}</span>

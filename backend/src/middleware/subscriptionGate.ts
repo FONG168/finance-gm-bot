@@ -52,7 +52,17 @@ export async function requireActiveSubscription(
       return;
     }
 
-    // FREE plan users: check trial
+    // FREE plan users: auto-expire trial if time has passed
+    if (user.subscriptionStatus === 'TRIAL' && user.trialEndsAt && user.trialEndsAt < new Date()) {
+      await prisma.user.update({ where: { id: payload.userId }, data: { subscriptionStatus: 'EXPIRED' } });
+      res.status(403).json({
+        success: false,
+        error: 'SUBSCRIPTION_EXPIRED',
+        message: 'Your 14-day free trial has ended. Upgrade to Premium to keep recording transactions.',
+      });
+      return;
+    }
+
     if (user.subscriptionStatus === 'EXPIRED') {
       res.status(403).json({
         success: false,

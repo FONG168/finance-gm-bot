@@ -1,9 +1,11 @@
 'use client';
 
+import '@/lib/i18n';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Sparkles, X, Crown } from 'lucide-react';
 import { PaymentQRSheet } from './PaymentQRSheet';
+import { useTranslation } from 'react-i18next';
 
 interface SubscriptionExpiredModalProps {
   isOpen: boolean;
@@ -13,7 +15,15 @@ interface SubscriptionExpiredModalProps {
 
 export function SubscriptionExpiredModal({ isOpen, onClose, plan }: SubscriptionExpiredModalProps) {
   const [showQR, setShowQR] = useState(false);
+  const { t } = useTranslation('common');
   const isExpiredPremium = plan === 'PREMIUM';
+
+  const features = [
+    { icon: '📊', textKey: 'subscription.unlimitedTransactions' },
+    { icon: '📈', textKey: 'subscription.advancedAnalytics' },
+    { icon: '🏦', textKey: 'subscription.multipleAccounts' },
+    { icon: '🔔', textKey: 'subscription.smartAlerts' },
+  ];
 
   return (
     <>
@@ -63,28 +73,23 @@ export function SubscriptionExpiredModal({ isOpen, onClose, plan }: Subscription
                 </div>
 
                 <h2 className="text-xl font-bold text-white text-center">
-                  {isExpiredPremium ? 'Subscription Expired' : 'Free Trial Ended'}
+                  {isExpiredPremium ? t('subscription.expired') : t('subscription.trialEnded')}
                 </h2>
                 <p className="text-sm text-indigo-200 text-center mt-1.5 leading-relaxed">
                   {isExpiredPremium
-                    ? 'Your premium subscription has expired. Renew now to keep recording transactions.'
-                    : "Your free trial has ended. Go Premium to keep tracking your finances."}
+                    ? t('subscription.expiredDesc')
+                    : t('subscription.trialDesc')}
                 </p>
               </div>
 
               {/* Body */}
               <div className="bg-card px-6 pt-5 pb-6">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Premium includes</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">{t('subscription.premiumIncludes')}</p>
                 <div className="space-y-2.5 mb-6">
-                  {[
-                    { icon: '📊', text: 'Unlimited transaction recording' },
-                    { icon: '📈', text: 'Advanced analytics & reports' },
-                    { icon: '🏦', text: 'Multiple accounts & transfers' },
-                    { icon: '🔔', text: 'Smart spending alerts' },
-                  ].map((feat) => (
-                    <div key={feat.text} className="flex items-center gap-3">
+                  {features.map((feat) => (
+                    <div key={feat.textKey} className="flex items-center gap-3">
                       <span className="text-base w-6 text-center flex-shrink-0">{feat.icon}</span>
-                      <span className="text-sm text-foreground">{feat.text}</span>
+                      <span className="text-sm text-foreground">{t(feat.textKey)}</span>
                       <span className="ml-auto text-emerald-400 text-xs font-bold">✓</span>
                     </div>
                   ))}
@@ -97,11 +102,11 @@ export function SubscriptionExpiredModal({ isOpen, onClose, plan }: Subscription
                   style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)' }}
                 >
                   <Crown className="w-4 h-4" />
-                  Upgrade to Premium
+                  {t('subscription.upgradePremium')}
                 </button>
 
                 <p className="text-center text-[10px] text-muted-foreground mt-3">
-                  Scan QR to pay · Activated within 24h
+                  {t('subscription.scanQR')}
                 </p>
               </div>
             </motion.div>

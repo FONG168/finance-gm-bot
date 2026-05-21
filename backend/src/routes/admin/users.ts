@@ -60,7 +60,7 @@ router.get('/', requirePermission('manage_users'), async (req: Request, res: Res
 router.get('/:id', requirePermission('manage_users'), async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { id },
       include: {
         accounts: true,
@@ -71,6 +71,23 @@ router.get('/:id', requirePermission('manage_users'), async (req: Request, res: 
       },
     });
     if (!user) { res.status(404).json({ success: false, error: 'User not found' }); return; }
+
+    // Lazy-set trialEndsAt from createdAt + 14 days for users who registered before this logic existed
+    if (user.plan === 'FREE' && user.subscriptionStatus === 'TRIAL' && !user.trialEndsAt) {
+      const trialEnd = new Date(user.createdAt.getTime() + 14 * 24 * 60 * 60 * 1000);
+      user = await prisma.user.update({
+        where: { id },
+        data: { trialEndsAt: trialEnd },
+        include: {
+          accounts: true,
+          transactions: { orderBy: { date: 'desc' }, take: 20, include: { category: true } },
+          paymentRequests: { orderBy: { createdAt: 'desc' }, take: 10 },
+          subscriptionLogs: { orderBy: { createdAt: 'desc' }, take: 10 },
+          _count: { select: { transactions: true, accounts: true } },
+        },
+      });
+    }
+
     res.json({ success: true, data: { ...user, telegramId: Number(user.telegramId) } });
   } catch (err) {
     console.error('Get user error:', err);
@@ -154,9 +171,11 @@ router.post('/:id/extend-trial', requirePermission('manage_subscriptions'), asyn
     const { id } = req.params;
     const { days = 7 } = req.body;
     const admin = (req as any).admin;
-    const user = await prisma.user.findUnique({ where: { id }, select: { trialEndsAt: true } });
+    const user = await prisma.user.findUnique({ where: { id }, select: { trialEndsAt: true, createdAt: true } });
     if (!user) { res.status(404).json({ success: false, error: 'User not found' }); return; }
-    const base = user.trialEndsAt && user.trialEndsAt > new Date() ? user.trialEndsAt : new Date();
+    // If no trial end set yet, base from createdAt + 14 days; otherwise extend from existing end (or now if already expired)
+    const defaultBase = new Date(user.createdAt.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const base = user.trialEndsAt && user.trialEndsAt > new Date() ? user.trialEndsAt : defaultBase > new Date() ? defaultBase : new Date();
     const newTrialEnd = new Date(base.getTime() + days * 24 * 60 * 60 * 1000);
     await prisma.user.update({
       where: { id },

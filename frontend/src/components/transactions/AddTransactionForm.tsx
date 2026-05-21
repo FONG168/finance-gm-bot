@@ -1,5 +1,6 @@
 'use client';
 
+import '@/lib/i18n';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -10,12 +11,14 @@ import { useTelegram } from '@/hooks/useTelegram';
 import { useAuth } from '@/hooks/useAuth';
 import { cn, formatCurrency } from '@/lib/utils';
 import { SubscriptionExpiredModal } from '@/components/subscription/SubscriptionExpiredModal';
+import { useTranslation } from 'react-i18next';
 
 const EXPENSE_CATS = CATEGORIES.filter((c) => c.type === 'expense' || c.type === 'both');
 const INCOME_CATS = CATEGORIES.filter((c) => c.type === 'income' || c.type === 'both');
 
 // ── Error popup ───────────────────────────────────────────────────────────────
 function ErrorPopup({ message, onClose }: { message: string; onClose: () => void }) {
+  const { t } = useTranslation('common');
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -37,13 +40,13 @@ function ErrorPopup({ message, onClose }: { message: string; onClose: () => void
           <div className="w-14 h-14 rounded-full bg-rose-500/20 flex items-center justify-center">
             <AlertCircle className="w-7 h-7 text-rose-400" />
           </div>
-          <h3 className="text-base font-bold text-rose-400">Transaction Blocked</h3>
+          <h3 className="text-base font-bold text-rose-400">{t('add.blocked')}</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">{message}</p>
           <button
             onClick={onClose}
             className="mt-2 w-full py-3 rounded-2xl bg-rose-500 text-white text-sm font-bold"
           >
-            Got it
+            {t('add.gotIt')}
           </button>
         </div>
       </motion.div>
@@ -59,6 +62,7 @@ function ConfirmModal({
   type: TransactionType; amount: string; category: string; account: Account | undefined;
   note: string; onConfirm: () => void; onCancel: () => void; isLoading: boolean;
 }) {
+  const { t } = useTranslation('common');
   const amountNum = parseFloat(amount);
   const isExpense = type === 'expense';
   const cat = CATEGORIES.find((c) => c.id === category);
@@ -82,7 +86,7 @@ function ConfirmModal({
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-bold">Confirm Transaction</h2>
+          <h2 className="text-base font-bold">{t('add.confirmTransaction')}</h2>
           <button onClick={onCancel} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
             <X className="w-4 h-4" />
           </button>
@@ -97,7 +101,7 @@ function ConfirmModal({
             <span className="text-3xl">{cat?.icon || '📦'}</span>
             <div className="flex-1">
               <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                {isExpense ? 'Expense' : 'Income'}
+                {isExpense ? t('add.expense') : t('add.income')}
               </p>
               <p className="text-xl font-bold" style={{ color: isExpense ? '#ef4444' : '#22c55e' }}>
                 {isExpense ? '-' : '+'}{formatCurrency(amountNum)}
@@ -109,16 +113,16 @@ function ConfirmModal({
         {/* Details */}
         <div className="space-y-2 mb-5">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Category</span>
-            <span className="font-semibold">{cat?.label || 'Other'}</span>
+            <span className="text-muted-foreground">{t('add.category')}</span>
+            <span className="font-semibold">{cat ? t(`categories.${cat.name}`) : t('categories.other')}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Account</span>
+            <span className="text-muted-foreground">{t('add.account')}</span>
             <span className="font-semibold">{account ? `${account.icon} ${account.name}` : '—'}</span>
           </div>
           {account && (
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Balance after</span>
+              <span className="text-muted-foreground">{t('add.balanceAfter')}</span>
               <span
                 className="font-bold"
                 style={{ color: (account.balance + (isExpense ? -amountNum : amountNum)) >= 0 ? '#22c55e' : '#ef4444' }}
@@ -129,7 +133,7 @@ function ConfirmModal({
           )}
           {note && (
             <div className="flex justify-between text-sm gap-3">
-              <span className="text-muted-foreground flex-shrink-0">Note</span>
+              <span className="text-muted-foreground flex-shrink-0">{t('add.note')}</span>
               <span className="font-semibold text-right truncate">{note}</span>
             </div>
           )}
@@ -141,7 +145,7 @@ function ConfirmModal({
             onClick={onCancel}
             className="flex-1 py-3 rounded-2xl bg-secondary text-sm font-semibold text-muted-foreground"
           >
-            Cancel
+            {t('add.cancel')}
           </button>
           <button
             onClick={onConfirm}
@@ -156,7 +160,7 @@ function ConfirmModal({
                 className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
               />
             ) : (
-              <><Check className="w-4 h-4" />Confirm</>
+              <><Check className="w-4 h-4" />{t('add.confirm')}</>
             )}
           </button>
         </div>
@@ -170,6 +174,7 @@ export function AddTransactionForm() {
   const router = useRouter();
   const { haptic } = useTelegram();
   const { user } = useAuth();
+  const { t } = useTranslation('common');
   const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
@@ -204,12 +209,12 @@ export function AddTransactionForm() {
     }
     const amountNum = parseFloat(amount);
     if (!amountNum || amountNum <= 0) {
-      setErrorPopup('Please enter a valid amount greater than $0.');
+      setErrorPopup(t('add.invalidAmount'));
       haptic.error();
       return;
     }
     if (!categoryId) {
-      setErrorPopup('Please select a category before saving.');
+      setErrorPopup(t('add.selectCategory'));
       haptic.error();
       return;
     }
@@ -226,6 +231,7 @@ export function AddTransactionForm() {
         categoryId,
         note: note.trim() || undefined,
         accountId: accountId || undefined,
+        date: new Date().toISOString(),
       });
       haptic.success();
       setShowConfirm(false);
@@ -246,25 +252,25 @@ export function AddTransactionForm() {
       <div className="space-y-5">
         {/* Type toggle */}
         <div className="flex rounded-2xl bg-secondary p-1 gap-1">
-          {(['expense', 'income'] as TransactionType[]).map((t) => (
+          {(['expense', 'income'] as TransactionType[]).map((tp) => (
             <button
-              key={t}
-              onClick={() => { setType(t); setCategoryId(''); haptic.selection(); }}
+              key={tp}
+              onClick={() => { setType(tp); setCategoryId(''); haptic.selection(); }}
               className={cn(
                 'flex-1 py-3 rounded-xl text-sm font-semibold transition-all',
-                type === t
-                  ? t === 'expense' ? 'bg-rose-500 text-white shadow-sm' : 'bg-emerald-500 text-white shadow-sm'
+                type === tp
+                  ? tp === 'expense' ? 'bg-rose-500 text-white shadow-sm' : 'bg-emerald-500 text-white shadow-sm'
                   : 'text-muted-foreground',
               )}
             >
-              {t === 'expense' ? '💸 Expense' : '💰 Income'}
+              {tp === 'expense' ? `💸 ${t('add.expense')}` : `💰 ${t('add.income')}`}
             </button>
           ))}
         </div>
 
         {/* Amount */}
         <div className="text-center py-5">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Amount</p>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">{t('add.amount')}</p>
           <div className="flex items-center justify-center gap-1">
             <span className="text-4xl sm:text-5xl font-bold flex-shrink-0" style={{ color: amountColor }}>$</span>
             <input
@@ -284,7 +290,7 @@ export function AddTransactionForm() {
 
         {/* Category grid */}
         <div>
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Category</p>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">{t('add.category')}</p>
           <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
             {categories.map((cat) => (
               <button
@@ -300,7 +306,7 @@ export function AddTransactionForm() {
                   'text-[9px] sm:text-[10px] font-medium text-center leading-tight',
                   categoryId === cat.id ? 'text-violet-400' : 'text-muted-foreground',
                 )}>
-                  {cat.label.split(' ')[0]}
+                  {t(`categories.${cat.name}`)}
                 </span>
               </button>
             ))}
@@ -310,7 +316,7 @@ export function AddTransactionForm() {
         {/* Account selector */}
         {accounts.length > 0 && (
           <div>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Account</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">{t('add.account')}</p>
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
               {accounts.map((acc) => (
                 <button
@@ -339,12 +345,12 @@ export function AddTransactionForm() {
 
         {/* Note */}
         <div className="bg-secondary rounded-2xl p-4">
-          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block mb-2">Note (optional)</label>
+          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest block mb-2">{t('add.noteOptional')}</label>
           <input
             type="text"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="What was this for?"
+            placeholder={t('add.noteHint')}
             className="w-full bg-transparent outline-none text-sm placeholder:text-muted-foreground/40"
             maxLength={100}
           />
@@ -361,7 +367,7 @@ export function AddTransactionForm() {
           style={amount && categoryId ? { background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)' } : undefined}
         >
           <Check className="w-5 h-5" />
-          Save {type === 'expense' ? 'Expense' : 'Income'}
+          {type === 'expense' ? t('add.saveExpense') : t('add.saveIncome')}
         </button>
       </div>
 

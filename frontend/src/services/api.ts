@@ -134,6 +134,8 @@ class ApiService {
       note?: string;
     }): Promise<{ id: string; status: string }> =>
       this.fetch('/payments/request', { method: 'POST', body: JSON.stringify(data) }),
+    history: (): Promise<{ id: string; status: string; amount: number; plan: string; createdAt: string; reviewedAt?: string }[]> =>
+      this.fetch('/payments/my'),
   };
 
   categories = {

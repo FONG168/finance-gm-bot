@@ -1,21 +1,28 @@
 {
   "name": "Finance GM",
-  "short_name": "FinanceGM",
-  "description": "Personal finance management for Telegram",
+  "short_name": "Finance GM",
+  "description": "Smart Money Platform — Personal finance management for Telegram",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f4f4f8",
+  "background_color": "#0d0820",
   "theme_color": "#7c3aed",
   "icons": [
     {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
