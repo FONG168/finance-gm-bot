@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { adminApi } from '@/lib/api';
 import {
   BarChart3,
   Users,
@@ -19,20 +21,42 @@ import {
 } from 'lucide-react';
 
 const nav = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, permission: null },
-  { label: 'Users', href: '/users', icon: Users, permission: 'manage_users' },
-  { label: 'Payments', href: '/payments', icon: CreditCard, permission: 'manage_payments' },
-  { label: 'Subscriptions', href: '/subscriptions', icon: Star, permission: 'manage_subscriptions' },
-  { label: 'Revenue', href: '/revenue', icon: BarChart3, permission: 'view_reports' },
-  { label: 'QR Codes', href: '/qr-codes', icon: QrCode, permission: 'manage_settings' },
-  { label: 'Announcements', href: '/announcements', icon: Megaphone, permission: 'manage_settings' },
-  { label: 'Audit Logs', href: '/audit-logs', icon: ScrollText, permission: 'view_reports' },
-  { label: 'Settings', href: '/settings', icon: Settings, permission: 'manage_settings' },
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, permission: null, badgeKey: null },
+  { label: 'Users', href: '/users', icon: Users, permission: 'manage_users', badgeKey: null },
+  { label: 'Payments', href: '/payments', icon: CreditCard, permission: 'manage_payments', badgeKey: 'payments' },
+  { label: 'Subscriptions', href: '/subscriptions', icon: Star, permission: 'manage_subscriptions', badgeKey: 'subscriptions' },
+  { label: 'Revenue', href: '/revenue', icon: BarChart3, permission: 'view_reports', badgeKey: null },
+  { label: 'QR Codes', href: '/qr-codes', icon: QrCode, permission: 'manage_settings', badgeKey: null },
+  { label: 'Announcements', href: '/announcements', icon: Megaphone, permission: 'manage_settings', badgeKey: null },
+  { label: 'Audit Logs', href: '/audit-logs', icon: ScrollText, permission: 'view_reports', badgeKey: null },
+  { label: 'Settings', href: '/settings', icon: Settings, permission: 'manage_settings', badgeKey: null },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const { admin, logout, hasPermission } = useAuth();
+  const [badges, setBadges] = useState<{ payments: number; subscriptions: number }>({ payments: 0, subscriptions: 0 });
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const [paymentsRes, subsRes] = await Promise.all([
+          adminApi.payments.list({ status: 'PENDING', limit: 1 }),
+          adminApi.users.list({ plan: 'PREMIUM', subscriptionStatus: 'ACTIVE', expiringSoonDays: 7, limit: 1 }),
+        ]);
+        setBadges({
+          payments: paymentsRes.data?.data?.pagination?.total ?? 0,
+          subscriptions: subsRes.data?.data?.pagination?.total ?? 0,
+        });
+      } catch {
+        // silently fail — badges just won't show
+      }
+    };
+
+    fetchCounts();
+    const interval = setInterval(fetchCounts, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const visibleNav = nav.filter(item => !item.permission || hasPermission(item.permission));
 
@@ -53,6 +77,7 @@ export function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-0.5">
         {visibleNav.map(item => {
           const active = pathname === item.href || pathname.startsWith(item.href + '/');
+          const badgeCount = item.badgeKey ? badges[item.badgeKey as keyof typeof badges] : 0;
           return (
             <Link
               key={item.href}
@@ -66,7 +91,12 @@ export function Sidebar() {
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
               <span className="flex-1">{item.label}</span>
-              {active && <ChevronRight className="h-3 w-3 opacity-50" />}
+              {badgeCount > 0 && (
+                <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                  {badgeCount > 99 ? '99+' : badgeCount}
+                </span>
+              )}
+              {active && !badgeCount && <ChevronRight className="h-3 w-3 opacity-50" />}
             </Link>
           );
         })}
