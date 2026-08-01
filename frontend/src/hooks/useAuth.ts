@@ -82,34 +82,7 @@ export function useAuth() {
       const response = await apiService.auth.telegram(effectiveInitData);
       saveAndSet(response);
     } catch (error: any) {
-      if (webApp?.initDataUnsafe?.user) {
-        const tgUser = webApp.initDataUnsafe.user;
-        const fallbackUser: any = {
-          id: String(tgUser.id),
-          telegramId: tgUser.id,
-          firstName: tgUser.first_name,
-          lastName: tgUser.last_name || null,
-          username: tgUser.username || null,
-          photoUrl: tgUser.photo_url || null,
-          currency: 'USD',
-          timezone: 'UTC',
-          preferredLanguage: tgUser.language_code || 'en',
-          plan: 'FREE',
-          subscriptionStatus: 'TRIAL',
-          trialEndsAt: null,
-          premiumStartedAt: null,
-          premiumExpiresAt: null,
-        };
-        setState({
-          user: fallbackUser,
-          token: 'telegram-session-token',
-          isLoading: false,
-          isAuthenticated: true,
-          error: null,
-        });
-      } else {
-        setState((s) => ({ ...s, isLoading: false, error: error.message || 'Authentication failed' }));
-      }
+      setState((s) => ({ ...s, isLoading: false, error: error.message || 'Authentication failed' }));
     }
   }, [initData, webApp]);
 
