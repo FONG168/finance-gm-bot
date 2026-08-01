@@ -174,12 +174,11 @@ export default function ProfilePage() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl p-6 text-white"
-          style={{ background: 'linear-gradient(135deg, #3b1278 0%, #5b21b6 45%, #312e81 100%)' }}
+          className="relative overflow-hidden p-6 text-white hero-card-decor"
         >
-          <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-white/5" />
+          <div className="hero-card-sheen" />
           <div className="relative z-10 flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-xl font-bold overflow-hidden">
+            <div className="w-16 h-16 rounded-2xl bg-black/30 border border-white/10 backdrop-blur-sm flex items-center justify-center text-xl font-bold overflow-hidden">
               {user?.photoUrl ? (
                 <img src={user.photoUrl} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -187,13 +186,13 @@ export default function ProfilePage() {
               )}
             </div>
             <div>
-              <p className="text-lg font-bold">
+              <p className="text-lg font-bold" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}>
                 {user ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Loading...'}
               </p>
               {user?.username && (
-                <p className="text-sm text-white/60">@{user.username}</p>
+                <p className="text-sm text-lime-100/60">@{user.username}</p>
               )}
-              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white/80 tracking-wide mt-1 inline-block">
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-black/30 text-white border border-white/15 tracking-wide mt-1 inline-block backdrop-blur-sm">
                 {t('profile.proMember')}
               </span>
             </div>
@@ -203,7 +202,7 @@ export default function ProfilePage() {
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {/* Currency */}
-          <div className="rounded-2xl bg-card border border-border p-3 text-center">
+          <div className="rounded-2xl bg-secondary shadow-sm p-3 text-center">
             <p className="font-bold text-sm">{user?.currency || 'USD'}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">{t('profile.currency')}</p>
           </div>
@@ -224,7 +223,7 @@ export default function ProfilePage() {
             const abs = Math.abs(diffMin);
             const offsetLabel = `GMT${diffMin === 0 ? '+0' : `${sign}${Math.floor(abs / 60)}${abs % 60 ? ':' + String(abs % 60).padStart(2, '0') : ''}`}`;
             return (
-              <div className="rounded-2xl bg-card border border-border p-3 text-center">
+              <div className="rounded-2xl bg-secondary shadow-sm p-3 text-center">
                 <p className="font-bold text-sm tabular-nums">
                   {now.toLocaleTimeString('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                 </p>
@@ -235,7 +234,7 @@ export default function ProfilePage() {
           })()}
 
           {/* Member since */}
-          <div className="rounded-2xl bg-card border border-border p-3 text-center">
+          <div className="rounded-2xl bg-secondary shadow-sm p-3 text-center">
             <p className="font-bold text-sm">{user?.createdAt ? new Date(user.createdAt).getFullYear().toString() : '—'}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">{t('profile.since')}</p>
           </div>
@@ -321,7 +320,7 @@ export default function ProfilePage() {
         })()}
 
         {/* Menu items */}
-        <div className="rounded-2xl bg-card border border-border overflow-hidden divide-y divide-border/50">
+        <div className="rounded-2xl bg-secondary shadow-sm overflow-hidden divide-y divide-border/50">
           {MENU_ITEMS.map((item) => {
             const Icon = item.icon;
             return (
@@ -329,13 +328,13 @@ export default function ProfilePage() {
                 key={item.label}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleMenuItem(item.action)}
-                className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-secondary/50 active:bg-secondary/70 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-card/60 active:bg-card/80 transition-colors text-left"
               >
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center"
                   style={item.accent
                     ? { background: 'rgba(34,158,217,0.15)', border: '1px solid rgba(34,158,217,0.25)' }
-                    : { background: 'var(--secondary)' }
+                    : { background: 'var(--card)' }
                   }
                 >
                   <Icon

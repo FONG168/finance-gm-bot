@@ -25,11 +25,12 @@ export default function PaymentsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-payments', status, page],
     queryFn: () => adminApi.payments.list({ status: status || undefined, page, limit: 20 }),
-    refetchInterval: 30_000,
+    refetchInterval: 3000,
   });
 
-  const payments = data?.data?.data?.payments ?? [];
-  const pagination = data?.data?.data?.pagination;
+  const rawData = data?.data;
+  const payments: any[] = Array.isArray(rawData) ? rawData : (rawData?.data || rawData?.payments || []);
+  const pagination = rawData?.pagination;
 
   const approveM = useMutation({
     mutationFn: (id: string) => adminApi.payments.approve(id),
@@ -147,7 +148,7 @@ export default function PaymentsPage() {
                             <td colSpan={9} className="px-4 py-3">
                               <div className="flex items-center gap-3">
                                 <input
-                                  placeholder="Rejection reason…"
+                                  placeholder="Rejection reason (optional)…"
                                   value={rejectReason[p.id] || ''}
                                   onChange={e => setRejectReason(prev => ({ ...prev, [p.id]: e.target.value }))}
                                   className="flex-1 h-9 rounded-md border border-border bg-secondary px-3 text-sm"
@@ -155,7 +156,7 @@ export default function PaymentsPage() {
                                 <Button
                                   variant="destructive"
                                   size="sm"
-                                  onClick={() => rejectM.mutate({ id: p.id, reason: rejectReason[p.id] || '' })}
+                                  onClick={() => rejectM.mutate({ id: p.id, reason: rejectReason[p.id] || 'Rejected by Admin' })}
                                   loading={rejectM.isPending}
                                 >
                                   Confirm Reject

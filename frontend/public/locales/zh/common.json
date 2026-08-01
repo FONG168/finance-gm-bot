@@ -2,12 +2,13 @@
   "nav": { "home": "首页", "accounts": "账户", "add": "添加", "reports": "报告", "profile": "我的" },
   "greeting": { "morning": "早上好", "afternoon": "下午好", "evening": "晚上好" },
   "home": {
-    "totalNetWorth": "总净资产", "income": "收入", "spent": "支出", "saved": "储蓄",
-    "accounts": "账户", "manage": "管理 →", "thisWeek": "本周", "savingsRate": "储蓄率",
+    "totalNetWorth": "总净资产", "liveBalance": "实时余额", "income": "收入", "spent": "支出", "saved": "储蓄",
+    "accounts": "账户", "manage": "管理 →", "thisWeek": "本周", "netThisWeek": "本周净额", "savingsRate": "储蓄率",
     "transactions": "笔交易", "spendingByCategory": "分类支出",
     "recentTransactions": "最近交易", "seeAll": "查看全部 →",
     "noTransactions": "暂无交易记录", "noTransactionsHint": "添加您的第一笔支出或收入！",
-    "monthlyTrend": "月度趋势", "excellent": "非常好！", "keepGoing": "继续加油！", "overspending": "超支"
+    "monthlyTrend": "月度趋势", "excellent": "非常好！", "keepGoing": "继续加油！", "overspending": "超支",
+    "analytics": "分析", "history": "历史"
   },
   "accounts": {
     "title": "账户", "subtitle": "管理您的资金账户", "totalAssets": "总资产",
@@ -27,7 +28,8 @@
     "noteHint": "这笔钱用于什么？", "saveExpense": "保存支出", "saveIncome": "保存收入",
     "confirmTransaction": "确认交易", "balanceAfter": "交易后余额", "note": "备注",
     "cancel": "取消", "confirm": "确认", "blocked": "交易被拦截", "gotIt": "知道了",
-    "invalidAmount": "请输入大于 0 的有效金额。", "selectCategory": "请先选择类别再保存。"
+    "invalidAmount": "请输入大于 0 的有效金额。", "selectCategory": "请先选择类别再保存。",
+    "dateOfTransaction": "交易日期", "scrollLeft": "向左滚动", "scrollRight": "向右滚动"
   },
   "transactions": {
     "title": "交易记录", "subtitle": "您的交易历史", "search": "搜索交易...",
@@ -43,8 +45,9 @@
     "excellentSavings": "非常好！您本月储蓄出色。",
     "brokeEven": "您收支平衡。下个月尝试多存一些。",
     "overspent": "您本月的支出超过了收入。",
-    "weeklyTrends": "周趋势", "spendingByCategory": "分类支出",
-    "noReports": "暂无报告", "noReportsHint": "开始添加交易记录以查看月度报告。"
+    "weeklyTrends": "周趋势", "spendingByCategory": "分类支出", "weekN": "第{{n}}周",
+    "noReports": "暂无报告", "noReportsHint": "开始添加交易记录以查看月度报告。",
+    "transactionsForMonth": "交易记录 — {{month}}"
   },
   "profile": {
     "title": "我的", "settings": "设置", "settingsDesc": "应用偏好",
@@ -101,7 +104,18 @@
     "loading": "加载中...", "error": "错误", "retry": "重试", "close": "关闭",
     "cancel": "取消", "save": "保存", "done": "完成", "comingSoon": "即将推出",
     "loadMore": "加载更多", "transfer": "转账", "noData": "暂无数据",
-    "today": "今天", "yesterday": "昨天", "daysAgo": "{{n}} 天前"
+    "today": "今天", "yesterday": "昨天", "daysAgo": "{{n}} 天前",
+    "loadFailed": "加载数据失败，请下拉刷新。",
+    "saveFailed": "保存失败，请重试。",
+    "deleteFailed": "删除失败，请重试。",
+    "exportFailed": "导出失败，请重试。",
+    "dismiss": "关闭",
+    "pageNotFound": "页面未找到",
+    "pageNotFoundHint": "您要查找的页面不存在或可能已移动。",
+    "backToHome": "返回首页",
+    "somethingWentWrong": "出错了",
+    "somethingWentWrongHint": "发生了意外错误。您可以重试，或返回首页。",
+    "tryAgain": "重试"
   },
   "notifications": {
     "title": "通知", "empty": "暂无通知", "emptyDesc": "您已全部查看！",

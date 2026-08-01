@@ -90,7 +90,7 @@ export function SubscriptionExpiredModal({ isOpen, onClose, plan }: Subscription
                     <div key={feat.textKey} className="flex items-center gap-3">
                       <span className="text-base w-6 text-center flex-shrink-0">{feat.icon}</span>
                       <span className="text-sm text-foreground">{t(feat.textKey)}</span>
-                      <span className="ml-auto text-emerald-400 text-xs font-bold">✓</span>
+                      <span className="ml-auto text-emerald-600 text-xs font-bold">✓</span>
                     </div>
                   ))}
                 </div>

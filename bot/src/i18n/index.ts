@@ -16,21 +16,10 @@ const T = {
     langBtn: { km: '🇰🇭 ខ្មែរ', zh: '🇨🇳 中文', en: '🇺🇸 English' },
 
     welcome: (name: string) =>
-      `👋 <b>ស្វាគមន៍មក Finance GM, ${name}!</b>\n` +
-      `ជំនួយការហិរញ្ញវត្ថុ AI ផ្ទាល់ខ្លួនរបស់អ្នក 💚\n\n` +
-      `━━━━━━━━━━━━━━\n\n` +
-      `🔹 <b>មុខងារ</b>\n` +
-      `📊 តាមដានចំណូល &amp; ចំណាយ\n` +
-      `📈 របាយការណ៍ប្រចាំសប្តាហ៍ &amp; ខែ\n` +
-      `🏆 ការចំណាយតាមប្រភេទ\n` +
-      `🤖 កត់ត្រាដោយភាសាធម្មជាតិ\n\n` +
-      `🔹 <b>ការកត់ត្រារហ័ស</b>\n` +
-      `→ "ចំណាយ $12 លើអាហារ"\n` +
-      `→ "ទទួលបាន $500 freelance"\n\n` +
-      `🔹 <b>ពាក្យបញ្ជា</b>\n` +
-      `/summary · /report · /language · /help\n\n` +
-      `━━━━━━━━━━━━━━\n` +
-      `ត្រៀមខ្លួន? 🚀`,
+      `✨ <b>ស្វាគមន៍មកកាន់ Finance GM, ${name}!</b>\n` +
+      `ជំនួយការហិរញ្ញវត្ថុ AI ផ្ទាល់ខ្លួនរបស់អ្នក 💎\n\n` +
+      `<i>សាកល្បង៖ "ចំណាយ $12 លើអាហារ" — ខ្ញុំកត់ត្រាភ្លាមៗ!</i>\n\n` +
+      `ចុចប៊ូតុងខាងក្រោមដើម្បីបើក Dashboard របស់អ្នក 👇 (ឬ /help សម្រាប់ពាក្យបញ្ជា)`,
 
     help: () =>
       `🤖 <b>Finance GM Bot</b>\n\n` +
@@ -120,20 +109,9 @@ const T = {
 
     welcome: (name: string) =>
       `👋 <b>欢迎使用 Finance GM, ${name}!</b>\n` +
-      `您的个人 AI 财务助理 💚\n\n` +
-      `━━━━━━━━━━━━━━\n\n` +
-      `🔹 <b>功能</b>\n` +
-      `📊 追踪收入 &amp; 支出\n` +
-      `📈 每周 &amp; 每月报告\n` +
-      `🏆 分类消费洞察\n` +
-      `🤖 自然语言记账\n\n` +
-      `🔹 <b>快速记账</b>\n` +
-      `→ "花了 $12 吃午饭"\n` +
-      `→ "赚了 $500 freelance"\n\n` +
-      `🔹 <b>命令</b>\n` +
-      `/summary · /report · /language · /help\n\n` +
-      `━━━━━━━━━━━━━━\n` +
-      `开始吧！🚀`,
+      `您的个人 AI 财务助理 💎\n\n` +
+      `<i>试试："花了 $12 吃午饭" — 我会立即记录！</i>\n\n` +
+      `点击下方打开您的仪表盘 👇 (输入 /help 查看命令)`,
 
     help: () =>
       `🤖 <b>Finance GM Bot</b>\n\n` +
@@ -222,21 +200,10 @@ const T = {
     langBtn: { km: '🇰🇭 ខ្មែរ', zh: '🇨🇳 中文', en: '🇺🇸 English' },
 
     welcome: (name: string) =>
-      `👋 <b>Welcome to Finance GM, ${name}!</b>\n` +
-      `Your personal AI finance assistant 💚\n\n` +
-      `━━━━━━━━━━━━━━\n\n` +
-      `🔹 <b>Features</b>\n` +
-      `📊 Track income &amp; expenses\n` +
-      `📈 Weekly &amp; monthly reports\n` +
-      `🏆 Category spending insights\n` +
-      `🤖 Natural language logging\n\n` +
-      `🔹 <b>Quick Log</b>\n` +
-      `→ "Spent $12 on lunch"\n` +
-      `→ "Earned $500 freelance"\n\n` +
-      `🔹 <b>Commands</b>\n` +
-      `/summary · /report · /language · /help\n\n` +
-      `━━━━━━━━━━━━━━\n` +
-      `Ready to crush it? 🚀`,
+      `✨ <b>Welcome to Finance GM, ${name}!</b>\n` +
+      `Your personal AI finance assistant 💎\n\n` +
+      `<i>Try: "Spent $12 on lunch" — I'll log it instantly!</i>\n\n` +
+      `Tap below to open your dashboard 👇 (or /help for commands)`,
 
     help: () =>
       `🤖 <b>Finance GM Bot</b>\n\n` +

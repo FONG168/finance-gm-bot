@@ -3,10 +3,11 @@
 import '@/lib/i18n';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle, Copy, ChevronRight, Upload, ImageIcon } from 'lucide-react';
+import { X, CheckCircle, Copy, ChevronRight, Upload, ImageIcon, ZoomIn, Download } from 'lucide-react';
 import { apiService } from '@/services/api';
 import { useTelegram } from '@/hooks/useTelegram';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/providers/ToastProvider';
 
 interface QRCode {
   id: string;
@@ -29,6 +30,7 @@ interface Props {
 export function PaymentQRSheet({ isOpen, onClose }: Props) {
   const { haptic } = useTelegram();
   const { t } = useTranslation('common');
+  const toast = useToast();
   const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProvider, setSelectedProvider] = useState(0);
@@ -38,9 +40,22 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
   const [copied, setCopied] = useState(false);
   const [receipt, setReceipt] = useState<string>('');
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const [showZoom, setShowZoom] = useState(false);
   const receiptRef = useRef<HTMLInputElement>(null);
 
-  const PLAN = { days: 30, price: 2.99 };
+  const [plans, setPlans] = useState<any[]>([
+    { id: '1_month', name: '1 Month', price: 2.99, days: 30 }
+  ]);
+  const [selectedPlanIdx, setSelectedPlanIdx] = useState(0);
+
+  useEffect(() => {
+    fetch('/api/subscription-plans')
+      .then(r => r.json())
+      .then(json => {
+        if (json?.data?.length > 0) setPlans(json.data);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,9 +63,32 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
     setUploadingReceipt(true);
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setReceipt(ev.target?.result as string);
-      setUploadingReceipt(false);
-      haptic.success();
+      const src = ev.target?.result as string;
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 800;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL('image/jpeg', 0.75);
+        setReceipt(compressed);
+        setUploadingReceipt(false);
+        haptic.success();
+      };
+      img.src = src;
     };
     reader.readAsDataURL(file);
   };
@@ -61,7 +99,7 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
     setReceipt('');
     setNote('');
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/qr-codes`)
+    fetch('/api/qr-codes')
       .then(r => r.json())
       .then(json => {
         setQrCodes(json.data || []);
@@ -71,7 +109,7 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
       .finally(() => setLoading(false));
   }, [isOpen]);
 
-  const plan = PLAN;
+  const plan = plans[selectedPlanIdx] || plans[0] || { name: '1 Month', price: 2.99, days: 30 };
   const qr = qrCodes[selectedProvider];
 
   const copyAccount = () => {
@@ -97,8 +135,9 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
       });
       haptic.success();
       setSubmitted(true);
-    } catch {
+    } catch (e: any) {
       haptic.error();
+      toast.error(e.message || t('common.saveFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -141,10 +180,10 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
               /* ── Success state ── */
               <div className="px-5 pb-8 flex flex-col items-center text-center gap-4 pt-4">
                 <div className="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                  <CheckCircle className="w-10 h-10 text-emerald-400" />
+                  <CheckCircle className="w-10 h-10 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-emerald-400">{t('payment.submitted')}</h3>
+                  <h3 className="text-lg font-bold text-emerald-600">{t('payment.submitted')}</h3>
                   <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
                     {t('payment.submittedDesc')}
                   </p>
@@ -159,10 +198,10 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
             ) : (
               <div className="px-5 pb-8 space-y-5">
 
-                {/* Fixed plan display */}
+                {/* Dynamic plan display */}
                 <div className="rounded-2xl border-2 border-violet-500 bg-violet-500/15 py-4 flex flex-col items-center">
-                  <span className="text-sm font-bold text-violet-300">{t('payment.plan1month')}</span>
-                  <span className="text-3xl font-bold text-white mt-1">${plan.price.toFixed(2)}</span>
+                  <span className="text-sm font-bold text-violet-600">{plan.name || '1 Month'}</span>
+                  <span className="text-3xl font-bold text-violet-900 mt-1">${plan.price?.toFixed(2) || '2.99'}</span>
                   <span className="text-xs text-muted-foreground mt-0.5">{plan.days} {t('payment.days')}</span>
                 </div>
 
@@ -193,7 +232,7 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
                               onClick={() => { setSelectedProvider(i); haptic.selection(); }}
                               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border-2 flex-shrink-0 text-sm font-semibold transition-all ${
                                 selectedProvider === i
-                                  ? 'border-violet-500 bg-violet-500/15 text-violet-300'
+                                  ? 'border-violet-500 bg-violet-500/15 text-violet-700'
                                   : 'border-border bg-secondary text-muted-foreground'
                               }`}
                             >
@@ -208,12 +247,39 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
                     {/* QR code display */}
                     {qr && (
                       <div className="flex flex-col items-center gap-3">
-                        <div className="bg-white p-3 rounded-2xl shadow-lg">
+                        <div
+                          onClick={() => { setShowZoom(true); haptic.selection(); }}
+                          className="group relative cursor-pointer bg-white p-3 rounded-2xl shadow-lg border-2 border-transparent hover:border-violet-500/50 transition-all flex items-center justify-center"
+                        >
                           <img
                             src={qr.imageUrl}
                             alt={`${qr.provider} QR code`}
-                            className="w-52 h-52 object-contain"
+                            className="w-52 h-52 object-contain rounded-xl"
                           />
+                          <div className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-bold">
+                            <ZoomIn className="w-4 h-4" /> Tap to Zoom
+                          </div>
+                        </div>
+
+                        {/* Action buttons under QR */}
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => { setShowZoom(true); haptic.selection(); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <ZoomIn className="w-3.5 h-3.5" /> Fullscreen
+                          </button>
+                          <a
+                            href={qr.imageUrl}
+                            download={`${qr.provider}_Payment_QR.png`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => haptic.success()}
+                            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-violet-500/15 border border-violet-500/30 text-xs font-semibold text-violet-700 hover:bg-violet-500/25 transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" /> Save QR Image
+                          </a>
                         </div>
 
                         {/* Account info */}
@@ -230,18 +296,18 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
                                 <span className="text-muted-foreground">{t('payment.accountNo')}</span>
                                 <button
                                   onClick={copyAccount}
-                                  className="flex items-center gap-1.5 font-semibold text-violet-400"
+                                  className="flex items-center gap-1.5 font-semibold text-violet-600"
                                 >
                                   {qr.accountNumber}
                                   {copied
-                                    ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                                    ? <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                                     : <Copy className="w-3.5 h-3.5" />}
                                 </button>
                               </div>
                             )}
                             <div className="flex justify-between text-sm">
                               <span className="text-muted-foreground">{t('payment.amountToPay')}</span>
-                              <span className="font-bold text-emerald-400">${plan.price.toFixed(2)}</span>
+                              <span className="font-bold text-emerald-600">${plan.price.toFixed(2)}</span>
                             </div>
                           </div>
                         )}
@@ -259,10 +325,10 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                          {t('payment.receipt')} <span className="text-rose-400">*</span>
+                          {t('payment.receipt')} <span className="text-rose-500">*</span>
                         </label>
                         {receipt && (
-                          <button onClick={() => setReceipt('')} className="text-[10px] text-rose-400 font-medium">
+                          <button onClick={() => setReceipt('')} className="text-[10px] text-rose-500 font-medium">
                             {t('payment.removeReceipt')}
                           </button>
                         )}
@@ -363,6 +429,41 @@ export function PaymentQRSheet({ isOpen, onClose }: Props) {
           </motion.div>
         </motion.div>
       )}
+
+      {/* Fullscreen Lightbox Preview */}
+      <AnimatePresence>
+        {showZoom && qr && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+            onClick={() => setShowZoom(false)}
+          >
+            <button
+              onClick={() => setShowZoom(false)}
+              className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="bg-white p-4 rounded-3xl max-w-xs w-full shadow-2xl space-y-2 text-center" onClick={e => e.stopPropagation()}>
+              <img src={qr.imageUrl} alt="QR Fullscreen" className="w-full h-auto object-contain rounded-2xl" />
+              {qr.accountName && <p className="text-sm font-bold text-gray-900 mt-2">{qr.accountName}</p>}
+              {qr.accountNumber && <p className="text-xs text-gray-500">{qr.accountNumber}</p>}
+            </div>
+            <a
+              href={qr.imageUrl}
+              download={`${qr.provider}_Payment_QR.png`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 flex items-center gap-2 px-6 py-3 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold shadow-xl transition-transform active:scale-95"
+              onClick={e => { e.stopPropagation(); haptic.success(); }}
+            >
+              <Download className="w-4 h-4" /> Save Image to Phone
+            </a>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AnimatePresence>
   );
 }

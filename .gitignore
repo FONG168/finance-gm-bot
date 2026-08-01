@@ -33,3 +33,8 @@ Thumbs.db
 # Temp
 *.tmp
 *.temp
+finance_gm.sql
+cloudflared.exe
+composer.phar
+vendor/
+

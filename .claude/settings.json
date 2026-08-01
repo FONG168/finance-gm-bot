@@ -44,7 +44,9 @@
       "Bash(Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue)",
       "Bash(Write-Host \"Cleared\")",
       "Bash(railway redeploy *)",
-      "Bash(railway list *)"
+      "Bash(railway list *)",
+      "Bash(git push *)",
+      "Bash(railway link *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\MSi\\.railway"

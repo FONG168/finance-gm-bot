@@ -14,6 +14,7 @@ import { useTheme, ThemeMode } from '@/hooks/useTheme';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/providers/I18nProvider';
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n';
+import { useToast } from '@/providers/ToastProvider';
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -133,6 +134,7 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const { t } = useTranslation('common');
   const { language, changeLanguage } = useLanguage();
+  const toast = useToast();
 
   const THEME_OPTIONS = [
     { value: 'dark' as ThemeMode, label: t('theme.dark'), sub: t('theme.darkDesc'), icon: Moon },
@@ -149,13 +151,21 @@ export default function SettingsPage() {
 
   const handleCurrency = async (value: string) => {
     setSaving('currency');
-    try { await updatePreferences({ currency: value }); } catch {}
+    try {
+      await updatePreferences({ currency: value });
+    } catch (e: any) {
+      toast.error(e.message || t('common.saveFailed'));
+    }
     setSaving(null);
   };
 
   const handleLanguage = async (value: string) => {
     setSaving('language');
-    try { await changeLanguage(value); } catch {}
+    try {
+      await changeLanguage(value);
+    } catch (e: any) {
+      toast.error(e.message || t('common.saveFailed'));
+    }
     setSaving(null);
   };
 

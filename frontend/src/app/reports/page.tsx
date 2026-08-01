@@ -13,6 +13,7 @@ import { MonthlySummary, Transaction } from '@shared/types';
 import { formatCurrency, formatDate, formatTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/providers/ToastProvider';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -50,6 +51,7 @@ function MonthDetailSheet({
   onClose: () => void;
 }) {
   const { t } = useTranslation('common');
+  const toast = useToast();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -69,8 +71,12 @@ function MonthDetailSheet({
         setTransactions(res.data);
         setHasMore(res.hasMore);
       })
-      .catch(() => {})
+      .catch((e) => {
+        console.error(e);
+        toast.error(t('common.loadFailed'));
+      })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [summary.month, summary.year]);
 
   const loadMore = async () => {
@@ -255,8 +261,44 @@ function MonthDetailSheet({
       doc.save(filename);
     } catch (err) {
       console.error('PDF generation failed', err);
+      toast.error(t('common.exportFailed'));
     } finally {
       setPdfLoading(false);
+    }
+  };
+
+  const downloadCSV = async () => {
+    try {
+      let allTx: Transaction[] = [...transactions];
+      if (hasMore) {
+        const res = await apiService.transactions.list({ startDate, endDate, limit: 1000, page: 1 });
+        allTx = res.data;
+      }
+      const headers = ['Date', 'Time', 'Type', 'Category', 'Description', 'Amount'];
+      const rows = allTx.map(tx => {
+        const isIn = tx.type === 'income' || (tx.type === 'transfer' && (tx.note?.startsWith('Transfer from') ?? false));
+        const isTransfer = tx.type === 'transfer';
+        const sign = isTransfer ? (tx.note?.startsWith('Transfer from') ? '+' : '-') : isIn ? '+' : '-';
+        return [
+          new Date(tx.date).toLocaleDateString(),
+          new Date(tx.date).toLocaleTimeString(),
+          tx.type,
+          `"${tx.category?.label || (isTransfer ? 'Transfer' : 'Other')}"`,
+          `"${(tx.note || '').replace(/"/g, '""')}"`,
+          `${sign}${tx.amount}`
+        ].join(',');
+      });
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `FinanceGM_${summary.year}_${summary.month}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (e) {
+      console.error('CSV export failed', e);
+      toast.error(t('common.exportFailed'));
     }
   };
 
@@ -300,9 +342,18 @@ function MonthDetailSheet({
             <div className="flex items-center gap-2">
               <motion.button
                 whileTap={{ scale: 0.92 }}
+                onClick={downloadCSV}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors"
+                style={{ background: 'rgba(16,185,129,0.15)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }}
+              >
+                <FileDown className="w-3.5 h-3.5" />
+                CSV
+              </motion.button>
+              <motion.button
+                whileTap={{ scale: 0.92 }}
                 onClick={downloadPDF}
                 disabled={pdfLoading || loading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-colors"
                 style={{ background: 'rgba(124,58,237,0.15)', color: '#a78bfa', border: '1px solid rgba(124,58,237,0.3)' }}
               >
                 {pdfLoading ? (
@@ -328,22 +379,22 @@ function MonthDetailSheet({
           {/* Summary strip */}
           <div className="grid grid-cols-3 gap-2 px-5 mb-3 flex-shrink-0">
             <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-3 text-center">
-              <TrendingUp className="w-4 h-4 text-emerald-400 mx-auto mb-1" />
-              <p className="text-xs font-bold text-emerald-400 tabular-nums truncate">
+              <TrendingUp className="w-4 h-4 text-emerald-600 mx-auto mb-1" />
+              <p className="text-xs font-bold text-emerald-600 tabular-nums truncate">
                 +{formatCurrency(summary.totalIncome)}
               </p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{t('reports.income')}</p>
             </div>
             <div className="rounded-2xl bg-rose-500/10 border border-rose-500/20 p-3 text-center">
-              <TrendingDown className="w-4 h-4 text-rose-400 mx-auto mb-1" />
-              <p className="text-xs font-bold text-rose-400 tabular-nums truncate">
+              <TrendingDown className="w-4 h-4 text-rose-600 mx-auto mb-1" />
+              <p className="text-xs font-bold text-rose-600 tabular-nums truncate">
                 -{formatCurrency(summary.totalExpenses)}
               </p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{t('reports.expenses')}</p>
             </div>
             <div className="rounded-2xl bg-violet-500/10 border border-violet-500/20 p-3 text-center">
-              <ArrowLeftRight className="w-4 h-4 text-violet-400 mx-auto mb-1" />
-              <p className="text-xs font-bold text-violet-400 tabular-nums truncate">
+              <ArrowLeftRight className="w-4 h-4 text-violet-600 mx-auto mb-1" />
+              <p className="text-xs font-bold text-violet-600 tabular-nums truncate">
                 {formatCurrency(Math.max(0, summary.netBalance))}
               </p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{t('reports.saved')}</p>
@@ -363,7 +414,7 @@ function MonthDetailSheet({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-0.5">
                         <span className="text-xs font-medium truncate">{cat.label}</span>
-                        <span className="text-xs font-bold text-rose-400 ml-2 flex-shrink-0">
+                        <span className="text-xs font-bold text-rose-600 ml-2 flex-shrink-0">
                           {formatCurrency(cat.amount)}
                         </span>
                       </div>
@@ -411,8 +462,8 @@ function MonthDetailSheet({
                   const isIn = isIncomeTx(tx);
                   const isTransfer = tx.type === 'transfer';
                   const color = isTransfer
-                    ? 'text-violet-400'
-                    : isIn ? 'text-emerald-400' : 'text-rose-400';
+                    ? 'text-violet-600'
+                    : isIn ? 'text-emerald-600' : 'text-rose-600';
                   const sign = isTransfer
                     ? (tx.note?.startsWith('Transfer from') ? '+' : '-')
                     : isIn ? '+' : '-';
@@ -451,7 +502,7 @@ function MonthDetailSheet({
                 {hasMore && (
                   <button
                     onClick={loadMore}
-                    className="w-full py-3 text-sm text-violet-400 font-semibold text-center"
+                    className="w-full py-3 text-sm text-violet-600 font-semibold text-center"
                   >
                     {t('common.loadMore')}
                   </button>
@@ -470,6 +521,7 @@ function MonthDetailSheet({
 export default function ReportsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { t, i18n } = useTranslation('common');
+  const toast = useToast();
   const [reports, setReports] = useState<MonthlySummary[]>([]);
   const [selected, setSelected] = useState<MonthlySummary | null>(null);
   const [detailSummary, setDetailSummary] = useState<MonthlySummary | null>(null);
@@ -485,8 +537,12 @@ export default function ReportsPage() {
         setReports(list);
         if (list.length > 0) setSelected(list[0]);
       })
-      .catch(console.error)
+      .catch((e) => {
+        console.error(e);
+        toast.error(t('common.loadFailed'));
+      })
       .finally(() => setIsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, authLoading]);
 
   return (
@@ -535,11 +591,11 @@ export default function ReportsPage() {
                   className="grid grid-cols-3 gap-2 sm:gap-3"
                 >
                   {[
-                    { labelKey: 'reports.income', value: selected.totalIncome, emoji: '💰', color: 'text-emerald-400' },
-                    { labelKey: 'reports.expenses', value: selected.totalExpenses, emoji: '💸', color: 'text-rose-400' },
-                    { labelKey: 'reports.saved', value: Math.max(0, selected.netBalance), emoji: '🏦', color: 'text-violet-400' },
+                    { labelKey: 'reports.income', value: selected.totalIncome, emoji: '💰', color: 'text-emerald-600' },
+                    { labelKey: 'reports.expenses', value: selected.totalExpenses, emoji: '💸', color: 'text-rose-600' },
+                    { labelKey: 'reports.saved', value: Math.max(0, selected.netBalance), emoji: '🏦', color: 'text-violet-600' },
                   ].map((s) => (
-                    <div key={s.labelKey} className="rounded-2xl bg-card border border-border p-3 text-center">
+                    <div key={s.labelKey} className="rounded-2xl bg-secondary shadow-sm p-3 text-center">
                       <p className="text-xl mb-1">{s.emoji}</p>
                       <p className={`text-sm font-bold tabular-nums truncate ${s.color}`}>{formatCurrency(s.value)}</p>
                       <p className="text-[10px] text-muted-foreground mt-0.5">{t(s.labelKey)}</p>
@@ -574,13 +630,13 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Weekly trends */}
-                <div className="rounded-3xl bg-card border border-border p-5">
+                <div className="rounded-3xl bg-secondary shadow-sm p-5">
                   <h2 className="text-sm font-bold mb-4">{t('reports.weeklyTrends')}</h2>
                   <IncomeExpenseChart data={selected.weeklyTrends} />
                 </div>
 
                 {/* Category breakdown */}
-                <div className="rounded-3xl bg-card border border-border p-5">
+                <div className="rounded-3xl bg-secondary shadow-sm p-5">
                   <h2 className="text-sm font-bold mb-4">{t('reports.spendingByCategory')}</h2>
                   <CategoryPieChart data={selected.categoryBreakdown} />
                 </div>
@@ -588,9 +644,9 @@ export default function ReportsPage() {
                 {/* View all transactions for month */}
                 <button
                   onClick={() => setDetailSummary(selected)}
-                  className="w-full py-3.5 rounded-2xl border border-violet-500/30 bg-violet-500/5 text-violet-400 text-sm font-semibold"
+                  className="w-full py-3.5 rounded-2xl border border-violet-500/30 bg-violet-500/5 text-violet-600 text-sm font-semibold"
                 >
-                  📋 {t('transactions.title')} — {formatMonthFull(selected.month, selected.year, i18n.language)}
+                  📋 {t('reports.transactionsForMonth', { month: formatMonthFull(selected.month, selected.year, i18n.language) })}
                 </button>
               </>
             )}

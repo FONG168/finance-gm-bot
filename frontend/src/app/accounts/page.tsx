@@ -11,6 +11,7 @@ import { Account, AccountType, CreateAccountDto, Transaction, PaginatedResponse 
 import { formatCurrency, formatDate, formatTime } from '@/lib/utils';
 import { TransactionItem } from '@/components/transactions/TransactionItem';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/providers/ToastProvider';
 
 const ACCOUNT_PRESETS: { type: AccountType; icon: string; color: string; labelKey: string }[] = [
   { type: 'cash',    icon: '💵', color: '#10b981', labelKey: 'accountType.cash' },
@@ -26,6 +27,7 @@ const ICON_OPTIONS  = ['💵','🏦','📱','🏧','💳','💰','🪙','💎','
 export default function AccountsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { t } = useTranslation('common');
+  const toast = useToast();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [totalAssets, setTotalAssets] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +43,7 @@ export default function AccountsPage() {
       setTotalAssets(data.totalAssets);
     } catch (e) {
       console.error(e);
+      toast.error(t('common.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -54,8 +57,12 @@ export default function AccountsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm(t('accounts.deleteConfirm'))) return;
-    await apiService.accounts.delete(id);
-    loadAccounts();
+    try {
+      await apiService.accounts.delete(id);
+      loadAccounts();
+    } catch (e: any) {
+      toast.error(e.message || t('common.deleteFailed'));
+    }
   };
 
   return (
@@ -75,16 +82,24 @@ export default function AccountsPage() {
 
       <div className="px-4 space-y-4 max-w-2xl mx-auto">
         {/* Net Worth Banner */}
-        <div className="rounded-2xl p-4 text-white" style={{ background: 'linear-gradient(135deg,#3b1278,#5b21b6)' }}>
-          <p className="text-[10px] text-white/50 uppercase tracking-widest font-bold mb-1">{t('accounts.totalAssets')}</p>
-          <p className="text-2xl sm:text-3xl font-bold tabular-nums">{formatCurrency(totalAssets)}</p>
-          <div className="flex gap-3 mt-3">
-            <button
-              onClick={() => setShowTransfer(true)}
-              className="flex items-center gap-1.5 text-xs font-semibold bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors"
+        <div className="relative overflow-hidden p-5 text-white hero-card-decor">
+          <div className="hero-card-sheen" />
+          <div className="relative z-10">
+            <p className="text-[10px] text-lime-100/70 uppercase tracking-widest font-bold mb-1">{t('accounts.totalAssets')}</p>
+            <p
+              className="text-2xl sm:text-3xl font-bold tabular-nums"
+              style={{ textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}
             >
-              <ArrowLeftRight className="w-3.5 h-3.5" /> {t('accounts.transfer')}
-            </button>
+              {formatCurrency(totalAssets)}
+            </p>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => setShowTransfer(true)}
+                className="flex items-center gap-1.5 text-xs font-bold bg-black/70 backdrop-blur-sm border border-white/10 text-white px-4 py-2.5 rounded-full active:scale-95 transition-transform"
+              >
+                <ArrowLeftRight className="w-3.5 h-3.5" /> {t('accounts.transfer')}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -99,7 +114,7 @@ export default function AccountsPage() {
           <div className="text-center py-12">
             <p className="text-3xl mb-2">🏦</p>
             <p className="text-sm text-muted-foreground">{t('accounts.noAccounts')}</p>
-            <button onClick={() => setShowAdd(true)} className="mt-3 text-xs text-violet-400 font-semibold">
+            <button onClick={() => setShowAdd(true)} className="mt-3 text-xs text-violet-600 font-semibold">
               {t('accounts.addFirst')}
             </button>
           </div>
@@ -111,7 +126,7 @@ export default function AccountsPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="rounded-2xl bg-card border border-border p-4 flex items-center gap-3"
+                className="rounded-2xl bg-secondary shadow-sm p-4 flex items-center gap-3"
               >
                 {/* Clickable area: icon + name + balance */}
                 <button
@@ -128,13 +143,13 @@ export default function AccountsPage() {
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-bold truncate">{acc.name}</p>
                       {acc.isDefault && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-bold">{t('accounts.default')}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-700 font-bold">{t('accounts.default')}</span>
                       )}
                     </div>
                     <p className="text-[10px] text-muted-foreground capitalize">{acc.type}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className={`text-sm font-bold tabular-nums ${acc.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <p className={`text-sm font-bold tabular-nums ${acc.balance >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                       {formatCurrency(acc.balance)}
                     </p>
                   </div>
@@ -144,16 +159,16 @@ export default function AccountsPage() {
                 <div className="flex gap-1 flex-shrink-0">
                   <button
                     onClick={() => setEditAccount(acc)}
-                    className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center"
+                    className="w-7 h-7 rounded-lg bg-card flex items-center justify-center"
                   >
                     <Pencil className="w-3 h-3 text-muted-foreground" />
                   </button>
                   {!acc.isDefault && (
                     <button
                       onClick={() => handleDelete(acc.id)}
-                      className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center"
+                      className="w-7 h-7 rounded-lg bg-card flex items-center justify-center"
                     >
-                      <Trash2 className="w-3 h-3 text-rose-400" />
+                      <Trash2 className="w-3 h-3 text-rose-600" />
                     </button>
                   )}
                 </div>
@@ -201,6 +216,7 @@ export default function AccountsPage() {
 // ─── Add Account Sheet ────────────────────────────────────────────────────────
 function AddAccountSheet({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const { t } = useTranslation('common');
+  const toast = useToast();
   const [name, setName] = useState('');
   const [type, setType] = useState<AccountType>('cash');
   const [balance, setBalance] = useState('0');
@@ -221,7 +237,7 @@ function AddAccountSheet({ onClose, onSaved }: { onClose: () => void; onSaved: (
       await apiService.accounts.create({ name: name.trim(), type, balance: parseFloat(balance) || 0, color, icon });
       onSaved();
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message || t('common.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -257,6 +273,7 @@ function AddAccountSheet({ onClose, onSaved }: { onClose: () => void; onSaved: (
 // ─── Edit Account Sheet ───────────────────────────────────────────────────────
 function EditAccountSheet({ account, onClose, onSaved }: { account: Account; onClose: () => void; onSaved: () => void }) {
   const { t } = useTranslation('common');
+  const toast = useToast();
   const [name, setName] = useState(account.name);
   const [type, setType] = useState<AccountType>(account.type);
   const [color, setColor] = useState(account.color);
@@ -270,7 +287,7 @@ function EditAccountSheet({ account, onClose, onSaved }: { account: Account; onC
       await apiService.accounts.update(account.id, { name: name.trim(), type, color, icon });
       onSaved();
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message || t('common.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -332,7 +349,7 @@ function TransferSheet({ accounts, onClose, onSaved }: { accounts: Account[]; on
     title={t('accounts.transferMoney')}
     footer={
       <>
-        {error && <p className="text-xs text-rose-400 mb-2">{error}</p>}
+        {error && <p className="text-xs text-rose-600 mb-2">{error}</p>}
         <button
           onClick={handleTransfer}
           disabled={!amount || saving}
@@ -386,6 +403,7 @@ function TransferSheet({ accounts, onClose, onSaved }: { accounts: Account[]; on
 // ─── Account Transactions Sheet ───────────────────────────────────────────────
 function AccountTransactionsSheet({ account, onClose }: { account: Account; onClose: () => void }) {
   const { t } = useTranslation('common');
+  const toast = useToast();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -407,11 +425,13 @@ function AccountTransactionsSheet({ account, onClose }: { account: Account; onCl
         setTotalExpense((res as any).totalExpense ?? 0);
       } catch (e) {
         console.error(e);
+        toast.error(t('common.loadFailed'));
       } finally {
         setIsLoading(false);
       }
     };
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account.id]);
 
   const loadMore = async () => {
@@ -424,6 +444,7 @@ function AccountTransactionsSheet({ account, onClose }: { account: Account; onCl
       setPage(nextPage);
     } catch (e) {
       console.error(e);
+      toast.error(t('common.loadFailed'));
     } finally {
       setIsLoadingMore(false);
     }
@@ -453,7 +474,7 @@ function AccountTransactionsSheet({ account, onClose }: { account: Account; onCl
             </div>
             <div>
               <h2 className="text-base font-bold">{account.name}</h2>
-              <p className={`text-sm font-semibold tabular-nums ${account.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <p className={`text-sm font-semibold tabular-nums ${account.balance >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                 {formatCurrency(account.balance)}
               </p>
             </div>
@@ -467,16 +488,16 @@ function AccountTransactionsSheet({ account, onClose }: { account: Account; onCl
         {!isLoading && (
           <div className="mx-6 mb-4 grid grid-cols-2 gap-2 flex-shrink-0">
             <div className="rounded-xl bg-emerald-500/10 px-3 py-2.5">
-              <p className="text-[10px] text-emerald-400/70 uppercase tracking-wider font-semibold mb-0.5">
+              <p className="text-[10px] text-emerald-700/70 uppercase tracking-wider font-semibold mb-0.5">
                 {t('home.income', { defaultValue: 'Income' })}
               </p>
-              <p className="text-sm font-bold text-emerald-400 tabular-nums">+{formatCurrency(totalIncome)}</p>
+              <p className="text-sm font-bold text-emerald-600 tabular-nums">+{formatCurrency(totalIncome)}</p>
             </div>
             <div className="rounded-xl bg-rose-500/10 px-3 py-2.5">
-              <p className="text-[10px] text-rose-400/70 uppercase tracking-wider font-semibold mb-0.5">
+              <p className="text-[10px] text-rose-700/70 uppercase tracking-wider font-semibold mb-0.5">
                 {t('home.expenses', { defaultValue: 'Expenses' })}
               </p>
-              <p className="text-sm font-bold text-rose-400 tabular-nums">-{formatCurrency(totalExpense)}</p>
+              <p className="text-sm font-bold text-rose-600 tabular-nums">-{formatCurrency(totalExpense)}</p>
             </div>
           </div>
         )}
@@ -510,7 +531,7 @@ function AccountTransactionsSheet({ account, onClose }: { account: Account; onCl
             <button
               onClick={loadMore}
               disabled={isLoadingMore}
-              className="w-full py-3 mt-2 text-xs font-semibold text-violet-400 flex items-center justify-center gap-2"
+              className="w-full py-3 mt-2 text-xs font-semibold text-violet-600 flex items-center justify-center gap-2"
             >
               {isLoadingMore ? (
                 <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="w-4 h-4 border-2 border-violet-400 border-t-transparent rounded-full" />
@@ -557,7 +578,7 @@ function TxDetailOverlay({ transaction, onClose }: { transaction: Transaction; o
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-3" style={{ backgroundColor: `${cat?.color}30` }}>
             {cat?.icon || '📦'}
           </div>
-          <p className={`text-3xl font-bold tabular-nums mb-1 ${isIncome ? 'text-emerald-400' : 'text-rose-400'}`}>
+          <p className={`text-3xl font-bold tabular-nums mb-1 ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}>
             {isIncome ? '+' : '-'}{formatCurrency(transaction.amount)}
           </p>
           <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ backgroundColor: `${cat?.color}25`, color: cat?.color }}>
@@ -650,7 +671,7 @@ function AccountForm({
             <button
               key={p.type}
               onClick={() => selectPreset(p)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${type === p.type ? 'border-violet-500 bg-violet-500/20 text-violet-300' : 'border-border bg-secondary text-muted-foreground'}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors ${type === p.type ? 'border-violet-500 bg-violet-500/20 text-violet-700' : 'border-border bg-secondary text-muted-foreground'}`}
             >
               {p.icon} {t(p.labelKey)}
             </button>

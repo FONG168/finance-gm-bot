@@ -18,10 +18,10 @@ function applyTheme(mode: ThemeMode) {
 }
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<ThemeMode>('dark');
+  const [theme, setThemeState] = useState<ThemeMode>('light');
 
   useEffect(() => {
-    const saved = (localStorage.getItem(STORAGE_KEY) as ThemeMode) || 'dark';
+    const saved = (localStorage.getItem(STORAGE_KEY) as ThemeMode) || 'light';
     setThemeState(saved);
     applyTheme(saved);
 

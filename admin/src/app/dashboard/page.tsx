@@ -61,11 +61,12 @@ export default function DashboardPage() {
   const { data: statsRes, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => adminApi.dashboard.stats(),
-    refetchInterval: 60_000,
+    refetchInterval: 3000,
   });
   const { data: activityRes, isLoading: activityLoading } = useQuery({
     queryKey: ['dashboard-activity'],
     queryFn: () => adminApi.dashboard.recentActivity(),
+    refetchInterval: 3000,
   });
 
   const stats = statsRes?.data?.data;

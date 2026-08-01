@@ -86,7 +86,7 @@ export function TransactionItem({ transaction, onEdit, onDelete, onClick, index 
               onClick={() => onDelete(transaction.id)}
               className="w-7 h-7 rounded-lg bg-rose-500/10 flex items-center justify-center active:scale-90 transition-transform"
             >
-              <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+              <Trash2 className="w-3.5 h-3.5 text-rose-600" />
             </button>
           )}
         </div>

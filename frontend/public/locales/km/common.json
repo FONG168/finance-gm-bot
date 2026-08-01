@@ -2,12 +2,13 @@
   "nav": { "home": "ទំព័រដើម", "accounts": "គណនី", "add": "បន្ថែម", "reports": "របាយការណ៍", "profile": "ប្រវត្តិរូប" },
   "greeting": { "morning": "អរុណសួស្ដី", "afternoon": "ទិវាសួស្ដី", "evening": "សាយណ្ហសួស្ដី" },
   "home": {
-    "totalNetWorth": "ទ្រព្យសម្បត្តិសុទ្ធ", "income": "ចំណូល", "spent": "ចំណាយ", "saved": "សន្សំ",
-    "accounts": "គណនី", "manage": "គ្រប់គ្រង →", "thisWeek": "សប្ដាហ៍នេះ", "savingsRate": "អត្រាសន្សំ",
+    "totalNetWorth": "ទ្រព្យសម្បត្តិសុទ្ធសរុប", "liveBalance": "សមតុល្យបច្ចុប្បន្ន", "income": "ចំណូល", "spent": "ចំណាយ", "saved": "សន្សំ",
+    "accounts": "គណនី", "manage": "គ្រប់គ្រង →", "thisWeek": "សប្តាហ៍នេះ", "netThisWeek": "សុទ្ធសប្តាហ៍នេះ", "savingsRate": "អត្រាសន្សំ",
     "transactions": "ប្រតិបត្តិការ", "spendingByCategory": "ការចំណាយតាមប្រភេទ",
     "recentTransactions": "ប្រតិបត្តិការថ្មីៗ", "seeAll": "មើលទាំងអស់ →",
     "noTransactions": "មិនទាន់មានប្រតិបត្តិការ", "noTransactionsHint": "បន្ថែមការចំណាយ ឬចំណូលដំបូងរបស់អ្នក!",
-    "monthlyTrend": "និន្នាការប្រចាំខែ", "excellent": "ល្អឥតខ្ចោះ!", "keepGoing": "បន្តទៀត!", "overspending": "ចំណាយលើស"
+    "monthlyTrend": "និន្នាការប្រចាំខែ", "excellent": "ល្អឥតខ្ចោះ!", "keepGoing": "បន្តទៀត!", "overspending": "ចំណាយលើស",
+    "analytics": "ការវិភាគ", "history": "ប្រវត្តិ"
   },
   "accounts": {
     "title": "គណនី", "subtitle": "គ្រប់គ្រងគណនីរបស់អ្នក", "totalAssets": "ទ្រព្យសម្បត្តិសរុប",
@@ -30,7 +31,8 @@
     "note": "កំណត់ចំណាំ", "cancel": "បោះបង់", "confirm": "បញ្ជាក់",
     "blocked": "ប្រតិបត្តិការត្រូវបានទប់ស្កាត់", "gotIt": "យល់ហើយ",
     "invalidAmount": "សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ។",
-    "selectCategory": "សូមជ្រើសរើសប្រភេទមុននឹងរក្សាទុក។"
+    "selectCategory": "សូមជ្រើសរើសប្រភេទមុននឹងរក្សាទុក។",
+    "dateOfTransaction": "កាលបរិច្ឆេទប្រតិបត្តិការ", "scrollLeft": "អូសទៅឆ្វេង", "scrollRight": "អូសទៅស្ដាំ"
   },
   "transactions": {
     "title": "ប្រតិបត្តិការ", "subtitle": "ប្រវត្តិប្រតិបត្តិការរបស់អ្នក", "search": "ស្វែងរកប្រតិបត្តិការ...",
@@ -42,34 +44,35 @@
     "category": "ប្រភេទ", "balanceAfter": "សមតុល្យក្រោយ"
   },
   "reports": {
-    "title": "របាយការណ៍", "subtitle": "ការវិភាគការចំណាយរបស់អ្នក", "income": "ចំណូល",
-    "expenses": "ការចំណាយ", "saved": "សន្សំ", "savingsRate": "អត្រាសន្សំ",
-    "excellentSavings": "ល្អឥតខ្ចោះ! អ្នកបានសន្សំបានល្អខែនេះ។",
+    "title": "របាយការណ៍", "subtitle": "ការវិភាគការចំណាយរបស់អ្នក", "income": "ប្រាក់ចំណូល",
+    "expenses": "ការចំណាយ", "saved": "ប្រាក់សន្សំ", "savingsRate": "អត្រាប្រាក់សន្សំ",
+    "excellentSavings": "ឆ្នើមណាស់! អ្នកបានសន្សំបានល្អក្នុងខែនេះ។",
     "brokeEven": "អ្នករកចំណូលស្មើនឹងការចំណាយ។ ព្យាយាមសន្សំបន្ថែមខែក្រោយ។",
     "overspent": "អ្នកចំណាយលើសចំណូលខែនេះ។",
-    "weeklyTrends": "និន្នាការប្រចាំសប្ដាហ៍", "spendingByCategory": "ការចំណាយតាមប្រភេទ",
-    "noReports": "មិនទាន់មានរបាយការណ៍", "noReportsHint": "ចាប់ផ្ដើមបន្ថែមប្រតិបត្តិការដើម្បីមើលរបាយការណ៍ប្រចាំខែ។"
+    "weeklyTrends": "និន្នាការប្រចាំសប្តាហ៍", "spendingByCategory": "ការចំណាយតាមប្រភេទ", "weekN": "សប្តាហ៍ទី{{n}}",
+    "noReports": "មិនទាន់មានរបាយការណ៍", "noReportsHint": "ចាប់ផ្ដើមបន្ថែមប្រតិបត្តិការដើម្បីមើលរបាយការណ៍ប្រចាំខែ។",
+    "transactionsForMonth": "ប្រតិបត្តិការរបស់អ្នកក្នុង{{month}}"
   },
   "profile": {
-    "title": "ប្រវត្តិរូប", "settings": "ការកំណត់", "settingsDesc": "ចំណូលចិត្តកម្មវិធី",
-    "privacy": "ឯកជនភាព & សន្តិសុខ", "privacyDesc": "ទិន្នន័យ & សិទ្ធ",
-    "support": "ជំនួយ Telegram", "supportDesc": "ជជែកផ្ទាល់ជាមួយអ្នកគ្រប់គ្រង",
+    "title": "ព័ត៌មានផ្ទាល់ខ្លួន", "settings": "ការកំណត់", "settingsDesc": "ការកំណត់ចំណូលចិត្តកម្មវិធី",
+    "privacy": "ឯកជនភាព និងសុវត្ថិភាព", "privacyDesc": "ទិន្នន័យ និងការអនុញ្ញាត",
+    "support": "ជំនួយ Telegram", "supportDesc": "ឆាតផ្ទាល់ជាមួយក្រុមការងារ",
     "closeApp": "បិទកម្មវិធី", "aiComing": "AI Insights នឹងមកដល់ក្នុងពេលឆាប់ៗ",
     "aiDesc": "ការចាត់ថ្នាក់ការចំណាយ ការណែនាំថវិកា និងការវិភាគការចំណាយ។",
-    "currency": "រូបិយប័ណ្ណ", "timezone": "តំបន់ពេលវេលា", "since": "តាំងពី",
+    "currency": "រូបិយវត្ថុ", "timezone": "តំបន់ពេលវេលា", "since": "ចាប់តាំងពី",
     "proMember": "សមាជិក PRO", "version": "Finance GM v1.0.0"
   },
   "settings": {
-    "title": "ការកំណត់", "appearance": "រូបរាង", "theme": "រូបរាង", "currency": "រូបិយប័ណ្ណ",
-    "defaultCurrency": "រូបិយប័ណ្ណលំនាំដើម", "timezone": "តំបន់ពេលវេលា",
-    "notifications": "ការជូនដំណឹង", "weeklySummary": "សង្ខេបប្រចាំសប្ដាហ៍",
-    "weeklySummaryDesc": "ទទួលរបាយការណ៍ហិរញ្ញវត្ថុប្រចាំសប្ដាហ៍",
+    "title": "ការកំណត់", "appearance": "រូបរាង", "theme": "រូបរាង", "currency": "រូបិយវត្ថុ",
+    "defaultCurrency": "រូបិយវត្ថុចម្បង", "timezone": "តំបន់ពេលវេលា",
+    "notifications": "ការជូនដំណឹង", "weeklySummary": "សង្ខេបប្រចាំសប្តាហ៍",
+    "weeklySummaryDesc": "ទទួលរបាយការណ៍ហិរញ្ញវត្ថុប្រចាំសប្តាហ៍",
     "trialExpiration": "ការផុតកំណត់ការសាកល្បង",
     "trialExpirationDesc": "ការរំលឹកមុនការផុតការសាកល្បង",
     "premiumReminder": "ការរំលឹក Premium", "premiumReminderDesc": "ការជូនដំណឹងការបន្ត",
     "budgetAlerts": "ការជូនដំណឹងថវិកា", "budgetAlertsDesc": "ជូនដំណឹងនៅពេលជិតដល់ដែនកំណត់ថវិកា",
     "language": "ភាសា", "saving": "កំពុងរក្សាទុក...", "chooseTheme": "ជ្រើសរើសរូបរាង",
-    "chooseCurrency": "ជ្រើសរើសរូបិយប័ណ្ណ", "chooseTimezone": "ជ្រើសរើសតំបន់ពេលវេលា",
+    "chooseCurrency": "ជ្រើសរើសរូបិយវត្ថុ", "chooseTimezone": "ជ្រើសរើសតំបន់ពេលវេលា",
     "chooseLanguage": "ជ្រើសរើសភាសា"
   },
   "theme": {
@@ -77,13 +80,13 @@
     "system": "ប្រព័ន្ធ", "systemDesc": "តាមឧបករណ៍"
   },
   "privacy": {
-    "title": "ឯកជនភាព & សន្តិសុខ", "telegramAccount": "គណនី Telegram", "session": "វគ្គ",
+    "title": "ឯកជនភាព និងសុវត្ថិភាព", "telegramAccount": "គណនី Telegram", "session": "វគ្គ",
     "security": "សន្តិសុខ", "name": "ឈ្មោះ", "username": "ឈ្មោះអ្នកប្រើ", "telegramId": "Telegram ID",
     "accountLinked": "គណនីភ្ជាប់", "status": "ស្ថានភាព", "platform": "វេទិកា",
-    "memberSince": "សមាជិកតាំងពី", "logout": "ចាកចេញ", "authentication": "ការផ្ទៀងផ្ទាត់",
+    "memberSince": "ជាសមាជិកចាប់ពី", "logout": "ចាកចេញ", "authentication": "ការផ្ទៀងផ្ទាត់",
     "dataEncryption": "ការអ៊ិនគ្រីបទិន្នន័យ", "yourPrivacy": "ឯកជនភាពរបស់អ្នកសំខាន់",
     "privacyText": "ទិន្នន័យហិរញ្ញវត្ថុរបស់អ្នកត្រូវបានរក្សាទុកដោយសុវត្ថិភាព និងមិនត្រូវបានចែករំលែកជាមួយភាគីទីបី។",
-    "active": "សកម្ម", "telegramAuth": "ការផ្ទៀងផ្ទាត់ Telegram", "endToEnd": "ពីចុងដល់ចុង"
+    "active": "កំពុងដំណើរការ", "telegramAuth": "ការផ្ទៀងផ្ទាត់ Telegram", "endToEnd": "ពីចុងដល់ចុង"
   },
   "subscription": {
     "expired": "ការជាវផុតកំណត់", "trialEnded": "ការសាកល្បងឥតគិតថ្លៃបានបញ្ចប់",
@@ -108,7 +111,18 @@
     "loading": "កំពុងផ្ទុក...", "error": "កំហុស", "retry": "ព្យាយាមម្ដងទៀត",
     "close": "បិទ", "cancel": "បោះបង់", "save": "រក្សាទុក", "done": "រួចរាល់", "comingSoon": "ឆាប់ៗ",
     "loadMore": "មើលបន្ថែម", "transfer": "ផ្ទេរ", "noData": "មិនទាន់មានទិន្នន័យ",
-    "today": "ថ្ងៃនេះ", "yesterday": "ម្សិលមិញ", "daysAgo": "{{n}} ថ្ងៃមុន"
+    "today": "ថ្ងៃនេះ", "yesterday": "ម្សិលមិញ", "daysAgo": "{{n}} ថ្ងៃមុន",
+    "loadFailed": "មិនអាចផ្ទុកទិន្នន័យបាន។ អូសចុះក្រោមដើម្បីផ្ទុកឡើងវិញ។",
+    "saveFailed": "មិនអាចរក្សាទុកបានទេ។ សូមព្យាយាមម្ដងទៀត។",
+    "deleteFailed": "មិនអាចលុបបានទេ។ សូមព្យាយាមម្ដងទៀត។",
+    "exportFailed": "ការនាំចេញបរាជ័យ។ សូមព្យាយាមម្ដងទៀត។",
+    "dismiss": "បិទ",
+    "pageNotFound": "រកមិនឃើញទំព័រ",
+    "pageNotFoundHint": "ទំព័រដែលអ្នកកំពុងស្វែងរកមិនមាន ឬប្រហែលបានផ្លាស់ទីហើយ។",
+    "backToHome": "ត្រឡប់ទៅទំព័រដើម",
+    "somethingWentWrong": "មានបញ្ហាកើតឡើង",
+    "somethingWentWrongHint": "មានកំហុសដែលមិនបានរំពឹងទុកកើតឡើង។ អ្នកអាចព្យាយាមម្ដងទៀត ឬត្រឡប់ទៅទំព័រដើម។",
+    "tryAgain": "ព្យាយាមម្ដងទៀត"
   },
   "notifications": {
     "title": "ការជូនដំណឹង", "empty": "គ្មានការជូនដំណឹង", "emptyDesc": "អ្នកទាំងអស់គ្នាបានឃើញ!",
@@ -128,7 +142,7 @@
     "food": "អាហារ",
     "transport": "ដឹកជញ្ជូន",
     "entertainment": "កម្សាន្ត",
-    "shopping": "ទិញដូរ",
+    "shopping": "ការទិញទំនិញ",
     "bills": "វិក្កយបត្រ",
     "health": "សុខភាព",
     "salary": "ប្រាក់ខែ",

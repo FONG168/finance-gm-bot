@@ -1,5 +1,6 @@
 'use client';
 
+import '@/lib/i18n';
 import {
   BarChart,
   Bar,
@@ -12,6 +13,7 @@ import {
 } from 'recharts';
 import { WeeklyTrend } from '@shared/types';
 import { formatCurrency } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface IncomeExpenseChartProps {
   data: WeeklyTrend[];
@@ -34,16 +36,18 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
+  const { t } = useTranslation('common');
+
   if (!data.length) {
     return (
       <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
-        No data for this period
+        {t('common.noData')}
       </div>
     );
   }
 
   const chartData = data.map((d) => ({
-    name: `W${d.weekNumber}`,
+    name: t('reports.weekN', { n: d.weekNumber }),
     Income: d.income,
     Expenses: d.expenses,
   }));
@@ -66,8 +70,8 @@ export function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
           width={40}
         />
         <Tooltip content={<CustomTooltip />} />
-        <Bar dataKey="Income" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={32} />
-        <Bar dataKey="Expenses" fill="#f43f5e" radius={[6, 6, 0, 0]} maxBarSize={32} />
+        <Bar dataKey="Income" name={t('reports.income')} fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={32} />
+        <Bar dataKey="Expenses" name={t('reports.expenses')} fill="#f43f5e" radius={[6, 6, 0, 0]} maxBarSize={32} />
       </BarChart>
     </ResponsiveContainer>
   );

@@ -3,7 +3,7 @@
 import '@/lib/i18n';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, RefreshCw, TrendingUp, TrendingDown, X, AlertCircle, CheckCircle, Clock, Globe } from 'lucide-react';
+import { Bell, RefreshCw, TrendingUp, TrendingDown, X, AlertCircle, CheckCircle, Clock, Globe, Eye, EyeOff, ArrowUpRight, PiggyBank } from 'lucide-react';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { CategoryPieChart } from '@/components/charts/CategoryPieChart';
 import { IncomeExpenseChart } from '@/components/charts/IncomeExpenseChart';
@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { SubscriptionExpiredModal } from '@/components/subscription/SubscriptionExpiredModal';
 import { useLanguage } from '@/providers/I18nProvider';
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n';
+import { useToast } from '@/providers/ToastProvider';
 
 function PlanBadge({ plan, status, premiumExpiresAt, onExpiredClick }: { plan?: string; status?: string; premiumExpiresAt?: string | null; onExpiredClick?: () => void }) {
   const isPremiumExpired = plan === 'PREMIUM' && premiumExpiresAt && new Date(premiumExpiresAt) < new Date();
@@ -26,7 +27,7 @@ function PlanBadge({ plan, status, premiumExpiresAt, onExpiredClick }: { plan?: 
     return (
       <button
         onClick={onExpiredClick}
-        className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 tracking-wide active:scale-95 transition-transform"
+        className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-600 tracking-wide active:scale-95 transition-transform"
       >
         EXPIRED
       </button>
@@ -34,27 +35,27 @@ function PlanBadge({ plan, status, premiumExpiresAt, onExpiredClick }: { plan?: 
   }
   if (plan === 'LIFETIME') {
     return (
-      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 tracking-wide">
+      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-700 tracking-wide">
         ∞ LIFETIME
       </span>
     );
   }
   if (plan === 'PREMIUM') {
     return (
-      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-400 tracking-wide">
+      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-700 tracking-wide">
         PRO
       </span>
     );
   }
   if (status === 'TRIAL') {
     return (
-      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 tracking-wide">
+      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-700 tracking-wide">
         TRIAL
       </span>
     );
   }
   return (
-    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-zinc-500/20 text-zinc-400 tracking-wide">
+    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-zinc-500/20 text-zinc-600 tracking-wide">
       FREE
     </span>
   );
@@ -71,6 +72,7 @@ function LanguageSheet({
   current: string;
   onSelect: (lang: string) => void;
 }) {
+  const { t } = useTranslation('common');
   return (
     <AnimatePresence>
       {isOpen && (
@@ -95,8 +97,8 @@ function LanguageSheet({
             </div>
             <div className="flex items-center justify-between px-5 py-3">
               <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-violet-400" />
-                <h2 className="text-base font-bold">Language</h2>
+                <Globe className="w-4 h-4 text-violet-600" />
+                <h2 className="text-base font-bold">{t('settings.language')}</h2>
               </div>
               <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
                 <X className="w-4 h-4 text-muted-foreground" />
@@ -115,7 +117,7 @@ function LanguageSheet({
                 >
                   <span className="text-2xl">{lang.flag}</span>
                   <div className="text-left flex-1">
-                    <p className={`text-sm font-bold ${current === lang.code ? 'text-violet-400' : ''}`}>
+                    <p className={`text-sm font-bold ${current === lang.code ? 'text-violet-700' : ''}`}>
                       {lang.nativeLabel}
                     </p>
                     <p className="text-xs text-muted-foreground">{lang.label}</p>
@@ -169,13 +171,13 @@ function NotificationsPanel({
     switch (type) {
       case 'plan_expired':
       case 'premium_expired':
-        return <AlertCircle className="w-5 h-5 text-rose-400" />;
+        return <AlertCircle className="w-5 h-5 text-rose-600" />;
       case 'premium_expiring':
-        return <Clock className="w-5 h-5 text-amber-400" />;
+        return <Clock className="w-5 h-5 text-amber-600" />;
       case 'payment_pending':
-        return <Clock className="w-5 h-5 text-violet-400" />;
+        return <Clock className="w-5 h-5 text-violet-600" />;
       case 'payment_approved':
-        return <CheckCircle className="w-5 h-5 text-emerald-400" />;
+        return <CheckCircle className="w-5 h-5 text-emerald-600" />;
     }
   };
 
@@ -244,7 +246,7 @@ function NotificationsPanel({
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 flex-shrink-0">
               <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-violet-400" />
+                <Bell className="w-4 h-4 text-violet-600" />
                 <h2 className="text-base font-bold">{t('notifications.title')}</h2>
               </div>
               <button
@@ -282,7 +284,7 @@ function NotificationsPanel({
                           <p className="text-sm font-bold">{getTitle(n)}</p>
                           <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{getDesc(n)}</p>
                           {isUpgradeType(n.type) && (
-                            <p className="text-xs text-violet-400 font-semibold mt-2">{t('notifications.tapToUpgrade')}</p>
+                            <p className="text-xs text-violet-700 font-semibold mt-2">{t('notifications.tapToUpgrade')}</p>
                           )}
                         </div>
                       </div>
@@ -302,6 +304,7 @@ export default function DashboardPage() {
   const { user, isLoading: authLoading, isAuthenticated, error: authError, authenticate } = useAuth();
   const { initData, user: tgUser } = useTelegram();
   const { t } = useTranslation('common');
+  const toast = useToast();
   const [rawTgDebug, setRawTgDebug] = useState<string>('...');
   const [weekly, setWeekly] = useState<WeeklySummary | null>(null);
   const [monthly, setMonthly] = useState<MonthlySummary | null>(null);
@@ -313,7 +316,20 @@ export default function DashboardPage() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLanguage, setShowLanguage] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<PaymentRecord[]>([]);
+  const [hideBalance, setHideBalance] = useState(false);
   const { language, changeLanguage, syncFromServer } = useLanguage();
+
+  // Persist balance-visibility preference across sessions
+  useEffect(() => {
+    const saved = localStorage.getItem('hideBalance');
+    if (saved === '1') setHideBalance(true);
+  }, []);
+  const toggleHideBalance = () => {
+    setHideBalance(prev => {
+      localStorage.setItem('hideBalance', !prev ? '1' : '0');
+      return !prev;
+    });
+  };
 
   // Sync language from DB when user loads (respects bot /language changes)
   useEffect(() => {
@@ -362,18 +378,20 @@ export default function DashboardPage() {
     return t('greeting.evening');
   };
 
-  const loadData = async () => {
+  const loadData = async (isInitial = false) => {
+    if (isInitial && !weekly) setIsLoading(true);
     try {
-      const [w, m, txns] = await Promise.all([
+      const [w, m, r] = await Promise.all([
         apiService.analytics.weekly(),
         apiService.analytics.monthly(),
-        apiService.transactions.list({ limit: 5 }),
+        apiService.transactions.list({ limit: 10 }),
       ]);
       setWeekly(w);
       setMonthly(m);
-      setRecent(txns.data);
-    } catch (e) {
-      console.error('Dashboard load failed:', e);
+      setRecent(r.data);
+    } catch (e: any) {
+      console.error('Error loading dashboard data:', e);
+      toast.error(t('common.loadFailed'));
     } finally {
       setIsLoading(false);
       setRefreshing(false);
@@ -386,7 +404,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (authLoading) return;
     if (isAuthenticated) {
-      loadData();
+      loadData(true);
     } else {
       setIsLoading(false);
     }
@@ -412,7 +430,7 @@ export default function DashboardPage() {
 
   const handleRefresh = () => {
     setRefreshing(true);
-    loadData();
+    loadData(false);
   };
 
   // Re-fetch auth + data when user returns to the app (after bot approval message)
@@ -420,8 +438,7 @@ export default function DashboardPage() {
     if (!isAuthenticated) return;
 
     const refresh = () => {
-      authenticate();
-      loadData();
+      loadData(false);
     };
 
     // Browser/Telegram visibility API
@@ -518,7 +535,7 @@ export default function DashboardPage() {
         {/* Auth debug panel */}
         {!isAuthenticated && (
           <div className="rounded-2xl bg-secondary border border-border px-4 py-3 text-xs space-y-1">
-            <p className="font-bold text-amber-400">Auth debug</p>
+            <p className="font-bold text-amber-600">Auth debug</p>
             <p className="text-muted-foreground">Error: {authError || 'none'}</p>
             <p className="text-muted-foreground">initData: {initData ? `✅ ${initData.length} chars` : '❌ empty'}</p>
             <p className="text-muted-foreground">initDataUnsafe user: {tgUser ? `✅ id=${tgUser.id}` : '❌ none'}</p>
@@ -526,59 +543,155 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Total Net Worth Card */}
+        {/* Total Net Worth Hero Card */}
         {isLoading ? (
-          <div className="h-52 rounded-3xl bg-secondary animate-pulse" />
+          <div className="h-52 rounded-3xl bg-secondary/40 animate-pulse border border-border" />
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="relative overflow-hidden rounded-3xl p-6 text-white"
-            style={{
-              background: 'linear-gradient(135deg, #3b1278 0%, #5b21b6 45%, #312e81 100%)',
-            }}
+            className="relative overflow-hidden p-6 text-white hero-card-decor"
           >
-            {/* decorative circles */}
-            <div className="absolute -right-12 -top-12 w-52 h-52 rounded-full bg-white/5" />
-            <div className="absolute -right-6 -bottom-16 w-64 h-64 rounded-full bg-white/5" />
-
+            <div className="hero-card-sheen" />
             <div className="relative z-10">
-              <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1.5">
-                {t('home.totalNetWorth')}
-              </p>
-              <p className="text-3xl sm:text-4xl font-bold tracking-tight mb-5 tabular-nums">
-                {formatCurrency(accountSummary?.totalAssets ?? weekly?.netBalance ?? 0)}
-              </p>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[10px] font-bold text-lime-100/70 uppercase tracking-widest">
+                  {t('home.totalNetWorth')}
+                </p>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-black/30 text-white border border-white/15 tracking-wide backdrop-blur-sm">
+                    {t('home.liveBalance')}
+                  </span>
+                  <button
+                    onClick={toggleHideBalance}
+                    className="w-6 h-6 rounded-full bg-black/25 flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+                    aria-label={hideBalance ? 'Show balance' : 'Hide balance'}
+                  >
+                    {hideBalance ? (
+                      <EyeOff className="w-3 h-3 text-white/80" />
+                    ) : (
+                      <Eye className="w-3 h-3 text-white/80" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-end gap-2.5 mb-5">
+                <p
+                  className="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums text-white"
+                  style={{ textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}
+                >
+                  {hideBalance ? '••••••' : formatCurrency(accountSummary?.totalAssets ?? weekly?.netBalance ?? 0)}
+                </p>
+                {!hideBalance && weekly && (
+                  <span
+                    className={`mb-1.5 flex items-center gap-0.5 text-[11px] font-bold ${
+                      (weekly.netBalance ?? 0) >= 0 ? 'text-lime-300' : 'text-rose-300'
+                    }`}
+                  >
+                    {(weekly.netBalance ?? 0) >= 0 ? (
+                      <TrendingUp className="w-3 h-3" />
+                    ) : (
+                      <TrendingDown className="w-3 h-3" />
+                    )}
+                    {formatCurrency(Math.abs(weekly.netBalance ?? 0))}
+                  </span>
+                )}
+              </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-white/10 rounded-2xl p-2.5 sm:p-3 min-w-0">
-                  <div className="flex items-center gap-1 mb-1.5">
-                    <TrendingUp className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                    <span className="text-[9px] text-white/50 font-semibold uppercase truncate">{t('home.income')}</span>
-                  </div>
-                  <p className="text-xs sm:text-sm font-bold text-emerald-400 tabular-nums truncate">
-                    +{formatCurrency(weekly?.totalIncome ?? 0)}
-                  </p>
-                </div>
-                <div className="bg-white/10 rounded-2xl p-2.5 sm:p-3 min-w-0">
-                  <div className="flex items-center gap-1 mb-1.5">
-                    <TrendingDown className="w-3 h-3 text-rose-400 flex-shrink-0" />
-                    <span className="text-[9px] text-white/50 font-semibold uppercase truncate">{t('home.spent')}</span>
-                  </div>
-                  <p className="text-xs sm:text-sm font-bold text-rose-400 tabular-nums truncate">
-                    -{formatCurrency(weekly?.totalExpenses ?? 0)}
-                  </p>
-                </div>
-                <div className="bg-white/10 rounded-2xl p-2.5 sm:p-3 min-w-0">
-                  <div className="flex items-center gap-1 mb-1.5">
-                    <span className="text-[9px] text-white/50 font-semibold uppercase">{t('home.saved')}</span>
-                  </div>
-                  <p className="text-xs sm:text-sm font-bold text-violet-300 tabular-nums">{weekly?.savingsRate ?? 0}%</p>
-                </div>
+              <div className="flex gap-2.5">
+                <a
+                  href="/add?type=income"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-full bg-black/70 backdrop-blur-sm border border-white/10 text-white text-xs font-bold active:scale-95 transition-transform shadow-sm"
+                >
+                  <TrendingUp className="w-3.5 h-3.5" />
+                  {t('home.income')}
+                </a>
+                <a
+                  href="/add?type=expense"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-full bg-white text-zinc-900 text-xs font-bold active:scale-95 transition-transform shadow-sm"
+                >
+                  <TrendingDown className="w-3.5 h-3.5" />
+                  {t('home.spent')}
+                </a>
               </div>
             </div>
           </motion.div>
+        )}
+
+        {/* Income / Expenses stat cards (off-white, sit below the hero) */}
+        {weekly && !isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="grid grid-cols-2 gap-2.5"
+          >
+            <a
+              href="/transactions?type=income"
+              className="bg-secondary rounded-3xl p-4 flex flex-col gap-3 shadow-sm active:scale-[0.98] transition-transform"
+            >
+              <div className="flex items-center justify-between">
+                <span className="w-10 h-10 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-4.5 h-4.5 text-emerald-600" />
+                </span>
+                <span className="w-8 h-8 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                  <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </span>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground font-semibold">{t('home.income')}</p>
+                <p className="font-rounded text-lg font-extrabold tabular-nums text-foreground truncate">
+                  {hideBalance ? '••••' : `+${formatCurrency(weekly.totalIncome)}`}
+                </p>
+              </div>
+            </a>
+            <a
+              href="/transactions?type=expense"
+              className="bg-secondary rounded-3xl p-4 flex flex-col gap-3 shadow-sm active:scale-[0.98] transition-transform"
+            >
+              <div className="flex items-center justify-between">
+                <span className="w-10 h-10 rounded-full bg-rose-500/15 flex items-center justify-center flex-shrink-0">
+                  <TrendingDown className="w-4.5 h-4.5 text-rose-600" />
+                </span>
+                <span className="w-8 h-8 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                  <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
+                </span>
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground font-semibold">{t('home.spent')}</p>
+                <p className="font-rounded text-lg font-extrabold tabular-nums text-foreground truncate">
+                  {hideBalance ? '••••' : `-${formatCurrency(weekly.totalExpenses)}`}
+                </p>
+              </div>
+            </a>
+          </motion.div>
+        )}
+
+        {/* Quick Action Buttons (Revolut / Fintech Style) */}
+        {!isLoading && (
+          <div className="grid grid-cols-3 gap-2 py-1">
+            <a href="/reports" className="flex flex-col items-center gap-1.5 group">
+              <div className="w-12 h-12 rounded-2xl bg-card border border-border hover:border-violet-300 text-foreground flex items-center justify-center shadow-sm active:scale-95 transition-all">
+                <TrendingUp className="w-5 h-5 text-cyan-500" />
+              </div>
+              <span className="text-[11px] font-semibold text-muted-foreground">{t('home.analytics')}</span>
+            </a>
+
+            <a href="/accounts" className="flex flex-col items-center gap-1.5 group">
+              <div className="w-12 h-12 rounded-2xl bg-card border border-border hover:border-violet-300 text-foreground flex items-center justify-center shadow-sm active:scale-95 transition-all">
+                <Clock className="w-5 h-5 text-emerald-500" />
+              </div>
+              <span className="text-[11px] font-semibold text-muted-foreground">{t('home.accounts')}</span>
+            </a>
+
+            <a href="/transactions" className="flex flex-col items-center gap-1.5 group">
+              <div className="w-12 h-12 rounded-2xl bg-card border border-border hover:border-violet-300 text-foreground flex items-center justify-center shadow-sm active:scale-95 transition-all">
+                <Bell className="w-5 h-5 text-amber-500" />
+              </div>
+              <span className="text-[11px] font-semibold text-muted-foreground">{t('home.history')}</span>
+            </a>
+          </div>
         )}
 
         {/* Account Cards */}
@@ -592,31 +705,48 @@ export default function DashboardPage() {
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                 {t('home.accounts')}
               </p>
-              <a href="/accounts" className="text-xs text-violet-400 font-semibold">{t('home.manage')}</a>
+              <a href="/accounts" className="text-xs text-violet-600 font-semibold">{t('home.manage')}</a>
             </div>
-            <div className={`grid gap-3 ${accountSummary.accounts.length === 1 ? 'grid-cols-1' : 'grid-cols-2 sm:grid-cols-3'}`}>
-              {accountSummary.accounts.map((acc) => (
-                <a
-                  key={acc.id}
-                  href="/accounts"
-                  className="rounded-2xl bg-card border border-border p-3 sm:p-4 flex flex-col gap-2"
+            <div className="space-y-2.5">
+              {Array.from(
+                { length: Math.ceil(accountSummary.accounts.length / 2) },
+                (_, row) => accountSummary.accounts.slice(row * 2, row * 2 + 2)
+              ).map((pair, i) => (
+                <div
+                  key={i}
+                  className={`blob-wrap !bg-secondary grid overflow-hidden ${
+                    pair.length === 1 ? 'grid-cols-1' : 'grid-cols-2 divide-x divide-border/60'
+                  }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                      style={{ backgroundColor: acc.color + '33' }}
+                  {pair.map((acc) => (
+                    <a
+                      key={acc.id}
+                      href="/accounts"
+                      className="p-5 flex flex-col gap-4 active:bg-card/60 transition-colors"
                     >
-                      {acc.icon}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold truncate">{acc.name}</p>
-                      <p className="text-[10px] text-muted-foreground capitalize">{acc.type}</p>
-                    </div>
-                  </div>
-                  <p className="text-sm font-bold tabular-nums" style={{ color: acc.color }}>
-                    {formatCurrency(acc.balance)}
-                  </p>
-                </a>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span
+                            className="w-11 h-11 rounded-full flex items-center justify-center text-lg flex-shrink-0"
+                            style={{ backgroundColor: acc.color + '1f' }}
+                          >
+                            {acc.icon}
+                          </span>
+                          <span className="text-xs font-semibold leading-tight">{acc.name}</span>
+                        </div>
+                        <span className="w-9 h-9 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                          <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-rounded text-lg font-extrabold tabular-nums text-foreground truncate">
+                          {formatCurrency(acc.balance)}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5 capitalize">{acc.type}</p>
+                      </div>
+                    </a>
+                  ))}
+                </div>
               ))}
             </div>
           </motion.div>
@@ -624,41 +754,65 @@ export default function DashboardPage() {
 
         {/* This Week + Savings Rate */}
         {weekly && !isLoading && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="blob-wrap !bg-secondary grid grid-cols-2 divide-x divide-border/60 overflow-hidden">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-2xl bg-card border border-border p-4"
+              className="p-5 flex flex-col gap-4"
             >
-              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mb-2">
-                {t('home.thisWeek')}
-              </p>
-              <p className="text-lg sm:text-xl font-bold text-rose-400 tabular-nums truncate">
-                -{formatCurrency(weekly.totalExpenses)}
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-1.5">
-                {weekly.transactionCount} {t('home.transactions')}
-              </p>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${weekly.netBalance >= 0 ? 'bg-emerald-500/15' : 'bg-rose-500/15'}`}>
+                    {weekly.netBalance >= 0 ? (
+                      <TrendingUp className="w-4.5 h-4.5 text-emerald-600" />
+                    ) : (
+                      <TrendingDown className="w-4.5 h-4.5 text-rose-600" />
+                    )}
+                  </span>
+                  <span className="text-xs font-semibold leading-tight">{t('home.netThisWeek')}</span>
+                </div>
+                <span className="w-9 h-9 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                  <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+                </span>
+              </div>
+              <div>
+                <p className={`font-rounded text-lg sm:text-xl font-extrabold tabular-nums truncate ${weekly.netBalance >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {weekly.netBalance >= 0 ? '+' : '-'}{formatCurrency(Math.abs(weekly.netBalance))}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {weekly.transactionCount} {t('home.transactions')}
+                </p>
+              </div>
             </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="rounded-2xl bg-card border border-border p-4"
+              className="p-5 flex flex-col gap-4"
             >
-              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider mb-2">
-                {t('home.savingsRate')}
-              </p>
-              <p className="text-lg sm:text-xl font-bold text-violet-400 tabular-nums">{weekly.savingsRate}%</p>
-              <p className="text-[10px] text-muted-foreground mt-1.5">
-                {weekly.savingsRate >= 20
-                  ? t('home.excellent')
-                  : weekly.savingsRate >= 0
-                  ? t('home.keepGoing')
-                  : t('home.overspending')}
-              </p>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="w-11 h-11 rounded-full bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+                    <PiggyBank className="w-4.5 h-4.5 text-amber-600" />
+                  </span>
+                  <span className="text-xs font-semibold leading-tight">{t('home.savingsRate')}</span>
+                </div>
+                <span className="w-9 h-9 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                  <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+                </span>
+              </div>
+              <div>
+                <p className="font-rounded text-lg sm:text-xl font-extrabold tabular-nums text-foreground">{weekly.savingsRate}%</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {weekly.savingsRate >= 20
+                    ? t('home.excellent')
+                    : weekly.savingsRate >= 0
+                    ? t('home.keepGoing')
+                    : t('home.overspending')}
+                </p>
+              </div>
             </motion.div>
           </div>
         )}
@@ -669,9 +823,9 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="rounded-3xl bg-card border border-border p-5"
+            className="rounded-3xl glass-card p-5"
           >
-            <h2 className="text-sm font-bold mb-4">{t('home.spendingByCategory')}</h2>
+            <h2 className="text-sm font-bold mb-4 gradient-text">{t('home.spendingByCategory')}</h2>
             <CategoryPieChart data={weekly.categoryBreakdown} />
           </motion.div>
         )}
@@ -682,11 +836,11 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
-            className="rounded-3xl bg-card border border-border p-5"
+            className="rounded-3xl glass-card p-5"
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-bold">{t('home.recentTransactions')}</h2>
-              <a href="/transactions" className="text-xs text-violet-400 font-semibold">
+              <a href="/transactions" className="text-xs text-violet-600 font-semibold hover:underline">
                 {t('home.seeAll')}
               </a>
             </div>
@@ -699,7 +853,7 @@ export default function DashboardPage() {
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-border/50">
+              <div className="divide-y divide-border">
                 {recent.map((t, i) => (
                   <TransactionItem key={t.id} transaction={t} index={i} />
                 ))}
@@ -714,7 +868,7 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="rounded-3xl bg-card border border-border p-5"
+            className="rounded-3xl glass-card p-5"
           >
             <h2 className="text-sm font-bold mb-4">{t('home.monthlyTrend')}</h2>
             <IncomeExpenseChart data={monthly.weeklyTrends} />

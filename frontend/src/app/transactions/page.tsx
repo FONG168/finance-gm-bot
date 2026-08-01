@@ -1,7 +1,8 @@
 'use client';
 
 import '@/lib/i18n';
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Check, Trash2, Pencil } from 'lucide-react';
 import { BottomNav } from '@/components/layout/BottomNav';
@@ -9,15 +10,14 @@ import { TransactionItem } from '@/components/transactions/TransactionItem';
 import { useAuth } from '@/hooks/useAuth';
 import { useTelegram } from '@/hooks/useTelegram';
 import { apiService } from '@/services/api';
-import { Transaction, CATEGORIES, TransactionType } from '@shared/types';
+import { Transaction, CATEGORIES, TransactionType, Category } from '@shared/types';
 import { formatDate, formatCurrency, formatTime } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '@/providers/ToastProvider';
+import { useCategories } from '@/hooks/useCategories';
 
 type FilterType = 'all' | 'income' | 'expense';
-
-const EXPENSE_CATS = CATEGORIES.filter((c) => c.type === 'expense' || c.type === 'both');
-const INCOME_CATS = CATEGORIES.filter((c) => c.type === 'income' || c.type === 'both');
 
 function groupByDate(transactions: Transaction[]): Map<string, Transaction[]> {
   const groups = new Map<string, Transaction[]>();
@@ -36,7 +36,7 @@ function DeleteConfirmModal({
   transaction: Transaction; onConfirm: () => void; onCancel: () => void; isLoading: boolean;
 }) {
   const { t } = useTranslation('common');
-  const cat = CATEGORIES.find((c) => c.id === transaction.categoryId);
+  const cat = CATEGORIES.find((c) => c.id === transaction.categoryId) || transaction.category;
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -54,7 +54,7 @@ function DeleteConfirmModal({
       >
         <div className="flex flex-col items-center text-center gap-3 mb-5">
           <div className="w-14 h-14 rounded-full bg-rose-500/20 flex items-center justify-center">
-            <Trash2 className="w-6 h-6 text-rose-400" />
+            <Trash2 className="w-6 h-6 text-rose-600" />
           </div>
           <h3 className="text-base font-bold">{t('transactions.deleteTransaction')}</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
@@ -69,7 +69,7 @@ function DeleteConfirmModal({
             <p className="text-sm font-semibold truncate">{transaction.note || (cat ? t(`categories.${cat.name}`) : t('categories.other'))}</p>
             <p className="text-xs text-muted-foreground">{cat ? t(`categories.${cat.name}`) : ''}</p>
           </div>
-          <p className={cn('text-sm font-bold tabular-nums flex-shrink-0', transaction.type === 'income' ? 'text-emerald-400' : 'text-rose-400')}>
+          <p className={cn('text-sm font-bold tabular-nums flex-shrink-0', transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600')}>
             {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
           </p>
         </div>
@@ -110,6 +110,7 @@ function EditTransactionModal({
 }) {
   const { haptic } = useTelegram();
   const { t } = useTranslation('common');
+  const toast = useToast();
   const [type, setType] = useState<TransactionType>(transaction.type as TransactionType);
   const [amount, setAmount] = useState(String(transaction.amount));
   const [categoryId, setCategoryId] = useState(transaction.categoryId);
@@ -117,9 +118,10 @@ function EditTransactionModal({
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const categories = type === 'expense' ? EXPENSE_CATS : INCOME_CATS;
+  const { categories } = useCategories();
+  const filteredCategories = categories.filter((c) => c.type === type || c.type === 'both');
   const amountColor = type === 'expense' ? '#ef4444' : '#22c55e';
-  const cat = CATEGORIES.find((c) => c.id === categoryId);
+  const cat = categories.find((c) => c.id === categoryId) || transaction.category;
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -135,7 +137,7 @@ function EditTransactionModal({
       onSaved();
     } catch (err: any) {
       haptic.error();
-      alert(err.message || 'Failed to update transaction');
+      toast.error(err.message || t('common.saveFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -204,7 +206,7 @@ function EditTransactionModal({
           <div>
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('transactions.category')}</p>
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-              {categories.map((c) => (
+              {filteredCategories.map((c) => (
                 <button
                   key={c.id}
                   onClick={() => { setCategoryId(c.id); haptic.selection(); }}
@@ -214,8 +216,8 @@ function EditTransactionModal({
                   )}
                 >
                   <span className="text-xl">{c.icon}</span>
-                  <span className={cn('text-[9px] font-medium text-center leading-tight', categoryId === c.id ? 'text-violet-400' : 'text-muted-foreground')}>
-                    {t(`categories.${c.name}`)}
+                  <span className={cn('text-[9px] font-medium text-center leading-tight', categoryId === c.id ? 'text-violet-600' : 'text-muted-foreground')}>
+                    {t(`categories.${c.name}`, { defaultValue: c.label })}
                   </span>
                 </button>
               ))}
@@ -310,12 +312,27 @@ function EditTransactionModal({
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function TransactionsPage() {
+  return (
+    <Suspense fallback={null}>
+      <TransactionsPageContent />
+    </Suspense>
+  );
+}
+
+
+function TransactionsPageContent() {
+  const searchParams = useSearchParams();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { haptic } = useTelegram();
   const { t } = useTranslation('common');
+  const toast = useToast();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState<FilterType>('all');
+  const initialFilter = searchParams.get('type') === 'income' || searchParams.get('type') === 'expense'
+    ? (searchParams.get('type') as FilterType)
+    : 'all';
+  const [filter, setFilter] = useState<FilterType>(initialFilter);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(searchParams.get('categoryId') || '');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
@@ -325,6 +342,12 @@ export default function TransactionsPage() {
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const { categories } = useCategories();
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
+  const selectedCategoryName = selectedCategory 
+    ? t(`categories.${selectedCategory.name}`, { defaultValue: selectedCategory.label })
+    : '';
+
   const load = useCallback(
     async (reset = false) => {
       const currentPage = reset ? 1 : page;
@@ -333,17 +356,20 @@ export default function TransactionsPage() {
           page: currentPage,
           limit: 20,
           type: filter === 'all' ? undefined : filter,
+          categoryId: selectedCategoryId || undefined,
         });
         setTransactions((prev) => (reset ? res.data : [...prev, ...res.data]));
         setHasMore(res.hasMore);
         if (!reset) setPage((p) => p + 1);
       } catch (err) {
         console.error(err);
+        toast.error(t('common.loadFailed'));
       } finally {
         setIsLoading(false);
       }
     },
-    [filter, page],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filter, page, selectedCategoryId],
   );
 
   useEffect(() => {
@@ -352,7 +378,7 @@ export default function TransactionsPage() {
     setPage(1);
     setIsLoading(true);
     load(true);
-  }, [filter, isAuthenticated, authLoading]);
+  }, [filter, selectedCategoryId, isAuthenticated, authLoading]);
 
   const handleDeleteConfirm = async () => {
     if (!pendingDelete) return;
@@ -364,7 +390,7 @@ export default function TransactionsPage() {
       setPendingDelete(null);
     } catch (err: any) {
       haptic.error();
-      alert(err.message || 'Failed to delete');
+      toast.error(err.message || t('common.deleteFailed'));
     } finally {
       setIsDeleting(false);
     }
@@ -408,19 +434,33 @@ export default function TransactionsPage() {
         </div>
 
         {/* Filter tabs */}
-        <div className="flex gap-2">
-          {(['all', 'expense', 'income'] as FilterType[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={cn(
-                'px-4 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all',
-                filter === f ? 'bg-violet-600 text-white' : 'bg-secondary text-muted-foreground',
-              )}
-            >
-              {f === 'all' ? t('transactions.all') : f === 'expense' ? `💸 ${t('transactions.expenses')}` : `💰 ${t('transactions.income')}`}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex gap-2">
+            {(['all', 'expense', 'income'] as FilterType[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={cn(
+                  'px-4 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all',
+                  filter === f ? 'bg-violet-600 text-white' : 'bg-secondary text-muted-foreground',
+                )}
+              >
+                {f === 'all' ? t('transactions.all') : f === 'expense' ? `💸 ${t('transactions.expenses')}` : `💰 ${t('transactions.income')}`}
+              </button>
+            ))}
+          </div>
+
+          {selectedCategoryId && selectedCategory && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-100 text-violet-700 text-xs font-semibold dark:bg-violet-950/40 dark:text-violet-300">
+              <span>{selectedCategory.icon} {selectedCategoryName}</span>
+              <button 
+                onClick={() => { setSelectedCategoryId(''); haptic.selection(); }}
+                className="w-4 h-4 rounded-full bg-violet-200/60 dark:bg-violet-800 flex items-center justify-center hover:bg-violet-300/60 transition-colors"
+              >
+                <X className="w-2.5 h-2.5" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -464,7 +504,7 @@ export default function TransactionsPage() {
             {hasMore && (
               <button
                 onClick={() => load(false)}
-                className="w-full py-3 text-sm text-violet-400 font-semibold"
+                className="w-full py-3 text-sm text-violet-600 font-semibold"
               >
                 {t('transactions.loadMore')}
               </button>
@@ -557,7 +597,7 @@ function TransactionDetailSheet({
           >
             {cat?.icon || '📦'}
           </div>
-          <p className={`text-3xl font-bold tabular-nums mb-1 ${isIncome ? 'text-emerald-400' : 'text-rose-400'}`}>
+          <p className={`text-3xl font-bold tabular-nums mb-1 ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}>
             {isIncome ? '+' : '-'}{formatCurrency(transaction.amount)}
           </p>
           <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ backgroundColor: `${cat?.color}25`, color: cat?.color }}>
@@ -585,7 +625,7 @@ function TransactionDetailSheet({
           </button>
           <button
             onClick={() => onDelete(transaction)}
-            className="flex-1 py-3 rounded-2xl bg-rose-500/10 flex items-center justify-center gap-2 text-sm font-semibold text-rose-400"
+            className="flex-1 py-3 rounded-2xl bg-rose-500/10 flex items-center justify-center gap-2 text-sm font-semibold text-rose-600"
           >
             <Trash2 className="w-4 h-4" />
             {t('transactions.delete', { defaultValue: 'Delete' })}

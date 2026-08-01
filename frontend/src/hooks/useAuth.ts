@@ -30,39 +30,46 @@ export function useAuth() {
   };
 
   const authenticate = useCallback(async () => {
-    // Step 1: Try saved JWT (skip re-auth if still valid)
     const savedToken = localStorage.getItem('auth_token');
+    const urlParams = new URLSearchParams(window.location.search);
+    const uid = urlParams.get('uid');
+    const tok = urlParams.get('tok');
+
+    const isLocal = typeof window !== 'undefined' && (
+      window.location.hostname === 'localhost' || 
+      window.location.hostname === '127.0.0.1'
+    );
+
     if (savedToken) {
       apiService.setToken(savedToken);
       try {
         const user = await apiService.auth.me();
-        setState({ user, token: savedToken, isLoading: false, isAuthenticated: true, error: null });
-        return;
+        // Clear cached mock token if we have real Telegram credentials or are on a tunnel domain
+        if (user.telegramId === 12345 && (!isLocal || initData || (uid && tok))) {
+          localStorage.removeItem('auth_token');
+          apiService.setToken('');
+        } else {
+          setState({ user, token: savedToken, isLoading: false, isAuthenticated: true, error: null });
+          return;
+        }
       } catch {
         localStorage.removeItem('auth_token');
         apiService.setToken('');
       }
     }
-
-    // Step 2: Bot-token auth (Telegram Desktop fallback — uid+tok in URL query params)
-    const urlParams = new URLSearchParams(window.location.search);
-    const uid = urlParams.get('uid');
-    const tok = urlParams.get('tok');
     if (uid && tok) {
       try {
         const response = await apiService.auth.botToken(uid, tok);
         saveAndSet(response);
         return;
       } catch {
-        // Invalid token, fall through
+        // Fall through
       }
     }
 
-    // Step 3: Telegram initData (works on mobile and newer Desktop versions)
     let effectiveInitData = initData;
 
-    // Dev mock when running outside Telegram entirely
-    if (process.env.NODE_ENV === 'development' && !effectiveInitData) {
+    if (isLocal && !effectiveInitData) {
       effectiveInitData = `user=${encodeURIComponent(JSON.stringify({ id: 12345, first_name: 'Test', last_name: 'User', username: 'testuser' }))}&auth_date=${Math.floor(Date.now() / 1000)}&hash=mock`;
     }
 
@@ -80,9 +87,10 @@ export function useAuth() {
   }, [initData, webApp]);
 
   useEffect(() => {
-    if (!isReady) return;
-    authenticate();
-  }, [isReady, authenticate]);
+    if (isReady) {
+      authenticate();
+    }
+  }, [isReady, authenticate, initData]);
 
   const refreshUser = useCallback(async () => {
     try {
@@ -90,6 +98,15 @@ export function useAuth() {
       setState(s => ({ ...s, user }));
     } catch {}
   }, []);
+
+  // Real-time listener: sync user status with admin actions every 2.5 seconds
+  useEffect(() => {
+    if (!state.isAuthenticated) return;
+    const interval = setInterval(() => {
+      refreshUser();
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [state.isAuthenticated, refreshUser]);
 
   const updatePreferences = useCallback(async (prefs: { currency?: string; timezone?: string }) => {
     await apiService.user.updatePreferences(prefs);

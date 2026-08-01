@@ -38,10 +38,10 @@ export default function AddTransactionPage() {
             style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.18),rgba(79,70,229,0.18))', border: '1px solid rgba(124,58,237,0.35)' }}
           >
             <div className="w-8 h-8 rounded-xl bg-violet-500/20 flex items-center justify-center flex-shrink-0">
-              <Lock className="w-4 h-4 text-violet-400" />
+              <Lock className="w-4 h-4 text-violet-600" />
             </div>
             <div>
-              <p className="font-semibold text-violet-300 text-xs">
+              <p className="font-semibold text-violet-700 text-xs">
                 {user?.plan === 'PREMIUM' ? t('subscription.expired') : t('subscription.trialEnded')}
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5">{t('add.blocked')}</p>

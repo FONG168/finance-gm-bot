@@ -55,6 +55,12 @@ export function useTelegram(): UseTelegramReturn {
     const applyWebApp = (tg: TelegramWebApp) => {
       tg.ready();
       tg.expand();
+      try {
+        tg.setHeaderColor('#ffffff');
+        tg.setBackgroundColor('#ffffff');
+      } catch {
+        // Older Telegram clients may not support these calls
+      }
       setWebApp(tg);
 
       const sdkData = tg.initData;

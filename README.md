@@ -2,7 +2,7 @@
 
 A production-ready **Telegram Mini App** for personal finance management. Track expenses, view analytics, and receive automated weekly reports — all inside Telegram.
 
-![Stack](https://img.shields.io/badge/Next.js-14-black) ![Stack](https://img.shields.io/badge/TypeScript-5-blue) ![Stack](https://img.shields.io/badge/PostgreSQL-Supabase-green) ![Stack](https://img.shields.io/badge/Bot-Telegraf-blue)
+![Stack](https://img.shields.io/badge/Next.js-14-black) ![Stack](https://img.shields.io/badge/PHP-8.2-indigo) ![Stack](https://img.shields.io/badge/Laravel-11-red) ![Stack](https://img.shields.io/badge/MySQL-XAMPP-blue) ![Stack](https://img.shields.io/badge/Bot-Telegraf-blue)
 
 ---
 
@@ -23,11 +23,10 @@ A production-ready **Telegram Mini App** for personal finance management. Track 
 ## Architecture
 
 ```
-├── bot/          Telegraf bot (Railway)
-├── frontend/     Next.js 14 Mini App (Vercel)
-├── backend/      Express REST API (Railway)
-├── prisma/       PostgreSQL schema (Supabase)
-└── shared/       TypeScript types shared across packages
+├── bot/          Telegraf bot (Node.js)
+├── frontend/     Next.js 14 Mini App
+├── backend/      PHP Laravel REST API (MySQL)
+└── admin/        Next.js 14 Admin Panel
 ```
 
 ---

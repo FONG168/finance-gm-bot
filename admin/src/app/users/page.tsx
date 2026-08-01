@@ -30,6 +30,7 @@ export default function UsersPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-users', debouncedSearch, plan, status, page],
     queryFn: () => adminApi.users.list({ search: debouncedSearch, plan, status, page, limit: 20 }),
+    refetchInterval: 2500,
   });
 
   const users = data?.data?.data?.users ?? [];

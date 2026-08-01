@@ -5,6 +5,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { CategoryBreakdown } from '@shared/types';
 import { formatCurrency } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
 
 interface CategoryPieChartProps {
   data: CategoryBreakdown[];
@@ -25,6 +26,7 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: an
 
 export function CategoryPieChart({ data }: CategoryPieChartProps) {
   const { t } = useTranslation('common');
+  const router = useRouter();
 
   const translatedData = data.map((item) => ({
     ...item,
@@ -67,6 +69,13 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
             dataKey="amount"
             labelLine={false}
             label={CustomLabel}
+            onClick={(node) => {
+              const catId = node?.payload?.categoryId || node?.categoryId;
+              if (catId) {
+                router.push(`/transactions?categoryId=${catId}`);
+              }
+            }}
+            className="cursor-pointer outline-none"
           >
             {translatedData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
@@ -79,12 +88,16 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
       {/* Category legend */}
       <div className="space-y-2">
         {translatedData.slice(0, 5).map((cat) => (
-          <div key={cat.categoryId} className="flex items-center justify-between">
+          <div 
+            key={cat.categoryId} 
+            onClick={() => router.push(`/transactions?categoryId=${cat.categoryId}`)}
+            className="flex items-center justify-between cursor-pointer hover:bg-secondary/50 p-2 -mx-2 rounded-2xl transition-all active:scale-[0.98]"
+          >
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color }} />
-              <span className="text-sm text-muted-foreground">{cat.icon} {cat.translatedLabel}</span>
+              <span className="text-sm text-muted-foreground font-medium">{cat.icon} {cat.translatedLabel}</span>
             </div>
-            <div className="text-right">
+            <div className="text-right flex items-center gap-1">
               <span className="text-sm font-semibold">{formatCurrency(cat.amount)}</span>
               <span className="text-xs text-muted-foreground ml-1">({cat.percentage}%)</span>
             </div>

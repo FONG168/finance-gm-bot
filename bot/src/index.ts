@@ -27,7 +27,7 @@ bot.command('help', async (ctx) => {
   const lang = resolveLang(user?.preferredLanguage);
   const tr = t(lang);
   const webAppUrl = process.env.FRONTEND_URL!;
-  const isProd = process.env.NODE_ENV === 'production' && webAppUrl?.startsWith('https://');
+  const isProd = webAppUrl?.startsWith('https://');
   await ctx.reply(tr.help(), {
     parse_mode: 'HTML',
     reply_markup: isProd
@@ -37,6 +37,10 @@ bot.command('help', async (ctx) => {
 });
 
 // Language selection callbacks
+bot.action('lang_choose', async (ctx) => {
+  await ctx.answerCbQuery();
+  await languageCommand(ctx as any);
+});
 bot.action('lang_km', (ctx) => handleLangCallback(ctx as any, 'km'));
 bot.action('lang_zh', (ctx) => handleLangCallback(ctx as any, 'zh'));
 bot.action('lang_en', (ctx) => handleLangCallback(ctx as any, 'en'));
@@ -45,6 +49,12 @@ bot.action('lang_en', (ctx) => handleLangCallback(ctx as any, 'en'));
 bot.action('weekly_summary', async (ctx) => {
   await ctx.answerCbQuery();
   await summaryCommand(ctx as any);
+});
+
+// Monthly report button
+bot.action('monthly_report', async (ctx) => {
+  await ctx.answerCbQuery();
+  await reportCommand(ctx as any);
 });
 
 bot.action('help', async (ctx) => {

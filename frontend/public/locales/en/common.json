@@ -2,12 +2,13 @@
   "nav": { "home": "Home", "accounts": "Accounts", "add": "Add", "reports": "Reports", "profile": "Profile" },
   "greeting": { "morning": "Good morning", "afternoon": "Good afternoon", "evening": "Good evening" },
   "home": {
-    "totalNetWorth": "Total Net Worth", "income": "Income", "spent": "Spent", "saved": "Saved",
-    "accounts": "Accounts", "manage": "Manage →", "thisWeek": "This Week", "savingsRate": "Savings Rate",
+    "totalNetWorth": "Total Net Worth", "liveBalance": "LIVE BALANCE", "income": "Income", "spent": "Spent", "saved": "Saved",
+    "accounts": "Accounts", "manage": "Manage →", "thisWeek": "This Week", "netThisWeek": "Net This Week", "savingsRate": "Savings Rate",
     "transactions": "transactions", "spendingByCategory": "Spending by Category",
     "recentTransactions": "Recent Transactions", "seeAll": "See all →",
     "noTransactions": "No transactions yet", "noTransactionsHint": "Add your first expense or income!",
-    "monthlyTrend": "Monthly Trend", "excellent": "Excellent!", "keepGoing": "Keep going!", "overspending": "Overspending"
+    "monthlyTrend": "Monthly Trend", "excellent": "Excellent!", "keepGoing": "Keep going!", "overspending": "Overspending",
+    "analytics": "Analytics", "history": "History"
   },
   "accounts": {
     "title": "Accounts", "subtitle": "Manage your money accounts", "totalAssets": "Total Assets",
@@ -28,7 +29,8 @@
     "confirmTransaction": "Confirm Transaction", "balanceAfter": "Balance after", "note": "Note",
     "cancel": "Cancel", "confirm": "Confirm", "blocked": "Transaction Blocked", "gotIt": "Got it",
     "invalidAmount": "Please enter a valid amount greater than $0.",
-    "selectCategory": "Please select a category before saving."
+    "selectCategory": "Please select a category before saving.",
+    "dateOfTransaction": "Date of Transaction", "scrollLeft": "Scroll left", "scrollRight": "Scroll right"
   },
   "transactions": {
     "title": "Transactions", "subtitle": "Your transaction history", "search": "Search transactions...",
@@ -44,8 +46,9 @@
     "excellentSavings": "Excellent! You saved well this month.",
     "brokeEven": "You broke even. Try to save more next month.",
     "overspent": "You spent more than you earned this month.",
-    "weeklyTrends": "Weekly Trends", "spendingByCategory": "Spending by Category",
-    "noReports": "No reports yet", "noReportsHint": "Start adding transactions to see monthly reports."
+    "weeklyTrends": "Weekly Trends", "spendingByCategory": "Spending by Category", "weekN": "W{{n}}",
+    "noReports": "No reports yet", "noReportsHint": "Start adding transactions to see monthly reports.",
+    "transactionsForMonth": "Transactions — {{month}}"
   },
   "profile": {
     "title": "Profile", "settings": "Settings", "settingsDesc": "App preferences",
@@ -102,7 +105,18 @@
     "loading": "Loading...", "error": "Error", "retry": "Retry", "close": "Close",
     "cancel": "Cancel", "save": "Save", "done": "Done", "comingSoon": "Coming soon",
     "loadMore": "Load more", "transfer": "Transfer", "noData": "No data yet",
-    "today": "Today", "yesterday": "Yesterday", "daysAgo": "{{n}} days ago"
+    "today": "Today", "yesterday": "Yesterday", "daysAgo": "{{n}} days ago",
+    "loadFailed": "Couldn't load your data. Pull down to refresh.",
+    "saveFailed": "Couldn't save your changes. Please try again.",
+    "deleteFailed": "Couldn't delete. Please try again.",
+    "exportFailed": "Export failed. Please try again.",
+    "dismiss": "Dismiss",
+    "pageNotFound": "Page not found",
+    "pageNotFoundHint": "The page you're looking for doesn't exist or may have moved.",
+    "backToHome": "Back to Home",
+    "somethingWentWrong": "Something went wrong",
+    "somethingWentWrongHint": "An unexpected error occurred. You can try again, or head back to the home screen.",
+    "tryAgain": "Try again"
   },
   "notifications": {
     "title": "Notifications", "empty": "No notifications", "emptyDesc": "You're all caught up!",

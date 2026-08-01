@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,16 +9,56 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
+import { useToast } from '@/components/ui/Toaster';
 import { ROLE_COLORS, formatDateTime, PERMISSIONS } from '@/lib/utils';
-import { Shield, Plus, Edit, Users } from 'lucide-react';
+import { Shield, Plus, Edit, Users, CreditCard } from 'lucide-react';
+
+interface SubPlan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  days: number;
+  popular?: boolean;
+  description?: string;
+}
 
 export default function SettingsPage() {
   const { admin } = useAuth();
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [editingPerms, setEditingPerms] = useState<string | null>(null);
   const [permsForm, setPermsForm] = useState<{ role: string; permissions: string[] }>({ role: '', permissions: [] });
   const [newAdmin, setNewAdmin] = useState({ email: '', password: '', firstName: '', role: 'SUPPORT_AGENT' });
   const [showNewAdmin, setShowNewAdmin] = useState(false);
+
+  const [plans, setPlans] = useState<SubPlan[]>([
+    { id: '1_month', name: '1 Month', price: 2.99, currency: 'USD', days: 30, popular: true, description: '30 days unlimited access' }
+  ]);
+
+  const { data: settingsData } = useQuery({
+    queryKey: ['system-settings'],
+    queryFn: () => adminApi.settings.get(),
+  });
+
+  useEffect(() => {
+    const list = settingsData?.data?.data || [];
+    const planSetting = list.find((s: any) => s.key === 'subscription_plans');
+    if (planSetting && Array.isArray(planSetting.value) && planSetting.value.length > 0) {
+      setPlans(planSetting.value);
+    }
+  }, [settingsData]);
+
+  const updatePlansM = useMutation({
+    mutationFn: () => adminApi.settings.update('subscription_plans', plans),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['system-settings'] });
+      toast({ title: 'Plan Settings Saved', description: 'Subscription plans and prices updated successfully.', variant: 'success' });
+    },
+    onError: () => {
+      toast({ title: 'Save Failed', description: 'Could not update subscription plan settings.', variant: 'destructive' });
+    }
+  });
 
   const { data: adminsData, isLoading } = useQuery({
     queryKey: ['admin-list'],
@@ -179,6 +219,84 @@ export default function SettingsPage() {
                   </div>
                 ))
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Subscription Plan Configurator */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-primary" /> Subscription Plan Pricing & Duration
+                </CardTitle>
+                <CardDescription>Configure premium plan prices and durations displayed in the Telegram Mini App</CardDescription>
+              </div>
+              <Button size="sm" onClick={() => updatePlansM.mutate()} loading={updatePlansM.isPending}>
+                Save Plan Settings
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {plans.map((p, idx) => (
+                <div key={p.id || idx} className="rounded-xl border border-border bg-secondary/40 p-4 space-y-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-semibold text-primary uppercase tracking-wider">Plan #{idx + 1}</span>
+                    <Badge variant={p.popular ? 'success' : 'gray'}>
+                      {p.popular ? 'Featured' : 'Standard'}
+                    </Badge>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground">Plan Title</label>
+                    <Input
+                      value={p.name}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setPlans(prev => prev.map((item, i) => i === idx ? { ...item, name: val } : item));
+                      }}
+                      placeholder="e.g. 1 Month"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-xs text-muted-foreground">Price ($ USD)</label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={p.price}
+                        onChange={e => {
+                          const val = parseFloat(e.target.value) || 0;
+                          setPlans(prev => prev.map((item, i) => i === idx ? { ...item, price: val } : item));
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">Duration (Days)</label>
+                      <Input
+                        type="number"
+                        value={p.days}
+                        onChange={e => {
+                          const val = parseInt(e.target.value) || 1;
+                          setPlans(prev => prev.map((item, i) => i === idx ? { ...item, days: val } : item));
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground">Description</label>
+                    <Input
+                      value={p.description || ''}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setPlans(prev => prev.map((item, i) => i === idx ? { ...item, description: val } : item));
+                      }}
+                      placeholder="e.g. 30 days full premium access"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

@@ -7,6 +7,6 @@ echo ==========================================
 echo.
 cd /d "%~dp0backend"
 echo Starting backend on port 3001...
-npx ts-node-dev --respawn --transpile-only src/index.ts
+C:\xampp\php\php.exe artisan serve --port=3001
 echo.
 pause

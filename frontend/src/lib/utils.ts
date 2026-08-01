@@ -70,6 +70,32 @@ export function formatTime(date: string | Date): string {
   return d.toLocaleTimeString('en-US', { timeZone: TZ, hour: '2-digit', minute: '2-digit' });
 }
 
+// Phnom Penh is fixed at UTC+7 year-round (no DST), so the offset is a constant.
+const PHNOM_PENH_UTC_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+// Today's calendar date in Phnom Penh, as 'YYYY-MM-DD' — for defaulting date pickers.
+export function getPhnomPenhToday(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+}
+
+// Combines a picked 'YYYY-MM-DD' date with the current wall-clock time in Phnom Penh,
+// returning a UTC ISO timestamp. Used so transactions record the real time they were
+// entered instead of a fixed placeholder time.
+export function combineDateWithPhnomPenhNow(dateStr: string): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: TZ,
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+  }).formatToParts(new Date());
+  const p: Record<string, string> = {};
+  parts.forEach((x) => { p[x.type] = x.value; });
+  const [year, month, day] = dateStr.split('-').map(Number);
+  // hour12:false can format midnight as '24' in some environments — normalize to 0.
+  const hour = parseInt(p.hour) % 24;
+
+  const utcMs = Date.UTC(year, month - 1, day, hour, parseInt(p.minute), parseInt(p.second)) - PHNOM_PENH_UTC_OFFSET_MS;
+  return new Date(utcMs).toISOString();
+}
+
 export function formatPercentage(value: number): string {
   return `${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { adminApi } from '@/lib/api';
@@ -38,7 +39,7 @@ export function Sidebar() {
   const [badges, setBadges] = useState<{ payments: number; subscriptions: number }>({ payments: 0, subscriptions: 0 });
 
   useEffect(() => {
-    const fetchCounts = async () => {
+    const timer = setTimeout(async () => {
       try {
         const [paymentsRes, subsRes] = await Promise.all([
           adminApi.payments.list({ status: 'PENDING', limit: 1 }),
@@ -49,13 +50,11 @@ export function Sidebar() {
           subscriptions: subsRes.data?.data?.pagination?.total ?? 0,
         });
       } catch {
-        // silently fail — badges just won't show
+        // silently fail
       }
-    };
+    }, 500);
 
-    fetchCounts();
-    const interval = setInterval(fetchCounts, 30000);
-    return () => clearInterval(interval);
+    return () => clearTimeout(timer);
   }, []);
 
   const visibleNav = nav.filter(item => !item.permission || hasPermission(item.permission));
@@ -82,21 +81,27 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={true}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors group',
-                active
-                  ? 'bg-primary/15 text-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                'relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors group',
+                active ? 'text-primary font-bold' : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <item.icon className="h-4 w-4 flex-shrink-0" />
-              <span className="flex-1">{item.label}</span>
+              {active && (
+                <motion.div
+                  layoutId="sidebarActivePill"
+                  className="absolute inset-0 bg-primary/15 border border-primary/25 rounded-lg"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+              <item.icon className="h-4 w-4 flex-shrink-0 relative z-10" />
+              <span className="flex-1 relative z-10">{item.label}</span>
               {badgeCount > 0 && (
-                <span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                <span className="relative z-10 flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
                   {badgeCount > 99 ? '99+' : badgeCount}
                 </span>
               )}
-              {active && !badgeCount && <ChevronRight className="h-3 w-3 opacity-50" />}
+              {active && !badgeCount && <ChevronRight className="h-3 w-3 opacity-50 relative z-10" />}
             </Link>
           );
         })}

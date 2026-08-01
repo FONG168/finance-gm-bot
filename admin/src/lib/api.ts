@@ -3,8 +3,15 @@ import Cookies from 'js-cookie';
 
 const TOKEN_KEY = 'admin_token';
 
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    return '/api';
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+};
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
+  baseURL: getBaseUrl(),
   headers: { 'Content-Type': 'application/json' },
 });
 

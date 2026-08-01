@@ -61,7 +61,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     try {
       const token = localStorage.getItem('auth_token');
       if (token) {
-        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://finance-gm-backend-production.up.railway.app/api';
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || '/api';
         fetch(`${apiBase}/auth/me`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },

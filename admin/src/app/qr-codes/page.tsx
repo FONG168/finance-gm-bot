@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
+import { useToast } from '@/components/ui/Toaster';
 import { QrCode, Plus, Trash2, Edit, Upload, Link, X } from 'lucide-react';
 
 const PROVIDERS = ['ABA', 'ACLEDA', 'WING', 'KHQR'];
@@ -21,6 +22,7 @@ interface QRForm {
 
 export default function QRCodesPage() {
   const qc = useQueryClient();
+  const { toast } = useToast();
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState<QRForm>({ imageUrl: '', accountName: '', accountNumber: '', instructions: '' });
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
@@ -33,8 +35,20 @@ export default function QRCodesPage() {
     setUploading(true);
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setForm(f => ({ ...f, imageUrl: ev.target?.result as string }));
-      setUploading(false);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 500;
+        const scale = Math.min(1, MAX_WIDTH / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setForm(f => ({ ...f, imageUrl: compressedDataUrl }));
+        setUploading(false);
+      };
+      img.src = ev.target?.result as string;
     };
     reader.readAsDataURL(file);
   };
@@ -49,7 +63,14 @@ export default function QRCodesPage() {
   const updateM = useMutation({
     mutationFn: ({ provider, data }: { provider: string; data: QRForm }) =>
       adminApi.qrCodes.update(provider, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin-qr-codes'] }); setEditing(null); },
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['admin-qr-codes'] });
+      toast({ title: 'QR Code Saved', description: `${variables.provider} QR code updated successfully.`, variant: 'success' });
+      setEditing(null);
+    },
+    onError: (err: any) => {
+      toast({ title: 'Save Failed', description: err.response?.data?.error || 'Could not save QR code.', variant: 'destructive' });
+    }
   });
 
   const deleteM = useMutation({
@@ -140,9 +161,9 @@ export default function QRCodesPage() {
                               className="hidden"
                               onChange={handleFileChange}
                             />
-                            {form.imageUrl && form.imageUrl.startsWith('data:') ? (
+                            {form.imageUrl ? (
                               <div className="relative w-full flex flex-col items-center gap-2">
-                                <div className="bg-white rounded-xl p-2 w-40 h-40 flex items-center justify-center">
+                                <div className="bg-white rounded-xl p-2 w-40 h-40 flex items-center justify-center border border-border">
                                   <img src={form.imageUrl} alt="QR preview" className="w-full h-full object-contain" />
                                 </div>
                                 <div className="flex gap-2">
