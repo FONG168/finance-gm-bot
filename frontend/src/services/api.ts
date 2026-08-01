@@ -14,7 +14,7 @@ import {
   User,
 } from '@shared/types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://finance-backend-zlt4.onrender.com/api';
+const API_BASE = 'https://finance-backend-zlt4.onrender.com/api';
 
 class ApiService {
   private token: string | null = null;
