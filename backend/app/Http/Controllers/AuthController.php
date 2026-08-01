@@ -20,8 +20,8 @@ class AuthController extends Controller
             foreach ($parts as $part) {
                 $kv = explode('=', $part, 2);
                 if (count($kv) === 2) {
-                    $key = rawurldecode($kv[0]);
-                    $val = rawurldecode($kv[1]);
+                    $key = urldecode($kv[0]);
+                    $val = urldecode($kv[1]);
                     if ($key === 'hash') {
                         $hash = $val;
                     } else {
@@ -43,7 +43,27 @@ class AuthController extends Controller
             $secretKey = hash_hmac('sha256', $botToken, 'WebAppData', true);
             $expectedHash = hash_hmac('sha256', $checkString, $secretKey);
             
-            return hash_equals($expectedHash, $hash);
+            if (hash_equals($expectedHash, $hash)) {
+                return true;
+            }
+
+            // Try raw values check if urldecode failed
+            $paramsRaw = [];
+            foreach ($parts as $part) {
+                $kv = explode('=', $part, 2);
+                if (count($kv) === 2 && $kv[0] !== 'hash') {
+                    $paramsRaw[urldecode($kv[0])] = $kv[1];
+                }
+            }
+            ksort($paramsRaw);
+            $checkStringRawArr = [];
+            foreach ($paramsRaw as $key => $val) {
+                $checkStringRawArr[] = "$key=$val";
+            }
+            $checkStringRaw = implode("\n", $checkStringRawArr);
+            $expectedHashRaw = hash_hmac('sha256', $checkStringRaw, $secretKey);
+            
+            return hash_equals($expectedHashRaw, $hash);
         } catch (\Throwable $e) {
             return false;
         }
