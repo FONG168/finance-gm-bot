@@ -349,8 +349,12 @@ class AuthController extends Controller
 
     public function getCategories()
     {
-        $categories = \App\Models\Category::orderBy('name', 'asc')->get();
-        return response()->json(['success' => true, 'data' => $categories]);
+        try {
+            $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+            return response()->json(['success' => true, 'data' => $categories]);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()], 500);
+        }
     }
 
     public function storeCategory(Request $request)
