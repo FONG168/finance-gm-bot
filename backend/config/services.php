@@ -39,4 +39,8 @@ return [
         'bot_token' => env('BOT_TOKEN', '8007954105:AAFBg5tpbWVni70U0AmCUjeLYG13oc1jgjw'),
     ],
 
+    'jwt' => [
+        'secret' => env('JWT_SECRET', 'finance_gm_super_secret_key_2024_prod'),
+    ],
+
 ];

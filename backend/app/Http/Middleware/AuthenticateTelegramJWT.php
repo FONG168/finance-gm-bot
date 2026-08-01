@@ -25,7 +25,7 @@ class AuthenticateTelegramJWT
         }
 
         $token = substr($authHeader, 7);
-        $jwtSecret = env('JWT_SECRET');
+        $jwtSecret = config('services.jwt.secret') ?: env('JWT_SECRET', 'finance_gm_super_secret_key_2024_prod');
 
         if (!$jwtSecret) {
             return response()->json(['success' => false, 'error' => 'JWT Secret not configured'], 500);
