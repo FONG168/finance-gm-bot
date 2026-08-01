@@ -158,8 +158,6 @@ return new class extends Migration
             $table->dateTime('last_login_at')->nullable();
             $table->string('created_by_id', 30)->nullable();
             $table->timestamps();
-
-            $table->foreign('created_by_id')->references('id')->on('admin_users');
         });
 
         // 9. Audit Logs table
