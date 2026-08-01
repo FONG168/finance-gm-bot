@@ -3,7 +3,7 @@
 import '@/lib/i18n';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, RefreshCw, TrendingUp, TrendingDown, X, AlertCircle, CheckCircle, Clock, Globe, Eye, EyeOff, ArrowUpRight, PiggyBank } from 'lucide-react';
+import { Bell, RefreshCw, TrendingUp, TrendingDown, X, AlertCircle, CheckCircle, Clock, Globe, Eye, EyeOff, ArrowUpRight, PiggyBank, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { CategoryPieChart } from '@/components/charts/CategoryPieChart';
 import { IncomeExpenseChart } from '@/components/charts/IncomeExpenseChart';
@@ -18,6 +18,17 @@ import { SubscriptionExpiredModal } from '@/components/subscription/Subscription
 import { useLanguage } from '@/providers/I18nProvider';
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n';
 import { useToast } from '@/providers/ToastProvider';
+
+const MONTH_NAMES_FULL: Record<string, string[]> = {
+  en: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+  km: ['មករា','កុម្ភៈ','មីនា','មេសា','ឧសភា','មិថុនា','កក្កដា','សីហា','កញ្ញា','តុលា','វិច្ឆិកា','ធ្នូ'],
+  zh: ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
+};
+
+function formatMonthTitle(month: number, year: number, lang: string) {
+  const names = MONTH_NAMES_FULL[lang] ?? MONTH_NAMES_FULL.en;
+  return `${names[month - 1]} ${year}`;
+}
 
 function PlanBadge({ plan, status, premiumExpiresAt, onExpiredClick }: { plan?: string; status?: string; premiumExpiresAt?: string | null; onExpiredClick?: () => void }) {
   const isPremiumExpired = plan === 'PREMIUM' && premiumExpiresAt && new Date(premiumExpiresAt) < new Date();
@@ -378,12 +389,55 @@ export default function DashboardPage() {
     return t('greeting.evening');
   };
 
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+
+  const handleMonthPrev = async () => {
+    let newM = selectedMonth - 1;
+    let newY = selectedYear;
+    if (newM < 1) {
+      newM = 12;
+      newY -= 1;
+    }
+    setSelectedMonth(newM);
+    setSelectedYear(newY);
+    try {
+      const m = await apiService.analytics.monthly(newM, newY);
+      setMonthly(m);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleMonthNext = async () => {
+    const now = new Date();
+    const currentM = now.getMonth() + 1;
+    const currentY = now.getFullYear();
+    if (selectedYear > currentY || (selectedYear === currentY && selectedMonth >= currentM)) {
+      return;
+    }
+    let newM = selectedMonth + 1;
+    let newY = selectedYear;
+    if (newM > 12) {
+      newM = 1;
+      newY += 1;
+    }
+    setSelectedMonth(newM);
+    setSelectedYear(newY);
+    try {
+      const m = await apiService.analytics.monthly(newM, newY);
+      setMonthly(m);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const loadData = async (isInitial = false) => {
     if (isInitial && !weekly) setIsLoading(true);
     try {
       const [w, m, r] = await Promise.all([
         apiService.analytics.weekly(),
-        apiService.analytics.monthly(),
+        apiService.analytics.monthly(selectedMonth, selectedYear),
         apiService.transactions.list({ limit: 10 }),
       ]);
       setWeekly(w);
@@ -619,53 +673,90 @@ export default function DashboardPage() {
           </motion.div>
         )}
 
-        {/* Income / Expenses stat cards (off-white, sit below the hero) */}
-        {weekly && !isLoading && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            className="grid grid-cols-2 gap-2.5"
-          >
-            <a
-              href="/transactions?type=income"
-              className="bg-secondary rounded-3xl p-4 flex flex-col gap-3 shadow-sm active:scale-[0.98] transition-transform"
+        {/* Monthly Selector & Income/Expenses stat cards */}
+        {!isLoading && (
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between bg-secondary/80 rounded-2xl px-3.5 py-2 border border-border/40">
+              <button
+                onClick={handleMonthPrev}
+                className="w-7 h-7 rounded-xl bg-card border border-border flex items-center justify-center text-foreground font-bold active:scale-90 transition-transform shadow-xs"
+                title="Previous Month"
+              >
+                <ChevronLeft className="w-4 h-4 text-foreground" />
+              </button>
+
+              <div className="flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5 text-violet-500" />
+                <span className="text-xs font-extrabold tracking-tight text-foreground">
+                  {formatMonthTitle(selectedMonth, selectedYear, language)}
+                </span>
+                {selectedMonth === new Date().getMonth() + 1 && selectedYear === new Date().getFullYear() && (
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-600">
+                    Current
+                  </span>
+                )}
+              </div>
+
+              <button
+                onClick={handleMonthNext}
+                disabled={selectedMonth === new Date().getMonth() + 1 && selectedYear === new Date().getFullYear()}
+                className={`w-7 h-7 rounded-xl bg-card border border-border flex items-center justify-center font-bold transition-transform shadow-xs ${
+                  selectedMonth === new Date().getMonth() + 1 && selectedYear === new Date().getFullYear()
+                    ? 'opacity-30 cursor-not-allowed'
+                    : 'text-foreground active:scale-90'
+                }`}
+                title="Next Month"
+              >
+                <ChevronRight className="w-4 h-4 text-foreground" />
+              </button>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="grid grid-cols-2 gap-2.5"
             >
-              <div className="flex items-center justify-between">
-                <span className="w-10 h-10 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-                  <TrendingUp className="w-4.5 h-4.5 text-emerald-600" />
-                </span>
-                <span className="w-8 h-8 rounded-full bg-card flex items-center justify-center flex-shrink-0">
-                  <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
-                </span>
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground font-semibold">{t('home.income')}</p>
-                <p className="font-rounded text-lg font-extrabold tabular-nums text-foreground truncate">
-                  {hideBalance ? '••••' : `+${formatCurrency(weekly.totalIncome)}`}
-                </p>
-              </div>
-            </a>
-            <a
-              href="/transactions?type=expense"
-              className="bg-secondary rounded-3xl p-4 flex flex-col gap-3 shadow-sm active:scale-[0.98] transition-transform"
-            >
-              <div className="flex items-center justify-between">
-                <span className="w-10 h-10 rounded-full bg-rose-500/15 flex items-center justify-center flex-shrink-0">
-                  <TrendingDown className="w-4.5 h-4.5 text-rose-600" />
-                </span>
-                <span className="w-8 h-8 rounded-full bg-card flex items-center justify-center flex-shrink-0">
-                  <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
-                </span>
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground font-semibold">{t('home.spent')}</p>
-                <p className="font-rounded text-lg font-extrabold tabular-nums text-foreground truncate">
-                  {hideBalance ? '••••' : `-${formatCurrency(weekly.totalExpenses)}`}
-                </p>
-              </div>
-            </a>
-          </motion.div>
+              <a
+                href={`/transactions?type=income`}
+                className="bg-secondary rounded-3xl p-4 flex flex-col gap-3 shadow-sm active:scale-[0.98] transition-transform"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="w-10 h-10 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-4.5 h-4.5 text-emerald-600" />
+                  </span>
+                  <span className="w-8 h-8 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                    <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground font-semibold">{t('home.income')}</p>
+                  <p className="font-rounded text-lg font-extrabold tabular-nums text-foreground truncate">
+                    {hideBalance ? '••••' : `+${formatCurrency(monthly?.totalIncome ?? 0)}`}
+                  </p>
+                </div>
+              </a>
+              <a
+                href={`/transactions?type=expense`}
+                className="bg-secondary rounded-3xl p-4 flex flex-col gap-3 shadow-sm active:scale-[0.98] transition-transform"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="w-10 h-10 rounded-full bg-rose-500/15 flex items-center justify-center flex-shrink-0">
+                    <TrendingDown className="w-4.5 h-4.5 text-rose-600" />
+                  </span>
+                  <span className="w-8 h-8 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                    <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground font-semibold">{t('home.spent')}</p>
+                  <p className="font-rounded text-lg font-extrabold tabular-nums text-foreground truncate">
+                    {hideBalance ? '••••' : `-${formatCurrency(monthly?.totalExpenses ?? 0)}`}
+                  </p>
+                </div>
+              </a>
+            </motion.div>
+          </div>
         )}
 
         {/* Quick Action Buttons (Revolut / Fintech Style) */}
