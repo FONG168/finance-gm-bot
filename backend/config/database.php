@@ -1,3 +1,8 @@
+<?php
+
+use Illuminate\Support\Str;
+use Pdo\Mysql;
+
 $dbUrl = env('DATABASE_URL') ?: env('DB_URL');
 $dbConn = env('DB_CONNECTION');
 if (!$dbConn && $dbUrl) {
