@@ -12,31 +12,34 @@ class RestoreUserDataSeeder extends Seeder
         $userId = 'M7YU9ktVW2S0DtE4Bgzt3TLE';
         $telegramId = 8341172708;
 
-        // Restore User
-        DB::table('users')->updateOrInsert(
-            ['telegram_id' => $telegramId],
-            [
-                'id' => $userId,
-                'first_name' => 'Peaky',
-                'last_name' => 'Blinder',
-                'username' => 'god_of_wealthy',
-                'photo_url' => 'https://t.me/i/userpic/320/95plM3pE2MW_V2ubHWDSri2xXoSTxwd-g5ww-o-u5OGAGQ0hHmNi5pz3hC-bKf7W.svg',
-                'currency' => 'USD',
-                'timezone' => 'UTC',
-                'preferred_language' => 'en',
-                'is_active' => true,
-                'plan' => 'PREMIUM',
-                'subscription_status' => 'ACTIVE',
-                'trial_ends_at' => '2026-08-07 14:06:26',
-                'premium_started_at' => '2026-07-25 05:55:53',
-                'premium_expires_at' => '2026-08-24 05:55:53',
-                'created_at' => '2026-07-24 07:06:26',
-                'updated_at' => '2026-07-31 23:03:11'
-            ]
-        );
+        // Wipe old/dummy accounts and transactions for this telegram_id
+        $existingUsers = DB::table('users')->where('telegram_id', $telegramId)->pluck('id');
+        if ($existingUsers->count() > 0) {
+            DB::table('transactions')->whereIn('user_id', $existingUsers)->delete();
+            DB::table('accounts')->whereIn('user_id', $existingUsers)->delete();
+            DB::table('users')->where('telegram_id', $telegramId)->delete();
+        }
 
-        // Delete default zero-balance accounts if created
-        DB::table('accounts')->where('user_id', $userId)->delete();
+        // Restore User
+        DB::table('users')->insert([
+            'id' => $userId,
+            'telegram_id' => $telegramId,
+            'first_name' => 'Peaky',
+            'last_name' => 'Blinder',
+            'username' => 'god_of_wealthy',
+            'photo_url' => 'https://t.me/i/userpic/320/95plM3pE2MW_V2ubHWDSri2xXoSTxwd-g5ww-o-u5OGAGQ0hHmNi5pz3hC-bKf7W.svg',
+            'currency' => 'USD',
+            'timezone' => 'UTC',
+            'preferred_language' => 'en',
+            'is_active' => true,
+            'plan' => 'PREMIUM',
+            'subscription_status' => 'ACTIVE',
+            'trial_ends_at' => '2026-08-07 14:06:26',
+            'premium_started_at' => '2026-07-25 05:55:53',
+            'premium_expires_at' => '2026-08-24 05:55:53',
+            'created_at' => '2026-07-24 07:06:26',
+            'updated_at' => '2026-07-31 23:03:11'
+        ]);
 
         // Restore Accounts
         $accounts = [
@@ -109,7 +112,7 @@ class RestoreUserDataSeeder extends Seeder
         ];
 
         foreach ($transactions as $tx) {
-            DB::table('transactions')->updateOrInsert(['id' => $tx['id']], $tx);
+            DB::table('transactions')->insert($tx);
         }
     }
 }
