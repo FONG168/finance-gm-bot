@@ -15,6 +15,27 @@ Route::get('/health', function () {
     return response()->json(['status' => 'ok', 'timestamp' => now()->toIso8601String()]);
 });
 
+Route::get('/test-db', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'CategorySeeder', '--force' => true]);
+        $count = \App\Models\Category::count();
+        return response()->json([
+            'success' => true, 
+            'categories_count' => $count, 
+            'default_db' => config('database.default'),
+            'database_url_set' => !empty(env('DATABASE_URL'))
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'success' => false, 
+            'error' => $e->getMessage(), 
+            'file' => $e->getFile(), 
+            'line' => $e->getLine()
+        ], 500);
+    }
+});
+
 // Public categories and QR Codes
 Route::get('/categories', [AuthController::class, 'getCategories']);
 Route::get('/qr-codes', [PaymentController::class, 'getActiveQRCodes']);
