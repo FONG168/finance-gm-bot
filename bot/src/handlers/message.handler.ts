@@ -47,8 +47,6 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
 
     const account = accounts.find((a: any) => a.isDefault) ?? accounts[0];
 
-
-
     const category = await prisma.category.findUnique({ where: { name: parsed.category } });
     const categoryId = category?.id || 'other';
 

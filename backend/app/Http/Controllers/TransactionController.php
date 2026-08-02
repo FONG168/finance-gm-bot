@@ -135,7 +135,6 @@ class TransactionController extends Controller
             $accountId = $account->id;
         }
 
-        // Balance delta calculation (expenses allow negative account balances)
         $balanceDelta = $type === 'income' ? $amount : -$amount;
 
         $transaction = DB::transaction(function () use ($user, $accountId, $amount, $type, $categoryId, $note, $date, $balanceDelta) {
