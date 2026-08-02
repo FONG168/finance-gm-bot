@@ -10,7 +10,18 @@ import { startSubscriptionReminderScheduler } from './scheduler/subscription-rem
 import { prisma } from './lib/prisma';
 import { t, resolveLang } from './i18n';
 
+import http from 'http';
+
 const bot = new Telegraf(process.env.BOT_TOKEN!);
+
+// Lightweight HTTP server for Render Web Service health checks
+const port = process.env.PORT || 8080;
+http.createServer((_, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('OK');
+}).listen(port, () => {
+  console.log(`✅ Health check server listening on port ${port}`);
+});
 
 // Session middleware
 bot.use(session());
