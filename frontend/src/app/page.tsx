@@ -843,8 +843,8 @@ export default function DashboardPage() {
           </motion.div>
         )}
 
-        {/* This Week + Savings Rate */}
-        {weekly && !isLoading && (
+        {/* Monthly Net & Savings Rate */}
+        {monthly && !isLoading && (
           <div className="blob-wrap !bg-secondary grid grid-cols-2 divide-x divide-border/60 overflow-hidden">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -854,25 +854,22 @@ export default function DashboardPage() {
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${weekly.netBalance >= 0 ? 'bg-emerald-500/15' : 'bg-rose-500/15'}`}>
-                    {weekly.netBalance >= 0 ? (
+                  <span className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${monthly.netBalance >= 0 ? 'bg-emerald-500/15' : 'bg-rose-500/15'}`}>
+                    {monthly.netBalance >= 0 ? (
                       <TrendingUp className="w-4.5 h-4.5 text-emerald-600" />
                     ) : (
                       <TrendingDown className="w-4.5 h-4.5 text-rose-600" />
                     )}
                   </span>
-                  <span className="text-xs font-semibold leading-tight">{t('home.netThisWeek')}</span>
+                  <span className="text-xs font-semibold leading-tight">Net Monthly</span>
                 </div>
                 <span className="w-9 h-9 rounded-full bg-card flex items-center justify-center flex-shrink-0">
                   <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
                 </span>
               </div>
               <div>
-                <p className={`font-rounded text-lg sm:text-xl font-extrabold tabular-nums truncate ${weekly.netBalance >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                  {weekly.netBalance >= 0 ? '+' : '-'}{formatCurrency(Math.abs(weekly.netBalance))}
-                </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {weekly.transactionCount} {t('home.transactions')}
+                <p className={`font-rounded text-lg sm:text-xl font-extrabold tabular-nums truncate ${monthly.netBalance >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {monthly.netBalance >= 0 ? '+' : '-'}{formatCurrency(Math.abs(monthly.netBalance))}
                 </p>
               </div>
             </motion.div>
@@ -895,11 +892,11 @@ export default function DashboardPage() {
                 </span>
               </div>
               <div>
-                <p className="font-rounded text-lg sm:text-xl font-extrabold tabular-nums text-foreground">{weekly.savingsRate}%</p>
+                <p className="font-rounded text-lg sm:text-xl font-extrabold tabular-nums text-foreground">{monthly.savingsRate}%</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {weekly.savingsRate >= 20
+                  {monthly.savingsRate >= 20
                     ? t('home.excellent')
-                    : weekly.savingsRate >= 0
+                    : monthly.savingsRate >= 0
                     ? t('home.keepGoing')
                     : t('home.overspending')}
                 </p>
@@ -908,16 +905,21 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Spending by Category */}
-        {weekly && !isLoading && weekly.categoryBreakdown.length > 0 && (
+        {/* Spending by Category (Monthly) */}
+        {monthly && !isLoading && monthly.categoryBreakdown.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="rounded-3xl glass-card p-5"
           >
-            <h2 className="text-sm font-bold mb-4 gradient-text">{t('home.spendingByCategory')}</h2>
-            <CategoryPieChart data={weekly.categoryBreakdown} />
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-bold gradient-text">{t('home.spendingByCategory')}</h2>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-600">
+                {formatMonthTitle(selectedMonth, selectedYear, language)}
+              </span>
+            </div>
+            <CategoryPieChart data={monthly.categoryBreakdown} />
           </motion.div>
         )}
 
