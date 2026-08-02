@@ -135,6 +135,7 @@ class TransactionController extends Controller
             $accountId = $account->id;
         }
 
+        // Allow transaction recording regardless of account balance
         $balanceDelta = $type === 'income' ? $amount : -$amount;
 
         $transaction = DB::transaction(function () use ($user, $accountId, $amount, $type, $categoryId, $note, $date, $balanceDelta) {

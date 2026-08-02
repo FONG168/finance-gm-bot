@@ -20,7 +20,7 @@ class RestoreUserDataSeeder extends Seeder
             DB::table('users')->where('telegram_id', $telegramId)->delete();
         }
 
-        // Restore User with Lifetime status
+        // Restore User
         DB::table('users')->insert([
             'id' => $userId,
             'telegram_id' => $telegramId,
@@ -32,11 +32,11 @@ class RestoreUserDataSeeder extends Seeder
             'timezone' => 'UTC',
             'preferred_language' => 'en',
             'is_active' => true,
-            'plan' => 'LIFETIME',
+            'plan' => 'PREMIUM',
             'subscription_status' => 'ACTIVE',
-            'trial_ends_at' => null,
+            'trial_ends_at' => '2026-08-07 14:06:26',
             'premium_started_at' => '2026-07-25 05:55:53',
-            'premium_expires_at' => '2099-12-31 23:59:59',
+            'premium_expires_at' => '2026-08-24 05:55:53',
             'created_at' => '2026-07-24 07:06:26',
             'updated_at' => '2026-07-31 23:03:11'
         ]);
@@ -44,10 +44,10 @@ class RestoreUserDataSeeder extends Seeder
         // Restore Accounts
         $accounts = [
             ['id' => '700872A2ulDtEuTDJIPt8fdf', 'user_id' => $userId, 'name' => 'GEM Wallet', 'type' => 'ewallet', 'balance' => 28.46, 'currency' => 'USD', 'color' => '#10b981', 'icon' => '📱', 'is_archived' => 0, 'is_default' => 0, 'is_frozen' => 0, 'created_at' => '2026-07-24 07:58:02', 'updated_at' => '2026-07-31 23:04:37'],
-            ['id' => '9igZsJ1ENKh4tQANJZy0Seff', 'user_id' => $userId, 'name' => 'ABA', 'type' => 'bank', 'balance' => 4509.21, 'currency' => 'USD', 'color' => '#3b82f6', 'icon' => '🏦', 'is_archived' => 0, 'is_default' => 0, 'is_frozen' => 0, 'created_at' => '2026-07-24 08:04:38', 'updated_at' => '2026-07-31 23:15:33'],
+            ['id' => '9igZsJ1ENKh4tQANJZy0Seff', 'user_id' => $userId, 'name' => 'ABA', 'type' => 'bank', 'balance' => 4509.21, 'currency' => 'USD', 'color' => '#3b82f6', 'icon' => '🏦', 'is_archived' => 0, 'is_default' => 1, 'is_frozen' => 0, 'created_at' => '2026-07-24 08:04:38', 'updated_at' => '2026-07-31 23:15:33'],
             ['id' => 'bLYKdGDMNS4AeKviQRugTmKN', 'user_id' => $userId, 'name' => 'OKX', 'type' => 'ewallet', 'balance' => 12.82, 'currency' => 'USD', 'color' => '#8b5cf6', 'icon' => '📱', 'is_archived' => 0, 'is_default' => 0, 'is_frozen' => 0, 'created_at' => '2026-07-28 20:55:18', 'updated_at' => '2026-07-31 23:08:45'],
             ['id' => 'GroKzcuGEJO3bmLz7HKEXYzU', 'user_id' => $userId, 'name' => 'C Wallet', 'type' => 'ewallet', 'balance' => 0.00, 'currency' => 'USD', 'color' => '#8b5cf6', 'icon' => '🪙', 'is_archived' => 0, 'is_default' => 0, 'is_frozen' => 0, 'created_at' => '2026-07-28 20:06:14', 'updated_at' => '2026-07-31 23:06:09'],
-            ['id' => 'n2rmSzq2Y0YuCi5NjajCPp0v', 'user_id' => $userId, 'name' => 'Cash on Hand', 'type' => 'cash', 'balance' => 32.26, 'currency' => 'USD', 'color' => '#10b981', 'icon' => '💵', 'is_archived' => 0, 'is_default' => 1, 'is_frozen' => 0, 'created_at' => '2026-07-24 07:06:26', 'updated_at' => '2026-07-31 23:18:28']
+            ['id' => 'n2rmSzq2Y0YuCi5NjajCPp0v', 'user_id' => $userId, 'name' => 'Cash on Hand', 'type' => 'cash', 'balance' => 32.26, 'currency' => 'USD', 'color' => '#10b981', 'icon' => '💵', 'is_archived' => 0, 'is_default' => 0, 'is_frozen' => 0, 'created_at' => '2026-07-24 07:06:26', 'updated_at' => '2026-07-31 23:18:28']
         ];
 
         foreach ($accounts as $acc) {
