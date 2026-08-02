@@ -135,14 +135,7 @@ class TransactionController extends Controller
             $accountId = $account->id;
         }
 
-        // Insufficient funds check for expenses
-        if ($type === 'expense' && (float) $account->balance < $amount) {
-            return response()->json([
-                'success' => false,
-                'error' => "Insufficient funds. {$account->name} balance: $" . number_format((float) $account->balance, 2) . ", required: $" . number_format($amount, 2),
-            ], 400);
-        }
-
+        // Balance delta calculation (expenses allow negative account balances)
         $balanceDelta = $type === 'income' ? $amount : -$amount;
 
         $transaction = DB::transaction(function () use ($user, $accountId, $amount, $type, $categoryId, $note, $date, $balanceDelta) {

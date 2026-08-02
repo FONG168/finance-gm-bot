@@ -20,7 +20,7 @@ class RestoreUserDataSeeder extends Seeder
             DB::table('users')->where('telegram_id', $telegramId)->delete();
         }
 
-        // Restore User
+        // Restore User with Lifetime status
         DB::table('users')->insert([
             'id' => $userId,
             'telegram_id' => $telegramId,
@@ -32,11 +32,11 @@ class RestoreUserDataSeeder extends Seeder
             'timezone' => 'UTC',
             'preferred_language' => 'en',
             'is_active' => true,
-            'plan' => 'PREMIUM',
+            'plan' => 'LIFETIME',
             'subscription_status' => 'ACTIVE',
-            'trial_ends_at' => '2026-08-07 14:06:26',
+            'trial_ends_at' => null,
             'premium_started_at' => '2026-07-25 05:55:53',
-            'premium_expires_at' => '2026-08-24 05:55:53',
+            'premium_expires_at' => '2099-12-31 23:59:59',
             'created_at' => '2026-07-24 07:06:26',
             'updated_at' => '2026-07-31 23:03:11'
         ]);

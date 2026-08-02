@@ -47,21 +47,7 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
 
     const account = accounts.find((a: any) => a.isDefault) ?? accounts[0];
 
-    if (parsed.type === 'expense') {
-      const balance = Number(account.balance);
-      if (balance < parsed.amount) {
-        await ctx.reply(
-          tr.insufficientFunds(
-            account.name,
-            balance.toFixed(2),
-            parsed.amount.toFixed(2),
-            (parsed.amount - balance).toFixed(2),
-          ),
-          { parse_mode: 'Markdown' },
-        );
-        return;
-      }
-    }
+
 
     const category = await prisma.category.findUnique({ where: { name: parsed.category } });
     const categoryId = category?.id || 'other';
