@@ -209,7 +209,7 @@ function MonthDetailSheet({
 
       autoTable(doc, {
         startY: y,
-        head: [['Date', 'Time', 'Description', 'Category', 'Type', 'Amount']],
+        head: [['Date', 'Time', 'Account', 'Description', 'Category', 'Type', 'Amount']],
         body: allTx.map(tx => {
           const isIn = tx.type === 'income' || (tx.type === 'transfer' && (tx.note?.startsWith('Transfer from') ?? false));
           const isTransfer = tx.type === 'transfer';
@@ -217,6 +217,7 @@ function MonthDetailSheet({
           return [
             fmtDatePdf(tx.date),
             fmtTimePdf(tx.date),
+            tx.account?.name || 'Cash on Hand',
             tx.note || '—',
             tx.category?.label || (isTransfer ? 'Transfer' : '—'),
             tx.type.charAt(0).toUpperCase() + tx.type.slice(1),

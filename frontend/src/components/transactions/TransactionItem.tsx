@@ -40,9 +40,17 @@ export function TransactionItem({ transaction, onEdit, onDelete, onClick, index 
         <p className="font-semibold text-sm truncate">
           {transaction.note || catLabel || 'Transaction'}
         </p>
-        <p className="text-xs text-muted-foreground">
-          {catLabel} · {formatRelativeDate(transaction.date)}, {formatTime(transaction.date)}
-        </p>
+        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+          {transaction.account && (
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-secondary border border-border/60 text-foreground flex items-center gap-1">
+              <span>{transaction.account.icon || '💳'}</span>
+              <span>{transaction.account.name}</span>
+            </span>
+          )}
+          <span className="text-xs text-muted-foreground">
+            {catLabel} · {formatRelativeDate(transaction.date)}, {formatTime(transaction.date)}
+          </span>
+        </div>
       </div>
 
       {/* Amount */}
