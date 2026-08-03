@@ -12,16 +12,8 @@ class RestoreUserDataSeeder extends Seeder
         $userId = 'M7YU9ktVW2S0DtE4Bgzt3TLE';
         $telegramId = 8341172708;
 
-        // Wipe old/dummy accounts and transactions for this telegram_id
-        $existingUsers = DB::table('users')->where('telegram_id', $telegramId)->pluck('id');
-        if ($existingUsers->count() > 0) {
-            DB::table('transactions')->whereIn('user_id', $existingUsers)->delete();
-            DB::table('accounts')->whereIn('user_id', $existingUsers)->delete();
-            DB::table('users')->where('telegram_id', $telegramId)->delete();
-        }
-
-        // Restore User
-        DB::table('users')->insert([
+        // Only seed initial user record if not present
+        DB::table('users')->insertOrIgnore([
             'id' => $userId,
             'telegram_id' => $telegramId,
             'first_name' => 'Peaky',
@@ -51,7 +43,7 @@ class RestoreUserDataSeeder extends Seeder
         ];
 
         foreach ($accounts as $acc) {
-            DB::table('accounts')->insert($acc);
+            DB::table('accounts')->insertOrIgnore($acc);
         }
 
         // Restore Transactions
@@ -112,7 +104,7 @@ class RestoreUserDataSeeder extends Seeder
         ];
 
         foreach ($transactions as $tx) {
-            DB::table('transactions')->insert($tx);
+            DB::table('transactions')->insertOrIgnore($tx);
         }
     }
 }

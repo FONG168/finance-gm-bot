@@ -19,7 +19,6 @@ Route::get('/test-db', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
         \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'CategorySeeder', '--force' => true]);
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'RestoreUserDataSeeder', '--force' => true]);
         $count = \App\Models\Category::count();
         $accounts = \App\Models\Account::where('user_id', 'M7YU9ktVW2S0DtE4Bgzt3TLE')->get();
         return response()->json([

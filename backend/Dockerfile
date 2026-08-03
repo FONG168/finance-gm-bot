@@ -22,7 +22,8 @@ RUN composer install --no-dev --optimize-autoloader
 # Expose port
 EXPOSE 8080
 
-# Start Laravel server after running migrations and restoring user data
-CMD php artisan migrate --force && php artisan db:seed --class=CategorySeeder --force && php artisan db:seed --class=RestoreUserDataSeeder --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+# Start Laravel server after running migrations and seeding categories
+CMD php artisan migrate --force && php artisan db:seed --class=CategorySeeder --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+
 
 
