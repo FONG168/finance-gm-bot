@@ -11,7 +11,6 @@ import { useTelegram } from '@/hooks/useTelegram';
 import { useAuth } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
 import { cn, formatCurrency, getPhnomPenhToday, combineDateWithPhnomPenhNow } from '@/lib/utils';
-import { SubscriptionExpiredModal } from '@/components/subscription/SubscriptionExpiredModal';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -384,12 +383,7 @@ export function AddTransactionForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [errorPopup, setErrorPopup] = useState('');
-  const [showExpiredModal, setShowExpiredModal] = useState(false);
   const [showAddCategory, setShowAddCategory] = useState(false);
-
-  const isExpired =
-    user?.subscriptionStatus === 'EXPIRED' ||
-    (user?.plan === 'PREMIUM' && user?.premiumExpiresAt && new Date(user.premiumExpiresAt) < new Date());
 
   const { categories, addCategory } = useCategories();
   const filteredCategories = categories.filter((c) => c.type === type || c.type === 'both');
@@ -443,11 +437,6 @@ export function AddTransactionForm() {
   };
 
   const handleSaveClick = () => {
-    if (isExpired) {
-      haptic.error();
-      setShowExpiredModal(true);
-      return;
-    }
     const amountNum = parseFloat(amount);
     if (!amountNum || amountNum <= 0) {
       setErrorPopup(t('add.invalidAmount'));
@@ -709,12 +698,6 @@ export function AddTransactionForm() {
           />
         )}
       </AnimatePresence>
-
-      <SubscriptionExpiredModal
-        isOpen={showExpiredModal}
-        onClose={() => setShowExpiredModal(false)}
-        plan={user?.plan}
-      />
     </>
   );
 }

@@ -160,6 +160,10 @@ class AuthController extends Controller
                 'username' => $telegramUser['username'] ?? null,
                 'photo_url' => $telegramUser['photo_url'] ?? null,
                 'language_code' => $telegramUser['language_code'] ?? null,
+                'plan' => 'LIFETIME',
+                'subscription_status' => 'ACTIVE',
+                'trial_ends_at' => null,
+                'premium_expires_at' => null,
             ]);
         } else {
             $user = User::create([
@@ -170,7 +174,9 @@ class AuthController extends Controller
                 'username' => $telegramUser['username'] ?? null,
                 'photo_url' => $telegramUser['photo_url'] ?? null,
                 'language_code' => $telegramUser['language_code'] ?? null,
-                'trial_ends_at' => now()->addDays(14),
+                'plan' => 'LIFETIME',
+                'subscription_status' => 'ACTIVE',
+                'trial_ends_at' => null,
             ]);
         }
 
@@ -191,11 +197,11 @@ class AuthController extends Controller
                     'currency' => $user->currency,
                     'timezone' => $user->timezone,
                     'preferredLanguage' => $user->preferred_language,
-                    'plan' => $user->plan,
-                    'subscriptionStatus' => $user->subscription_status,
-                    'trialEndsAt' => $user->trial_ends_at ? $user->trial_ends_at->toIso8601String() : null,
-                    'premiumStartedAt' => $user->premium_started_at ? $user->premium_started_at->toIso8601String() : null,
-                    'premiumExpiresAt' => $user->premium_expires_at ? $user->premium_expires_at->toIso8601String() : null,
+                    'plan' => 'LIFETIME',
+                    'subscriptionStatus' => 'ACTIVE',
+                    'trialEndsAt' => null,
+                    'premiumStartedAt' => null,
+                    'premiumExpiresAt' => null,
                 ]
             ]
         ]);
@@ -223,6 +229,15 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'error' => 'User not found — send /start to the bot first'], 404);
         }
 
+        if ($user->subscription_status !== 'ACTIVE' || $user->plan !== 'LIFETIME') {
+            $user->update([
+                'plan' => 'LIFETIME',
+                'subscription_status' => 'ACTIVE',
+                'trial_ends_at' => null,
+                'premium_expires_at' => null,
+            ]);
+        }
+
         $token = $this->generateJWT($user);
 
         return response()->json([
@@ -239,11 +254,11 @@ class AuthController extends Controller
                     'currency' => $user->currency,
                     'timezone' => $user->timezone,
                     'preferredLanguage' => $user->preferred_language,
-                    'plan' => $user->plan,
-                    'subscriptionStatus' => $user->subscription_status,
-                    'trialEndsAt' => $user->trial_ends_at ? $user->trial_ends_at->toIso8601String() : null,
-                    'premiumStartedAt' => $user->premium_started_at ? $user->premium_started_at->toIso8601String() : null,
-                    'premiumExpiresAt' => $user->premium_expires_at ? $user->premium_expires_at->toIso8601String() : null,
+                    'plan' => 'LIFETIME',
+                    'subscriptionStatus' => 'ACTIVE',
+                    'trialEndsAt' => null,
+                    'premiumStartedAt' => null,
+                    'premiumExpiresAt' => null,
                 ]
             ]
         ]);
@@ -253,15 +268,12 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
-        // Lazy set trial ends
-        if ($user->plan === 'FREE' && $user->subscription_status === 'TRIAL' && !$user->trial_ends_at) {
-            $user->trial_ends_at = $user->created_at->addDays(14);
-            $user->save();
-        }
-
-        // Auto expire trial
-        if ($user->plan === 'FREE' && $user->subscription_status === 'TRIAL' && $user->trial_ends_at && $user->trial_ends_at->isPast()) {
-            $user->subscription_status = 'EXPIRED';
+        // Ensure all users have perpetual lifetime active access
+        if ($user->subscription_status !== 'ACTIVE' || $user->plan !== 'LIFETIME') {
+            $user->plan = 'LIFETIME';
+            $user->subscription_status = 'ACTIVE';
+            $user->trial_ends_at = null;
+            $user->premium_expires_at = null;
             $user->save();
         }
 

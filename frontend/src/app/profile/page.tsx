@@ -3,13 +3,12 @@
 import '@/lib/i18n';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, Shield, ChevronRight, X, Send, Crown, Zap } from 'lucide-react';
+import { Settings, Shield, ChevronRight, X, Send } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTelegram } from '@/hooks/useTelegram';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
-import { PaymentQRSheet } from '@/components/subscription/PaymentQRSheet';
 
 const SUPPORT_USERNAME = 'smart_money_management_admin';
 const SUPPORT_URL = `https://t.me/${SUPPORT_USERNAME}`;
@@ -133,7 +132,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const { t } = useTranslation('common');
   const [showSupport, setShowSupport] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -240,85 +238,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Upgrade / Renewal card */}
-        {(() => {
-          const status = user?.subscriptionStatus;
-          const plan = user?.plan;
-          const trialEnd = user?.trialEndsAt ? new Date(user.trialEndsAt) : null;
-          const premiumEnd = user?.premiumExpiresAt ? new Date(user.premiumExpiresAt) : null;
-          const now2 = new Date();
-
-          const isTrial = status === 'TRIAL';
-          const isExpired = status === 'EXPIRED';
-          const isPremiumExpiringSoon = plan === 'PREMIUM' && status === 'ACTIVE' && premiumEnd && (premiumEnd.getTime() - now2.getTime()) < 14 * 86_400_000;
-          const isLifetime = plan === 'LIFETIME';
-
-          if (isLifetime || (!isTrial && !isExpired && !isPremiumExpiringSoon)) return null;
-
-          const trialDaysLeft = trialEnd ? Math.max(0, Math.floor((trialEnd.getTime() - now2.getTime()) / 86_400_000)) : null;
-          const premiumDaysLeft = premiumEnd ? Math.max(0, Math.floor((premiumEnd.getTime() - now2.getTime()) / 86_400_000)) : null;
-
-          const accentColor = isExpired ? '#ef4444' : '#7c3aed';
-          const bgGrad = isExpired
-            ? 'linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%)'
-            : 'linear-gradient(135deg, #1e1b4b 0%, #3b1278 60%, #4c1d95 100%)';
-
-          return (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="relative overflow-hidden rounded-2xl p-4"
-              style={{ background: bgGrad }}
-            >
-              {/* Decorative circle */}
-              <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full opacity-10 bg-white" />
-
-              <div className="relative z-10 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: `${accentColor}30`, border: `1px solid ${accentColor}50` }}>
-                  {isExpired ? <Zap className="w-5 h-5" style={{ color: accentColor }} /> : <Crown className="w-5 h-5 text-yellow-300" />}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  {isExpired && (
-                    <>
-                      <p className="text-sm font-bold text-white">{t('subscription.expired')}</p>
-                      <p className="text-xs text-red-300">{t('subscription.renewToKeep')}</p>
-                    </>
-                  )}
-                  {isTrial && trialDaysLeft !== null && (
-                    <>
-                      <p className="text-sm font-bold text-white">
-                        {trialDaysLeft === 0
-                          ? t('subscription.trialEndsToday')
-                          : t('subscription.daysLeftTrial', { count: trialDaysLeft })}
-                      </p>
-                      <p className="text-xs text-indigo-300">{t('subscription.upgradeAnytime')}</p>
-                    </>
-                  )}
-                  {isPremiumExpiringSoon && premiumDaysLeft !== null && (
-                    <>
-                      <p className="text-sm font-bold text-white">
-                        {t('subscription.premiumExpiresIn', { count: premiumDaysLeft })}
-                      </p>
-                      <p className="text-xs text-indigo-300">{t('subscription.renewToAvoid')}</p>
-                    </>
-                  )}
-                </div>
-
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowPayment(true)}
-                  className="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold text-white"
-                  style={{ background: isExpired ? '#ef4444' : 'rgba(124,58,237,0.9)', border: `1px solid ${isExpired ? '#f87171' : '#a78bfa'}40` }}
-                >
-                  {isExpired ? t('subscription.renew') : t('subscription.upgrade')}
-                </motion.button>
-              </div>
-            </motion.div>
-          );
-        })()}
-
         {/* Menu items */}
         <div className="rounded-2xl bg-secondary shadow-sm overflow-hidden divide-y divide-border/50">
           {MENU_ITEMS.map((item) => {
@@ -366,9 +285,6 @@ export default function ProfilePage() {
 
       {/* Support modal */}
       {showSupport && <SupportModal onClose={() => setShowSupport(false)} />}
-
-      {/* Payment / upgrade sheet */}
-      <PaymentQRSheet isOpen={showPayment} onClose={() => setShowPayment(false)} />
     </div>
   );
 }

@@ -14,7 +14,6 @@ import { apiService } from '@/services/api';
 import { WeeklySummary, MonthlySummary, Transaction, AccountSummary } from '@shared/types';
 import { formatCurrency } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
-import { SubscriptionExpiredModal } from '@/components/subscription/SubscriptionExpiredModal';
 import { useLanguage } from '@/providers/I18nProvider';
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n';
 import { useToast } from '@/providers/ToastProvider';
@@ -30,43 +29,9 @@ function formatMonthTitle(month: number, year: number, lang: string) {
   return `${names[month - 1]} ${year}`;
 }
 
-function PlanBadge({ plan, status, premiumExpiresAt, onExpiredClick }: { plan?: string; status?: string; premiumExpiresAt?: string | null; onExpiredClick?: () => void }) {
-  const isPremiumExpired = plan === 'PREMIUM' && premiumExpiresAt && new Date(premiumExpiresAt) < new Date();
-  const isExpired = status === 'EXPIRED' || isPremiumExpired;
-
-  if (isExpired) {
-    return (
-      <button
-        onClick={onExpiredClick}
-        className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-600 tracking-wide active:scale-95 transition-transform"
-      >
-        EXPIRED
-      </button>
-    );
-  }
-  if (plan === 'LIFETIME') {
-    return (
-      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-700 tracking-wide">
-        ∞ LIFETIME
-      </span>
-    );
-  }
-  if (plan === 'PREMIUM') {
-    return (
-      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-700 tracking-wide">
-        PRO
-      </span>
-    );
-  }
-  if (status === 'TRIAL') {
-    return (
-      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-700 tracking-wide">
-        TRIAL
-      </span>
-    );
-  }
+function PlanBadge({ plan }: { plan?: string; status?: string; premiumExpiresAt?: string | null; onExpiredClick?: () => void }) {
   return (
-    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-zinc-500/20 text-zinc-600 tracking-wide">
+    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 tracking-wide">
       FREE
     </span>
   );
@@ -159,7 +124,7 @@ interface PaymentRecord {
 
 interface Notification {
   id: string;
-  type: 'plan_expired' | 'premium_expired' | 'premium_expiring' | 'payment_pending' | 'payment_approved';
+  type: 'payment_pending' | 'payment_approved';
   daysLeft?: number;
   paymentId?: string;
   createdAt?: string;
@@ -169,22 +134,15 @@ function NotificationsPanel({
   isOpen,
   onClose,
   notifications,
-  onUpgrade,
 }: {
   isOpen: boolean;
   onClose: () => void;
   notifications: Notification[];
-  onUpgrade: () => void;
 }) {
   const { t } = useTranslation('common');
 
   const getIcon = (type: Notification['type']) => {
     switch (type) {
-      case 'plan_expired':
-      case 'premium_expired':
-        return <AlertCircle className="w-5 h-5 text-rose-600" />;
-      case 'premium_expiring':
-        return <Clock className="w-5 h-5 text-amber-600" />;
       case 'payment_pending':
         return <Clock className="w-5 h-5 text-violet-600" />;
       case 'payment_approved':
@@ -194,11 +152,6 @@ function NotificationsPanel({
 
   const getBg = (type: Notification['type']) => {
     switch (type) {
-      case 'plan_expired':
-      case 'premium_expired':
-        return 'bg-rose-500/10 border-rose-500/20';
-      case 'premium_expiring':
-        return 'bg-amber-500/10 border-amber-500/20';
       case 'payment_pending':
         return 'bg-violet-500/10 border-violet-500/20';
       case 'payment_approved':
@@ -208,9 +161,6 @@ function NotificationsPanel({
 
   const getTitle = (n: Notification) => {
     switch (n.type) {
-      case 'plan_expired': return t('notifications.planExpired');
-      case 'premium_expired': return t('notifications.premiumExpired');
-      case 'premium_expiring': return t('notifications.premiumExpiringSoon');
       case 'payment_pending': return t('notifications.paymentPending');
       case 'payment_approved': return t('notifications.paymentApproved');
     }
@@ -218,16 +168,10 @@ function NotificationsPanel({
 
   const getDesc = (n: Notification) => {
     switch (n.type) {
-      case 'plan_expired': return t('notifications.planExpiredDesc');
-      case 'premium_expired': return t('notifications.premiumExpiredDesc');
-      case 'premium_expiring': return t('notifications.premiumExpiringSoonDesc', { days: n.daysLeft ?? 0 });
       case 'payment_pending': return t('notifications.paymentPendingDesc');
       case 'payment_approved': return t('notifications.paymentApprovedDesc');
     }
   };
-
-  const isUpgradeType = (type: Notification['type']) =>
-    type === 'plan_expired' || type === 'premium_expired' || type === 'premium_expiring';
 
   return (
     <AnimatePresence>
@@ -284,19 +228,12 @@ function NotificationsPanel({
                     <div
                       key={n.id}
                       className={`rounded-2xl border p-4 ${getBg(n.type)}`}
-                      onClick={() => {
-                        if (isUpgradeType(n.type)) { onClose(); onUpgrade(); }
-                      }}
-                      style={{ cursor: isUpgradeType(n.type) ? 'pointer' : 'default' }}
                     >
                       <div className="flex items-start gap-3">
                         <div className="flex-shrink-0 mt-0.5">{getIcon(n.type)}</div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-bold">{getTitle(n)}</p>
                           <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{getDesc(n)}</p>
-                          {isUpgradeType(n.type) && (
-                            <p className="text-xs text-violet-700 font-semibold mt-2">{t('notifications.tapToUpgrade')}</p>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -323,7 +260,6 @@ export default function DashboardPage() {
   const [accountSummary, setAccountSummary] = useState<AccountSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLanguage, setShowLanguage] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<PaymentRecord[]>([]);
@@ -351,23 +287,6 @@ export default function DashboardPage() {
 
   const notifications: Notification[] = (() => {
     const list: Notification[] = [];
-    if (user) {
-      const isPremiumExpired =
-        user.plan === 'PREMIUM' && user.premiumExpiresAt && new Date(user.premiumExpiresAt) < new Date();
-      const isPlanExpired = user.subscriptionStatus === 'EXPIRED';
-
-      if (isPremiumExpired) {
-        list.push({ id: 'premium_expired', type: 'premium_expired' });
-      } else if (isPlanExpired) {
-        list.push({ id: 'plan_expired', type: 'plan_expired' });
-      } else if (user.plan === 'PREMIUM' && user.premiumExpiresAt) {
-        const msLeft = new Date(user.premiumExpiresAt).getTime() - Date.now();
-        const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
-        if (daysLeft <= 7 && daysLeft > 0) {
-          list.push({ id: 'premium_expiring', type: 'premium_expiring', daysLeft });
-        }
-      }
-    }
     for (const p of paymentHistory) {
       if (p.status === 'PENDING') {
         list.push({ id: `payment_pending_${p.id}`, type: 'payment_pending', paymentId: p.id, createdAt: p.createdAt });
@@ -544,7 +463,7 @@ export default function DashboardPage() {
               <p className="text-xs text-muted-foreground">{getGreeting()},</p>
               <div className="flex items-center gap-2">
                 <p className="text-base font-bold">{user?.firstName || 'there'}</p>
-                {user && <PlanBadge plan={user.plan} status={user.subscriptionStatus} premiumExpiresAt={user.premiumExpiresAt} onExpiredClick={() => setShowUpgradeModal(true)} />}
+                {user && <PlanBadge plan={user.plan} />}
               </div>
             </div>
           </div>
@@ -971,17 +890,10 @@ export default function DashboardPage() {
 
       <BottomNav />
 
-      <SubscriptionExpiredModal
-        isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        plan={user?.plan}
-      />
-
       <NotificationsPanel
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
         notifications={notifications}
-        onUpgrade={() => { setShowNotifications(false); setShowUpgradeModal(true); }}
       />
 
       <LanguageSheet
