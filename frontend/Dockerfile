@@ -2,10 +2,10 @@
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY frontend/package*.json ./
 RUN npm install
 
-COPY . .
+COPY frontend/ .
 
 ENV NEXT_TELEMETRY_DISABLED 1
 RUN npm run build
