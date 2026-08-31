@@ -1,14 +1,15 @@
-/** @type {import('next').NextConfig} */
+const backendUrl = process.env.BACKEND_INTERNAL_URL || 'https://kh-finance-api.zeabur.app';
+
 const nextConfig = {
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: process.env.BACKEND_INTERNAL_URL || 'http://127.0.0.1:3001/api/:path*',
+        destination: `${backendUrl}/api/:path*`,
       },
       {
         source: '/uploads/:path*',
-        destination: 'http://127.0.0.1:3001/uploads/:path*',
+        destination: `${backendUrl}/uploads/:path*`,
       },
     ];
   },
